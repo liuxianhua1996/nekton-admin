@@ -1,10 +1,12 @@
 package com.jing.admin.config;
 
+import com.jing.admin.model.dto.UserDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil {
@@ -61,8 +64,13 @@ public class JwtTokenUtil {
     }
 
     // 生成token
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDTO userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("username", userDetails.getUsername());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        claims.put("iat", new Date());
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
@@ -78,7 +86,7 @@ public class JwtTokenUtil {
     }
 
     // 验证token
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    public Boolean validateToken(String token, UserDTO userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
@@ -89,8 +97,5 @@ public class JwtTokenUtil {
         String base64Key = Base64.getEncoder().encodeToString(key.getEncoded());
         System.out.println("安全的JWT密钥 (Base64): " + base64Key);
         System.out.println("密钥长度: " + base64Key.length() + " 字符");
-
-        // 将这个密钥复制到 application.properties 中
-        // jwt.secret=你的base64密钥
     }
 }
