@@ -1,9 +1,12 @@
 package com.jing.admin.service;
 
 import com.jing.admin.config.JwtTokenUtil;
-import com.jing.admin.model.Role;
-import com.jing.admin.model.User;
+import com.jing.admin.model.domain.Role;
+import com.jing.admin.model.domain.User;
+import com.jing.admin.model.dto.UserDTO;
+import com.jing.admin.model.mapping.UserMapping;
 import com.jing.admin.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class AuthService {
 
     @Autowired
@@ -43,14 +47,12 @@ public class AuthService {
                     new UsernamePasswordAuthenticationToken(username, password)
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            String token = jwtTokenUtil.generateToken(userDetails);
-            
             User user = userRepository.findByUsername(username).orElse(null);
-            
+            UserDTO userDTO = UserMapping.INSTANCE.toDTO(user);
+            String token = jwtTokenUtil.generateToken(userDTO);
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
-            response.put("user", user);
+            response.put("user", userDTO);
             
             return response;
         } catch (BadCredentialsException e) {

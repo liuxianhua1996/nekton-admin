@@ -1,4 +1,4 @@
-package com.jing.admin.model;
+package com.jing.admin.model.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -7,7 +7,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
@@ -37,7 +36,7 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+                .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toList());
     }
 

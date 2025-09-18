@@ -1,6 +1,6 @@
 package com.jing.admin.repository;
 
-import com.jing.admin.model.User;
+import com.jing.admin.model.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

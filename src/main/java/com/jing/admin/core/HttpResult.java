@@ -1,4 +1,4 @@
-package com.jing.admin.common;
+package com.jing.admin.core;
 
 import lombok.Data;
 

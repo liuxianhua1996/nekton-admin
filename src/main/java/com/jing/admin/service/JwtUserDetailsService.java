@@ -1,6 +1,8 @@
 package com.jing.admin.service;
 
-import com.jing.admin.model.User;
+import com.jing.admin.model.domain.User;
+import com.jing.admin.model.dto.UserDTO;
+import com.jing.admin.model.mapping.UserMapping;
 import com.jing.admin.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

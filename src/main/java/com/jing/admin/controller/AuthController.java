@@ -1,19 +1,27 @@
 package com.jing.admin.controller;
 
-import com.jing.admin.common.HttpResult;
-import com.jing.admin.model.Role;
-import com.jing.admin.model.User;
+import com.jing.admin.config.JwtTokenUtil;
+import com.jing.admin.config.LoginUserUtil;
+import com.jing.admin.core.HttpResult;
+import com.jing.admin.model.domain.Role;
+import com.jing.admin.model.domain.User;
+import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,6 +29,8 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private LoginUserUtil loginUserUtil;
 
     @PostMapping("/login")
     public HttpResult<Map<String, Object>> login(@RequestBody Map<String, String> loginRequest) {
@@ -55,13 +65,9 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        
-        return authService.findByUsername(username)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public HttpResult getCurrentUser(HttpServletRequest request) {
+        String jwtToken = request.getHeader("Authorization").substring(7);
+        return HttpResult.success(loginUserUtil.getLoginUser(jwtToken));
     }
 
     @PostMapping("/add-role")
