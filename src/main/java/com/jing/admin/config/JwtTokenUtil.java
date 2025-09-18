@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,5 +81,16 @@ public class JwtTokenUtil {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+    public static void main(String[] args) {
+        // 生成安全的HS512密钥
+        SecretKey key = Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS512);
+
+        String base64Key = Base64.getEncoder().encodeToString(key.getEncoded());
+        System.out.println("安全的JWT密钥 (Base64): " + base64Key);
+        System.out.println("密钥长度: " + base64Key.length() + " 字符");
+
+        // 将这个密钥复制到 application.properties 中
+        // jwt.secret=你的base64密钥
     }
 }

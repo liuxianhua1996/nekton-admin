@@ -1,5 +1,6 @@
 package com.jing.admin.controller;
 
+import com.jing.admin.common.HttpResult;
 import com.jing.admin.model.Role;
 import com.jing.admin.model.User;
 import com.jing.admin.service.AuthService;
@@ -22,22 +23,22 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
+    public HttpResult<Map<String, Object>> login(@RequestBody Map<String, String> loginRequest) {
         String username = loginRequest.get("username");
         String password = loginRequest.get("password");
         
         Map<String, Object> response = authService.authenticate(username, password);
-        return ResponseEntity.ok(response);
+        return HttpResult.success(response);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> registerRequest) {
+    public HttpResult<User> register(@RequestBody Map<String, String> registerRequest) {
         String username = registerRequest.get("username");
         String password = registerRequest.get("password");
         String email = registerRequest.get("email");
         
         User user = authService.register(username, password, email);
-        return ResponseEntity.ok(user);
+        return HttpResult.success(user);
     }
 
     @PostMapping("/register-with-role")

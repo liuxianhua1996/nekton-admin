@@ -42,9 +42,7 @@ public class AuthService {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
-            
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             String token = jwtTokenUtil.generateToken(userDetails);
             

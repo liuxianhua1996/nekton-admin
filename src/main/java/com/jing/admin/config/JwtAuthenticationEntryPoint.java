@@ -1,6 +1,7 @@
 package com.jing.admin.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jing.admin.common.HttpResult;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,14 +22,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        
-        Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        body.put("error", "Unauthorized");
-        body.put("message", "认证失败，请登录后再试");
-        body.put("path", request.getServletPath());
-        
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getOutputStream(), body);
+        mapper.writeValue(response.getOutputStream(),  HttpResult.fail("Unauthorized","认证失败，请登录后再试"));
     }
 }
