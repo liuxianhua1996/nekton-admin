@@ -1,6 +1,7 @@
 package com.jing.admin.config;
 
 import com.jing.admin.core.constant.Role;
+import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,10 +18,10 @@ import java.util.stream.Collectors;
 public class LoginUserUtil {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-    public UserDTO getLoginUser(String token){
-        UserDTO user = new UserDTO();
+    public LoginUser getLoginUser(String token){
+        LoginUser user = new LoginUser();
         user.setUsername(jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("username", String.class)));
-        user.setId(jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("id", Long.class)));
+        user.setId(jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("id", String.class)));
         Collection<String> roleNames = jwtTokenUtil.getClaimFromToken(token, cl -> (Collection<String>) cl.get("roles"));
         List<Role> roles = roleNames.stream()
                 .map(Role::fromName) // 使用你定义的 Role.fromName(String) 方法

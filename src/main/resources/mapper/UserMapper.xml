@@ -18,16 +18,16 @@
     <!-- 查询用户及其角色 -->
     <select id="selectUserWithRoles" parameterType="long" resultMap="UserResultMap">
         SELECT u.*, ur.role
-        FROM users u
-        LEFT JOIN user_roles ur ON u.id = ur.user_id
+        FROM tb_users u
+        LEFT JOIN tb_user_roles ur ON u.id = ur.user_id
         WHERE u.id = #{id}
     </select>
 
     <!-- 根据用户名查询用户及其角色 -->
     <select id="selectUserWithRolesByUsername" parameterType="string" resultMap="UserResultMap">
         SELECT u.*, ur.role
-        FROM users u
-        LEFT JOIN user_roles ur ON u.id = ur.user_id
+        FROM tb_users u
+        LEFT JOIN tb_user_roles ur ON u.id = ur.user_id
         WHERE u.username = #{username}
     </select>
 

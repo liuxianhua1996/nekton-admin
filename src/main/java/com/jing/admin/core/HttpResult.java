@@ -1,6 +1,7 @@
 package com.jing.admin.core;
 
 import lombok.Data;
+import org.slf4j.MDC;
 
 import java.io.Serializable;
 
@@ -24,20 +25,20 @@ public class HttpResult<T> implements Serializable {
         this.success = true;
         this.error = "";
         this.message = "";
-        this.traceId = "";
+        this.traceId =MDC.get(ThreadMdcUtils.getTraceId());
     }
     HttpResult(T data,String error,String message){
         this.data= data;
         this.success = false;
         this.error = error;
         this.message = message;
-        this.traceId = "";
+        this.traceId = MDC.get(ThreadMdcUtils.getTraceId());
     }
     HttpResult(String error,String message){
         this.success = false;
         this.error = error;
         this.message = message;
-        this.traceId = "";
+        this.traceId = MDC.get(ThreadMdcUtils.getTraceId());
     }
 
     public static <T> HttpResult<T> success(T data){

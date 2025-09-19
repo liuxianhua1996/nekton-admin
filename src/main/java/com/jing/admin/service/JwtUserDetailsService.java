@@ -1,6 +1,7 @@
 package com.jing.admin.service;
 
 import com.jing.admin.model.domain.User;
+import com.jing.admin.model.mapping.UserMapping;
 import com.jing.admin.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,6 @@ public class JwtUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + username));
-        return user;
+        return UserMapping.INSTANCE.toLoginUser(user);
     }
 }

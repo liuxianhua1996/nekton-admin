@@ -14,27 +14,15 @@ import java.util.stream.Collectors;
  * @date 2025/9/18
  **/
 @Data
-public class UserDTO implements UserDetails {
-    private Long id;
+public class UserDTO {
+    private String id;
 
     private String username;
 
 
     private String email;
 
-    private boolean enabled = true;
+    private int enabled;
 
     private Collection<Role> roles;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.name()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public String getPassword() {
-        return null;
-    }
 }

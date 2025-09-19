@@ -1,5 +1,6 @@
 package com.jing.admin.config;
 
+import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.service.JwtUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -65,7 +66,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
             // 验证token
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDTO user = loginUserUtil.getLoginUser(jwtToken);
+                LoginUser user = loginUserUtil.getLoginUser(jwtToken);
                 if (jwtTokenUtil.validateToken(jwtToken, user)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(

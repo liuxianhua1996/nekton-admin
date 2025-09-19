@@ -20,7 +20,7 @@ public interface UserMapper extends BaseMapper<User> {
      * @param username 用户名
      * @return 用户对象
      */
-    @Select("SELECT * FROM users WHERE username = #{username}")
+    @Select("SELECT * FROM tb_users WHERE username = #{username}")
     Optional<User> findByUsername(String username);
     
     /**
@@ -28,7 +28,7 @@ public interface UserMapper extends BaseMapper<User> {
      * @param email 邮箱
      * @return 用户对象
      */
-    @Select("SELECT * FROM users WHERE email = #{email}")
+    @Select("SELECT * FROM tb_users WHERE email = #{email}")
     Optional<User> findByEmail(String email);
     
     /**
@@ -36,7 +36,7 @@ public interface UserMapper extends BaseMapper<User> {
      * @param username 用户名
      * @return 是否存在
      */
-    @Select("SELECT COUNT(*) > 0 FROM users WHERE username = #{username}")
+    @Select("SELECT COUNT(*) > 0 FROM tb_users WHERE username = #{username}")
     boolean existsByUsername(String username);
     
     /**
@@ -44,7 +44,7 @@ public interface UserMapper extends BaseMapper<User> {
      * @param email 邮箱
      * @return 是否存在
      */
-    @Select("SELECT COUNT(*) > 0 FROM users WHERE email = #{email}")
+    @Select("SELECT COUNT(*) > 0 FROM tb_users WHERE email = #{email}")
     boolean existsByEmail(String email);
     
     /**
@@ -52,7 +52,7 @@ public interface UserMapper extends BaseMapper<User> {
      * @param id 用户ID
      * @return 用户对象
      */
-    User selectUserWithRoles(Long id);
+    User selectUserWithRoles(String id);
     
     /**
      * 根据用户名查询用户及其角色

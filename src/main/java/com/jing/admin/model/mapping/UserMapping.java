@@ -1,5 +1,6 @@
 package com.jing.admin.model.mapping;
 
+import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.domain.User;
 import com.jing.admin.model.dto.UserDTO;
 import org.mapstruct.Mapper;
@@ -25,12 +26,7 @@ public interface UserMapping {
      * @param user 用户实体
      * @return 用户DTO
      */
-    @Mapping(target = "roles", source = "roles")
-    @Mapping(target = "authorities", ignore = true)
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "accountNonExpired", ignore = true)
-    @Mapping(target = "accountNonLocked", ignore = true)
-    @Mapping(target = "credentialsNonExpired", ignore = true)
-    @Mapping(target = "enabled", source = "enabled")
     UserDTO toDTO(User user);
+
+    LoginUser toLoginUser(User user);
 }

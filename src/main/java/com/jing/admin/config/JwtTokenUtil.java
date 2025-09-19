@@ -1,5 +1,6 @@
 package com.jing.admin.config;
 
+import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.dto.UserDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -64,7 +65,7 @@ public class JwtTokenUtil {
     }
 
     // 生成token
-    public String generateToken(UserDTO userDetails) {
+    public String generateToken(LoginUser userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("username", userDetails.getUsername());
         claims.put("roles", userDetails.getAuthorities().stream()
@@ -86,7 +87,7 @@ public class JwtTokenUtil {
     }
 
     // 验证token
-    public Boolean validateToken(String token, UserDTO userDetails) {
+    public Boolean validateToken(String token, LoginUser userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }

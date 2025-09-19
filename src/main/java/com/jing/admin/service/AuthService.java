@@ -2,6 +2,7 @@ package com.jing.admin.service;
 
 import com.jing.admin.config.JwtTokenUtil;
 import com.jing.admin.core.constant.Role;
+import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.domain.User;
 import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.model.mapping.UserMapping;
@@ -44,11 +45,11 @@ public class AuthService {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = userRepository.findByUsername(username).orElse(null);
-            UserDTO userDTO = UserMapping.INSTANCE.toDTO(user);
-            String token = jwtTokenUtil.generateToken(userDTO);
+            LoginUser loginUser = UserMapping.INSTANCE.toLoginUser(user);
+            String token = jwtTokenUtil.generateToken(loginUser);
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
-            response.put("user", userDTO);
+            response.put("user", UserMapping.INSTANCE.toDTO(user));
             
             return response;
         } catch (BadCredentialsException e) {
@@ -74,6 +75,8 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
         user.setRoles(Collections.singleton(role));
+        user.setCreateTime(System.currentTimeMillis());
+        user.setUpdateTime(user.getCreateTime());
         
         return userRepository.save(user);
     }

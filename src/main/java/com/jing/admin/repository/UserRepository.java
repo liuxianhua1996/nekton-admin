@@ -4,7 +4,9 @@ import com.jing.admin.mapper.UserMapper;
 import com.jing.admin.mapper.UserRoleMapper;
 import com.jing.admin.core.constant.Role;
 import com.jing.admin.model.domain.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -13,6 +15,7 @@ import java.util.Optional;
  * 使用MyBatis-Plus的UserMapper进行数据访问
  */
 @Repository
+@Slf4j
 public class UserRepository {
     
     private final UserMapper userMapper;
@@ -38,7 +41,7 @@ public class UserRepository {
     public boolean existsByEmail(String email) {
         return userMapper.existsByEmail(email);
     }
-    
+    @Transactional
     public User save(User user) {
         if (user.getId() == null) {
             // 新增用户
@@ -51,18 +54,19 @@ public class UserRepository {
         // 保存用户角色
         if (user.getRoles() != null && !user.getRoles().isEmpty()) {
             // 先删除原有角色
+            log.info("删除角色: {}",user.getId());
             userRoleMapper.deleteUserRolesByUserId(user.getId());
             
             // 添加新角色
             for (Role role : user.getRoles()) {
-                userRoleMapper.insertUserRole(user.getId(), role.name());
+                userRoleMapper.insertUserRole(user.getId(), role.name(),System.currentTimeMillis());
             }
         }
         
         return user;
     }
     
-    public Optional<User> findById(Long id) {
+    public Optional<User> findById(String id) {
         return Optional.ofNullable(userMapper.selectUserWithRoles(id));
     }
 }
