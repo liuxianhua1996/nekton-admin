@@ -1,4 +1,4 @@
-package com.jing.admin.model.domain;
+package com.jing.admin.core.constant;
 
 /**
  * 角色枚举类，定义系统中所有可用的角色

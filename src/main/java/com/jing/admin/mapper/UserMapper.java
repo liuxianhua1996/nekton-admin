@@ -3,7 +3,6 @@ package com.jing.admin.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jing.admin.model.domain.User;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;

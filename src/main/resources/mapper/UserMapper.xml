@@ -10,7 +10,7 @@
         <result column="email" property="email"/>
         <result column="enabled" property="enabled"/>
         <!-- 角色映射 -->
-        <collection property="roles" ofType="com.jing.admin.model.domain.Role">
+        <collection property="roles" ofType="com.jing.admin.core.constant.Role">
             <result column="role" property="name"/>
         </collection>
     </resultMap>

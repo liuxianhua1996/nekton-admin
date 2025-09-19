@@ -1,7 +1,5 @@
 package com.jing.admin.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jing.admin.model.domain.Role;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

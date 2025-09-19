@@ -1,6 +1,6 @@
 package com.jing.admin.config;
 
-import com.jing.admin.model.domain.Role;
+import com.jing.admin.core.constant.Role;
 import com.jing.admin.model.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

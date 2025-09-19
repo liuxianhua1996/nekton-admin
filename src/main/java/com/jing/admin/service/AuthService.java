@@ -1,7 +1,7 @@
 package com.jing.admin.service;
 
 import com.jing.admin.config.JwtTokenUtil;
-import com.jing.admin.model.domain.Role;
+import com.jing.admin.core.constant.Role;
 import com.jing.admin.model.domain.User;
 import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.model.mapping.UserMapping;

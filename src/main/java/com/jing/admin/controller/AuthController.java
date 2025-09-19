@@ -1,27 +1,19 @@
 package com.jing.admin.controller;
 
-import com.jing.admin.config.JwtTokenUtil;
 import com.jing.admin.config.LoginUserUtil;
 import com.jing.admin.core.HttpResult;
-import com.jing.admin.model.domain.Role;
+import com.jing.admin.core.constant.Role;
 import com.jing.admin.model.domain.User;
-import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")

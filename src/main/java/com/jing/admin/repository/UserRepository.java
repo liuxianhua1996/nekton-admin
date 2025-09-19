@@ -2,13 +2,11 @@ package com.jing.admin.repository;
 
 import com.jing.admin.mapper.UserMapper;
 import com.jing.admin.mapper.UserRoleMapper;
-import com.jing.admin.model.domain.Role;
+import com.jing.admin.core.constant.Role;
 import com.jing.admin.model.domain.User;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * 用户Repository类

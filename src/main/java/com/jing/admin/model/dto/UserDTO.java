@@ -1,13 +1,12 @@
 package com.jing.admin.model.dto;
 
-import com.jing.admin.model.domain.Role;
+import com.jing.admin.core.constant.Role;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
