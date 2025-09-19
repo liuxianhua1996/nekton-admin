@@ -1,5 +1,5 @@
 -- 创建用户表
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS tb_users (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- 创建用户角色关联表
-CREATE TABLE IF NOT EXISTS user_roles (
+CREATE TABLE IF NOT EXISTS tb_user_roles (
     user_id BIGINT REFERENCES users(id),
     role VARCHAR(20),
     PRIMARY KEY (user_id, role)
