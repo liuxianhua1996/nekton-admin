@@ -4,6 +4,7 @@ import com.jing.admin.config.LoginUserUtil;
 import com.jing.admin.core.HttpResult;
 import com.jing.admin.core.constant.Role;
 import com.jing.admin.model.domain.User;
+import com.jing.admin.model.mapping.UserMapping;
 import com.jing.admin.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,7 @@ public class AuthController {
     @GetMapping("/me")
     public HttpResult getCurrentUser(HttpServletRequest request) {
         String jwtToken = request.getHeader("Authorization").substring(7);
-        return HttpResult.success(loginUserUtil.getLoginUser(jwtToken));
+        return HttpResult.success(UserMapping.INSTANCE.toDTO(loginUserUtil.getLoginUser(jwtToken)));
     }
 
     @PostMapping("/add-role")

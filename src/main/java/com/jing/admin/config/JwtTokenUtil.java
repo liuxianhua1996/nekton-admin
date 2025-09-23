@@ -70,6 +70,7 @@ public class JwtTokenUtil {
     // 生成访问token
     public String generateToken(LoginUser userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userDetails.getId());
         claims.put("username", userDetails.getUsername());
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)

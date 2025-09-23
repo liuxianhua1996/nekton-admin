@@ -21,7 +21,7 @@ public class LoginUserUtil {
     public LoginUser getLoginUser(String token){
         LoginUser user = new LoginUser();
         user.setUsername(jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("username", String.class)));
-        user.setId(jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("id", String.class)));
+        user.setId(jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("userId", String.class)));
         Collection<String> roleNames = jwtTokenUtil.getClaimFromToken(token, cl -> (Collection<String>) cl.get("roles"));
         List<Role> roles = roleNames.stream()
                 .map(Role::fromName) // 使用你定义的 Role.fromName(String) 方法
