@@ -33,6 +33,14 @@ public class AuthController {
         return HttpResult.success(response);
     }
 
+    @PostMapping("/refresh")
+    public HttpResult<Map<String, Object>> refreshToken(@RequestBody Map<String, String> refreshRequest) {
+        String refreshToken = refreshRequest.get("refreshToken");
+        
+        Map<String, Object> response = authService.refreshToken(refreshToken);
+        return HttpResult.success(response);
+    }
+
     @PostMapping("/register")
     public HttpResult<User> register(@RequestBody Map<String, String> registerRequest) {
         String username = registerRequest.get("username");

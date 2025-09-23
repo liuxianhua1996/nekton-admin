@@ -46,15 +46,50 @@ public class AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = userRepository.findByUsername(username).orElse(null);
             LoginUser loginUser = UserMapping.INSTANCE.toLoginUser(user);
-            String token = jwtTokenUtil.generateToken(loginUser);
+            String accessToken = jwtTokenUtil.generateToken(loginUser);
+            String refreshToken = jwtTokenUtil.generateRefreshToken(loginUser);
             Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
+            response.put("accessToken", accessToken);
+            response.put("refreshToken", refreshToken);
             response.put("user", UserMapping.INSTANCE.toDTO(user));
             
             return response;
         } catch (BadCredentialsException e) {
             throw new BadCredentialsException("用户名或密码不正确");
         }
+    }
+
+    /**
+     * 刷新访问TOKEN
+     * @param refreshToken 刷新TOKEN
+     * @return 新的访问TOKEN和刷新TOKEN
+     */
+    public Map<String, Object> refreshToken(String refreshToken) {
+        // 验证刷新TOKEN是否有效
+        if (!jwtTokenUtil.validateToken(refreshToken)) {
+            throw new BadCredentialsException("刷新TOKEN无效");
+        }
+
+        // 从刷新TOKEN中获取用户名
+        String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
+        
+        // 获取用户信息
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) {
+            throw new BadCredentialsException("用户不存在");
+        }
+        
+        // 生成新的访问TOKEN和刷新TOKEN
+        LoginUser loginUser = UserMapping.INSTANCE.toLoginUser(user);
+        String newAccessToken = jwtTokenUtil.generateToken(loginUser);
+        String newRefreshToken = jwtTokenUtil.generateRefreshToken(loginUser);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("accessToken", newAccessToken);
+        response.put("refreshToken", newRefreshToken);
+        response.put("user", UserMapping.INSTANCE.toDTO(user));
+        
+        return response;
     }
 
     public User register(String username, String password, String email) {

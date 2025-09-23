@@ -5,5 +5,5 @@ ON CONFLICT (username) DO NOTHING;
 
 -- 插入默认角色
 INSERT INTO tb_user_roles (user_id, role)
-SELECT id, 'ADMIN' FROM users WHERE username = 'admin'
+SELECT id, 'ADMIN' FROM tb_users WHERE username = 'admin'
 ON CONFLICT DO NOTHING;

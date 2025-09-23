@@ -28,6 +28,9 @@ public class JwtTokenUtil {
     @Value("${jwt.expiration}")
     private Long expiration;
 
+    @Value("${jwt.refresh-expiration}")
+    private Long refreshExpiration;
+
     // 生成密钥
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
@@ -64,7 +67,7 @@ public class JwtTokenUtil {
         return expiration.before(new Date());
     }
 
-    // 生成token
+    // 生成访问token
     public String generateToken(LoginUser userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("username", userDetails.getUsername());
@@ -72,24 +75,49 @@ public class JwtTokenUtil {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
         claims.put("iat", new Date());
-        return doGenerateToken(claims, userDetails.getUsername());
+        return doGenerateToken(claims, userDetails.getUsername(), expiration);
+    }
+
+    // 生成刷新token
+    public String generateRefreshToken(LoginUser userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("username", userDetails.getUsername());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        claims.put("iat", new Date());
+        return doGenerateToken(claims, userDetails.getUsername(), refreshExpiration);
     }
 
     // 生成token的具体实现
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
+    private String doGenerateToken(Map<String, Object> claims, String subject, Long expirationTime) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime * 1000))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
+    }
+
+    // 重载原有的doGenerateToken方法以保持向后兼容
+    private String doGenerateToken(Map<String, Object> claims, String subject) {
+        return doGenerateToken(claims, subject, expiration);
     }
 
     // 验证token
     public Boolean validateToken(String token, LoginUser userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    // 验证token是否有效（不检查用户信息）
+    public Boolean validateToken(String token) {
+        try {
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
     public static void main(String[] args) {
         // 生成安全的HS512密钥

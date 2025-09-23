@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS tb_user_roles (
 
 -- 工作流表，存储工作流定义信息
 -- json_data字段使用TEXT类型，仅用于持久化存储JSON数据，不参与查询操作
-CREATE TABLE tb_workflow (
-    id VARCHAR(36) PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS tb_workflow (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     description TEXT,
     json_data TEXT NOT NULL,
