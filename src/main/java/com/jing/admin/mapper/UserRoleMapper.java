@@ -16,7 +16,7 @@ public interface UserRoleMapper {
      * @param userId 用户ID
      * @return 角色列表
      */
-    @Select("SELECT role FROM tb_user_roles WHERE user_id = #{userId}::uuid")
+    @Select("SELECT role FROM tb_user_roles WHERE user_id = #{userId}")
     List<String> selectRolesByUserId(@Param("userId") String userId);
     
     /**
@@ -24,7 +24,7 @@ public interface UserRoleMapper {
      * @param userId 用户ID
      * @param role 角色
      */
-    @Insert("INSERT INTO tb_user_roles (user_id, role,create_time,update_time) VALUES (#{userId}::uuid, #{role}, #{createTime},#{createTime}) ")
+    @Insert("INSERT INTO tb_user_roles (user_id, role,create_time,update_time) VALUES (#{userId}, #{role}, #{createTime},#{createTime}) ")
     void insertUserRole(@Param("userId") String userId, @Param("role") String role,@Param("createTime") long createTime);
     
     /**
@@ -39,6 +39,6 @@ public interface UserRoleMapper {
      * 删除用户的所有角色
      * @param userId 用户ID
      */
-    @Delete("DELETE FROM tb_user_roles WHERE user_id = #{userId}::uuid")
+    @Delete("DELETE FROM tb_user_roles WHERE user_id = #{userId}")
     void deleteUserRolesByUserId(@Param("userId") String userId);
 }

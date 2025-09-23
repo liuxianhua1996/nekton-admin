@@ -58,8 +58,9 @@ public class UserRepository {
             userRoleMapper.deleteUserRolesByUserId(user.getId());
             
             // 添加新角色
+            long currentTime = System.currentTimeMillis();
             for (Role role : user.getRoles()) {
-                userRoleMapper.insertUserRole(user.getId(), role.name(),System.currentTimeMillis());
+                userRoleMapper.insertUserRole(user.getId(), role.name(), currentTime);
             }
         }
         

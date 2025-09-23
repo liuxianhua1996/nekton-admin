@@ -26,7 +26,7 @@ import java.util.UUID;
  * @date 2025/9/18
  **/
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE) // 最高优先级，最先执行
+@Order(Ordered.HIGHEST_PRECEDENCE+10) // 最高优先级，最先执行
 @Slf4j
 public class RequestLoggingFilter extends OncePerRequestFilter {
     @Override
@@ -44,7 +44,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
 
             // 包装Response以记录状态码
             ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
-            chain.doFilter(request, responseWrapper);
+            chain.doFilter(request, response);
 
             long duration = System.currentTimeMillis() - startTime;
             log.info("Request Completed: {} {} - 状态: {} - 耗时: {}ms ←←←",

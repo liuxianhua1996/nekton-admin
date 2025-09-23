@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * @date 2025/9/19
  */
 @RestController
-@RequestMapping("/api/workflow")
+@RequestMapping("/workflow")
 public class WorkflowController {
     
     @Autowired
@@ -32,9 +32,9 @@ public class WorkflowController {
     public HttpResult<Workflow> saveOrUpdateWorkflow(@RequestBody Workflow workflow) {
         try {
             Workflow savedWorkflow = workflowService.saveOrUpdateWorkflow(workflow);
-            return HttpResult.ok(savedWorkflow);
+            return HttpResult.success(savedWorkflow);
         } catch (Exception e) {
-            return HttpResult.error("保存失败: " + e.getMessage());
+            return HttpResult.fail("保存失败: " + e.getMessage());
         }
     }
     
@@ -49,9 +49,9 @@ public class WorkflowController {
             Workflow workflow = WorkflowMapping.toEntity(workflowDTO);
             Workflow savedWorkflow = workflowService.saveOrUpdateWorkflow(workflow);
             WorkflowDTO savedDTO = WorkflowMapping.toDTO(savedWorkflow);
-            return HttpResult.ok(savedDTO);
+            return HttpResult.success(savedDTO);
         } catch (Exception e) {
-            return HttpResult.error("保存失败: " + e.getMessage());
+            return HttpResult.fail("保存失败: " + e.getMessage());
         }
     }
     
@@ -65,12 +65,12 @@ public class WorkflowController {
         try {
             Workflow workflow = workflowService.getWorkflowById(id);
             if (workflow != null) {
-                return HttpResult.ok(workflow);
+                return HttpResult.success(workflow);
             } else {
                 return HttpResult.error("未找到指定工作流");
             }
         } catch (Exception e) {
-            return HttpResult.error("查询失败: " + e.getMessage());
+            return HttpResult.fail("查询失败: " + e.getMessage());
         }
     }
     
@@ -82,9 +82,9 @@ public class WorkflowController {
     public HttpResult<List<Workflow>> getAllWorkflows() {
         try {
             List<Workflow> workflows = workflowService.getAllWorkflows();
-            return HttpResult.ok(workflows);
+            return HttpResult.success(workflows);
         } catch (Exception e) {
-            return HttpResult.error("查询失败: " + e.getMessage());
+            return HttpResult.fail("查询失败: " + e.getMessage());
         }
     }
     
@@ -99,9 +99,9 @@ public class WorkflowController {
             List<WorkflowDTO> dtos = workflows.stream()
                     .map(WorkflowMapping::toDTO)
                     .collect(Collectors.toList());
-            return HttpResult.ok(dtos);
+            return HttpResult.success(dtos);
         } catch (Exception e) {
-            return HttpResult.error("查询失败: " + e.getMessage());
+            return HttpResult.fail("查询失败: " + e.getMessage());
         }
     }
     
@@ -115,7 +115,7 @@ public class WorkflowController {
         try {
             boolean result = workflowService.deleteWorkflow(id);
             if (result) {
-                return HttpResult.ok(true);
+                return HttpResult.success(true);
             } else {
                 return HttpResult.error("删除失败，未找到指定工作流");
             }

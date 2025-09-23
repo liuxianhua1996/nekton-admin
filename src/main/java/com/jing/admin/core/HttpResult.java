@@ -53,5 +53,11 @@ public class HttpResult<T> implements Serializable {
     public static <T> HttpResult<T> fail(String error,String message){
         return new HttpResult(error,message);
     }
+    public static <T> HttpResult<T> fail(String message){
+        return new HttpResult("500",message);
+    }
+    public static <T> HttpResult<T> error(String message){
+        return new HttpResult("500",message);
+    }
 
 }
