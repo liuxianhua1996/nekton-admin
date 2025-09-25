@@ -41,4 +41,11 @@ public interface UserRoleMapper {
      */
     @Delete("DELETE FROM tb_user_roles WHERE user_id = #{userId}")
     void deleteUserRolesByUserId(@Param("userId") String userId);
+    
+    /**
+     * 根据角色ID删除用户角色关联
+     * @param roleId 角色ID
+     */
+    @Delete("DELETE FROM tb_user_roles WHERE role = #{roleId}")
+    void deleteByRoleId(@Param("roleId") String roleId);
 }

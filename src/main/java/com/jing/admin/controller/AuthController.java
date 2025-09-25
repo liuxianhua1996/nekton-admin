@@ -53,7 +53,6 @@ public class AuthController {
     }
 
     @PostMapping("/register-with-role")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> registerWithRole(@RequestBody Map<String, String> registerRequest) {
         String username = registerRequest.get("username");
         String password = registerRequest.get("password");
@@ -72,7 +71,6 @@ public class AuthController {
     }
 
     @PostMapping("/add-role")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addRole(@RequestBody Map<String, String> roleRequest) {
         String username = roleRequest.get("username");
         String roleName = roleRequest.get("role");
@@ -83,7 +81,6 @@ public class AuthController {
     }
 
     @PostMapping("/remove-role")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> removeRole(@RequestBody Map<String, String> roleRequest) {
         String username = roleRequest.get("username");
         String roleName = roleRequest.get("role");

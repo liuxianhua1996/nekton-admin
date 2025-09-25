@@ -41,3 +41,39 @@ CREATE TABLE IF NOT EXISTS tb_workflow (
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 菜单表
+CREATE TABLE IF NOT EXISTS tb_menu (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    code VARCHAR(50) UNIQUE,
+    name VARCHAR(50) NOT NULL,
+    path VARCHAR(255),
+    parent_code VARCHAR(50),
+    sort_order INT DEFAULT 0,
+    create_time BIGINT,
+    update_time BIGINT,
+    create_user_id VARCHAR(255),
+    update_user_id VARCHAR(255)
+);
+
+-- 角色表
+CREATE TABLE IF NOT EXISTS tb_roles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(50) UNIQUE NOT NULL,
+    description TEXT,
+    create_time BIGINT,
+    update_time BIGINT,
+    create_user_id VARCHAR(255),
+    update_user_id VARCHAR(255)
+);
+
+-- 角色菜单关联表
+CREATE TABLE IF NOT EXISTS tb_role_menu (
+    role VARCHAR(20) NOT NULL,
+    menu_id UUID NOT NULL,
+    create_time BIGINT,
+    update_time BIGINT,
+    create_user_id VARCHAR(255),
+    update_user_id VARCHAR(255),
+    PRIMARY KEY (role, menu_id)
+);
