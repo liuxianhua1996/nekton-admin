@@ -1,6 +1,7 @@
 package com.jing.admin.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jing.admin.core.cache.RoleMenuCache;
 import com.jing.admin.mapper.RoleMapper;
 import com.jing.admin.mapper.RoleMenuMapper;
 import com.jing.admin.mapper.UserRoleMapper;
@@ -26,6 +27,9 @@ public class RoleService {
     
     @Autowired
     private UserRoleMapper userRoleMapper;
+    
+    @Autowired
+    private RoleMenuCache roleMenuCache;
     
     /**
      * 创建角色
@@ -70,12 +74,21 @@ public class RoleService {
      */
     @Transactional
     public void deleteRole(String id) {
+        // 先获取角色信息
+        Role role = roleMapper.selectById(id);
+        
         // 删除角色
         roleMapper.deleteById(id);
         // 删除角色菜单关联
         roleMenuMapper.deleteByRole(id);
         // 删除用户角色关联
         userRoleMapper.deleteByRoleId(id);
+        
+        // 更新缓存：清除该角色的缓存
+        if (role != null) {
+            roleMenuCache.setRoleMenus(role.getName(), null);
+            roleMenuCache.setRoleMenuTree(role.getName(), null);
+        }
     }
     
     /**

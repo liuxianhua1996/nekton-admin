@@ -1,9 +1,11 @@
 package com.jing.admin.service;
 
+import com.jing.admin.core.cache.RoleMenuCache;
 import com.jing.admin.core.utils.MenuUtil;
 import com.jing.admin.mapper.MenuMapper;
 import com.jing.admin.mapper.RoleMenuMapper;
 import com.jing.admin.model.domain.Menu;
+import com.jing.admin.model.domain.Role;
 import com.jing.admin.model.domain.RoleMenu;
 import com.jing.admin.model.dto.MenuDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,12 @@ public class MenuService {
     
     @Autowired
     private RoleMenuMapper roleMenuMapper;
+    
+    @Autowired
+    private RoleService roleService;
+    
+    @Autowired
+    private RoleMenuCache roleMenuCache;
 
     
     /**
@@ -40,7 +48,19 @@ public class MenuService {
      * @return 菜单列表
      */
     public List<Menu> getMenusByRole(String role) {
-        return menuMapper.selectByRole(role);
+        // 先从缓存中获取
+        List<Menu> cachedMenus = roleMenuCache.getRoleMenus(role);
+        if (cachedMenus != null) {
+            return cachedMenus;
+        }
+        
+        // 缓存中没有则从数据库获取
+        List<Menu> menus = menuMapper.selectByRole(role);
+        
+        // 将结果存入缓存
+        roleMenuCache.setRoleMenus(role, menus);
+        
+        return menus;
     }
     
     /**
@@ -49,8 +69,20 @@ public class MenuService {
      * @return 菜单树结构
      */
     public List<MenuDTO> getMenuTreeByRole(String role) {
+        // 先从缓存中获取
+        List<MenuDTO> cachedMenuTree = roleMenuCache.getRoleMenuTree(role);
+        if (cachedMenuTree != null) {
+            return cachedMenuTree;
+        }
+        
+        // 缓存中没有则从数据库获取并构建菜单树
         List<Menu> menus = menuMapper.selectByRole(role);
-        return MenuUtil.buildMenuTree(menus);
+        List<MenuDTO> menuTree = MenuUtil.buildMenuTree(menus);
+        
+        // 将结果存入缓存
+        roleMenuCache.setRoleMenuTree(role, menuTree);
+        
+        return menuTree;
     }
     
     /**
@@ -76,6 +108,10 @@ public class MenuService {
             roleMenu.setUpdateUserId("system");
             roleMenuMapper.insert(roleMenu);
         }
+        
+        // 更新缓存：清除该角色的缓存，下次获取时重新加载
+        roleMenuCache.setRoleMenus(role, null);
+        roleMenuCache.setRoleMenuTree(role, null);
     }
     
     /**
@@ -85,5 +121,33 @@ public class MenuService {
      */
     public List<String> getMenuIdsByRole(String role) {
         return roleMenuMapper.selectMenuIdsByRole(role);
+    }
+    
+    /**
+     * 刷新所有角色的菜单缓存
+     * 该方法会在角色或菜单发生变化时调用
+     */
+    public void refreshRoleMenuCache() {
+        // 清空所有缓存
+        roleMenuCache.clearAll();
+        
+        // 重新加载所有角色的菜单缓存
+        List<Role> roles = roleService.getAllRoles();
+        List<Menu> allMenus = menuMapper.selectAll();
+        
+        for (Role role : roles) {
+            // admin角色拥有所有菜单权限
+            if ("ADMIN".equals(role.getName())) {
+                roleMenuCache.setRoleMenus(role.getName(), allMenus);
+                List<MenuDTO> menuTree = MenuUtil.buildMenuTree(allMenus);
+                roleMenuCache.setRoleMenuTree(role.getName(), menuTree);
+            } else {
+                // 其他角色按实际分配的菜单初始化
+                List<Menu> roleMenus = menuMapper.selectByRole(role.getName());
+                roleMenuCache.setRoleMenus(role.getName(), roleMenus);
+                List<MenuDTO> menuTree = MenuUtil.buildMenuTree(roleMenus);
+                roleMenuCache.setRoleMenuTree(role.getName(), menuTree);
+            }
+        }
     }
 }

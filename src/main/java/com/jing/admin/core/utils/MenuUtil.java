@@ -20,7 +20,7 @@ public class MenuUtil {
     public static List<MenuDTO> buildMenuTree(List<Menu> menus) {
         // 获取顶级菜单（没有父级ID的菜单）
         List<Menu> rootMenus = menus.stream()
-                .filter(menu -> menu.getCode() == null || menu.getParentCode().isEmpty())
+                .filter(menu -> menu.getParentCode() == null || menu.getParentCode().isEmpty())
                 .sorted((m1, m2) -> {
                     int order1 = m1.getSortOrder();
                     int order2 = m2.getSortOrder();

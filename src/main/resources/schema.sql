@@ -37,9 +37,10 @@ CREATE TABLE IF NOT EXISTS tb_workflow (
     json_data TEXT NOT NULL,
     version INT DEFAULT 1,
     status VARCHAR(50) DEFAULT '草稿',
-    create_user_id VARCHAR(36),
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    create_time BIGINT,
+    update_time BIGINT,
+    create_user_id VARCHAR(255),
+    update_user_id VARCHAR(255)
 );
 
 -- 菜单表
@@ -50,6 +51,7 @@ CREATE TABLE IF NOT EXISTS tb_menu (
     path VARCHAR(255),
     parent_code VARCHAR(50),
     sort_order INT DEFAULT 0,
+    tenant_id VARCHAR(255),
     create_time BIGINT,
     update_time BIGINT,
     create_user_id VARCHAR(255),
@@ -61,6 +63,7 @@ CREATE TABLE IF NOT EXISTS tb_roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(50) UNIQUE NOT NULL,
     description TEXT,
+    tenant_id VARCHAR(255),
     create_time BIGINT,
     update_time BIGINT,
     create_user_id VARCHAR(255),
@@ -71,6 +74,7 @@ CREATE TABLE IF NOT EXISTS tb_roles (
 CREATE TABLE IF NOT EXISTS tb_role_menu (
     role VARCHAR(20) NOT NULL,
     menu_id UUID NOT NULL,
+    tenant_id VARCHAR(255),
     create_time BIGINT,
     update_time BIGINT,
     create_user_id VARCHAR(255),

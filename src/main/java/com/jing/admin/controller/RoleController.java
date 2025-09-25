@@ -20,13 +20,11 @@ public class RoleController {
      * 创建角色
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public HttpResult<Role> createRole(@RequestBody Role role) {
         // 检查角色名称是否已存在
         if (roleService.existsByName(role.getName())) {
             return HttpResult.error("角色名称已存在");
         }
-        
         Role createdRole = roleService.createRole(role);
         return HttpResult.success(createdRole);
     }
@@ -35,7 +33,6 @@ public class RoleController {
      * 更新角色
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public HttpResult<Role> updateRole(@PathVariable String id, @RequestBody Role role) {
         Role updatedRole = roleService.updateRole(id, role);
         return HttpResult.success(updatedRole);
@@ -45,7 +42,6 @@ public class RoleController {
      * 删除角色
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public HttpResult<Void> deleteRole(@PathVariable String id) {
         roleService.deleteRole(id);
         return HttpResult.success();
@@ -55,7 +51,6 @@ public class RoleController {
      * 获取角色详情
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public HttpResult<Role> getRole(@PathVariable String id) {
         Role role = roleService.getRoleById(id);
         if (role == null) {
@@ -68,7 +63,6 @@ public class RoleController {
      * 获取所有角色
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public HttpResult<List<Role>> getAllRoles() {
         List<Role> roles = roleService.getAllRoles();
         return HttpResult.success(roles);
@@ -78,7 +72,6 @@ public class RoleController {
      * 检查角色名称是否存在
      */
     @GetMapping("/exists/{name}")
-    @PreAuthorize("hasRole('ADMIN')")
     public HttpResult<Boolean> checkRoleExists(@PathVariable String name) {
         boolean exists = roleService.existsByName(name);
         return HttpResult.success(exists);
