@@ -30,13 +30,9 @@ VALUES
 -- 用户管理子菜单
 ('USER_LIST', '用户列表', '/user/list', 'USER_MANAGE', 1,1696032000000, 1696032000000, 'system',
  'system'),
-('USER_DETAIL', '用户详情', '/user/detail', 'USER_MANAGE', 2,1696032000000, 1696032000000, 'system',
- 'system'),
 
 -- 工作流子菜单
 ('WORKFLOW_LIST', '工作流列表', '/workflow/list', 'WORKFLOW', 1,1696032000000, 1696032000000,
- 'system', 'system'),
-('WORKFLOW_DETAIL', '工作流详情', '/workflow/:id','WORKFLOW', 2,1696032000000, 1696032000000,
  'system', 'system'),
 
 -- 权限管理子菜单

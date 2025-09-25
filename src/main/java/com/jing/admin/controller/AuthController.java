@@ -3,9 +3,12 @@ package com.jing.admin.controller;
 import com.jing.admin.config.LoginUserUtil;
 import com.jing.admin.core.HttpResult;
 import com.jing.admin.core.constant.Role;
+import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.domain.User;
+import com.jing.admin.model.dto.MenuDTO;
 import com.jing.admin.model.mapping.UserMapping;
 import com.jing.admin.service.AuthService;
+import com.jing.admin.service.MenuService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,8 @@ public class AuthController {
     private AuthService authService;
     @Autowired
     private LoginUserUtil loginUserUtil;
+    @Autowired
+    private MenuService menuService;
 
     @PostMapping("/login")
     public HttpResult<Map<String, Object>> login(@RequestBody Map<String, String> loginRequest) {
@@ -101,5 +106,23 @@ public class AuthController {
                 .toList();
         
         return ResponseEntity.ok(roles);
+    }
+
+    /**
+     * 获取当前用户的菜单
+     * @param request HTTP请求
+     * @return 菜单树结构
+     */
+    @GetMapping("/menus")
+    public HttpResult<List<MenuDTO>> getCurrentUserMenus(HttpServletRequest request) {
+        try {
+            String jwtToken = request.getHeader("Authorization");
+            LoginUser user = loginUserUtil.getLoginUser(jwtToken);
+            List<MenuDTO> menus = authService.getMenusByUser(user);
+            return HttpResult.success(menus);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return HttpResult.error("获取菜单失败: " + e.getMessage());
+        }
     }
 }

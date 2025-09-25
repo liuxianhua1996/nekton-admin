@@ -46,7 +46,6 @@ public class MenuUtil {
         menuDTO.setCode(menu.getCode());
         menuDTO.setName(menu.getName());
         menuDTO.setPath(menu.getPath());
-        menuDTO.setSortOrder(menu.getSortOrder());
 
         // 查找子菜单
         List<Menu> children = allMenus.stream()

@@ -4,6 +4,7 @@ import com.jing.admin.config.JwtTokenUtil;
 import com.jing.admin.core.constant.Role;
 import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.domain.User;
+import com.jing.admin.model.dto.MenuDTO;
 import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.model.mapping.UserMapping;
 import com.jing.admin.repository.UserRepository;
@@ -17,10 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -37,6 +36,9 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private MenuService menuService;
 
     public Map<String, Object> authenticate(String username, String password) {
         try {
@@ -154,5 +156,27 @@ public class AuthService {
         }
         
         return user;
+    }
+
+    /**
+     * 根据用户角色获取菜单树
+     * @param user 用户
+     * @return 菜单树结构
+     */
+    public List<MenuDTO> getMenusByUser(LoginUser user) {
+        // 获取用户的角色，如果有管理员角色则直接返回所有菜单
+        Collection<Role> roles = user.getRoles();
+        if (roles.contains(Role.ADMIN)) {
+            return menuService.getMenuTreeByRole("ADMIN");
+        }
+        
+        // 如果用户有多个角色，合并所有角色的菜单
+        List<MenuDTO> allMenus = roles.stream()
+                .map(role -> menuService.getMenuTreeByRole(role.name()))
+                .flatMap(List::stream)
+                .distinct()
+                .collect(Collectors.toList());
+        
+        return allMenus;
     }
 }

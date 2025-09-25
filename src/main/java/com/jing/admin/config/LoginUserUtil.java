@@ -19,6 +19,9 @@ public class LoginUserUtil {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     public LoginUser getLoginUser(String token){
+        if(token.startsWith("Bearer ")){
+            token = token.substring(7);
+        }
         LoginUser user = new LoginUser();
         user.setUsername(jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("username", String.class)));
         user.setId(jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("userId", String.class)));
