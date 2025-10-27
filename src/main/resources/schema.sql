@@ -18,15 +18,15 @@ CREATE TABLE IF NOT EXISTS tb_users (
 
 -- 创建用户角色关联表
 CREATE TABLE IF NOT EXISTS tb_user_roles (
-                                             id UUID,
-                                             user_id VARCHAR(120),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id VARCHAR(120),
     role VARCHAR(20),
     tenant_id VARCHAR(255),
     create_time BIGINT,
     update_time BIGINT,
     create_user_id VARCHAR(255),
     update_user_id VARCHAR(255),
-    PRIMARY KEY (user_id, role)
+    UNIQUE  (user_id, role)
     );
 -- 菜单表
 CREATE TABLE IF NOT EXISTS tb_menu (
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS tb_workflow (
     description TEXT,
     json_data TEXT NOT NULL,
     version INT DEFAULT 1,
-    status VARCHAR(50) DEFAULT '草稿',
+    status char(2) NOT NULL,
     create_time BIGINT,
     update_time BIGINT,
     create_user_id VARCHAR(255),

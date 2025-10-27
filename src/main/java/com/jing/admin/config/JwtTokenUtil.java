@@ -40,6 +40,11 @@ public class JwtTokenUtil {
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
+    // 从token中提取用户id
+    public String getUserIdFromToken(String token) {
+        getClaimFromToken(token, Claims::getSubject);
+        return "";
+    }
 
     // 从token中提取过期时间
     public Date getExpirationDateFromToken(String token) {
@@ -82,6 +87,7 @@ public class JwtTokenUtil {
     // 生成刷新token
     public String generateRefreshToken(LoginUser userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userDetails.getId());
         claims.put("username", userDetails.getUsername());
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)

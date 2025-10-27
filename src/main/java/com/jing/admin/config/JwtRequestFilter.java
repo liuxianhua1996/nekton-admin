@@ -48,11 +48,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         final String requestTokenHeader = request.getHeader("Authorization");
         String username = null;
+        String userId = null;
         String jwtToken = null;
         try {
             // 只处理Bearer类型的token
-            if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-                jwtToken = requestTokenHeader.substring(7);
+            if (requestTokenHeader != null) {
+                jwtToken = requestTokenHeader.startsWith("Bearer ") ? requestTokenHeader.substring(7) : requestTokenHeader;
                 try {
                     username = jwtTokenUtil.getUsernameFromToken(jwtToken);
                     MDC.put("username", username);
@@ -67,6 +68,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             // 验证token
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 LoginUser user = loginUserUtil.getLoginUser(jwtToken);
+                MDC.put("userId", user.getId());
                 if (jwtTokenUtil.validateToken(jwtToken, user)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(
