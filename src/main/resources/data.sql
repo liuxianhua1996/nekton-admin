@@ -25,7 +25,8 @@ VALUES
 ('DASHBOARD', '首页', '/dashboard', NULL, 1,1696032000000, 1696032000000, 'system', 'system'),
 ('USER_MANAGE', '用户管理', '/user', NULL, 2,1696032000000, 1696032000000, 'system', 'system'),
 ('WORKFLOW', '工作流', '/workflow', NULL, 3,1696032000000, 1696032000000, 'system', 'system'),
-('PERMISSION', '权限管理', '/permission', NULL, 4, 1696032000000, 1696032000000, 'system', 'system'),
+('LOW_CODE', '低代码', '/lowcode', NULL, 4, 1696032000000, 1696032000000, 'system', 'system'),
+('PERMISSION', '权限管理', '/permission', NULL, 5, 1696032000000, 1696032000000, 'system', 'system'),
 
 -- 用户管理子菜单
 ('USER_LIST', '用户列表', '/user/list', 'USER_MANAGE', 1,1696032000000, 1696032000000, 'system',
@@ -34,7 +35,9 @@ VALUES
 -- 工作流子菜单
 ('WORKFLOW_LIST', '工作流列表', '/workflow/list', 'WORKFLOW', 1,1696032000000, 1696032000000,
  'system', 'system'),
-
+-- 低代码
+('LOW_CODE_LIST', '页面管理', '/lowcode', 'LOW_CODE', 1,1696032000000, 1696032000000,
+ 'system', 'system'),
 -- 权限管理子菜单
 ('ROLE_MANAGE', '角色管理', '/permission/roles','PERMISSION', 1, 1696032000000, 1696032000000,
  'system', 'system'),

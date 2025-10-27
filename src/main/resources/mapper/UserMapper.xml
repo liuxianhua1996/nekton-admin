@@ -19,7 +19,7 @@
     <select id="selectUserWithRoles" parameterType="long" resultMap="UserResultMap">
         SELECT u.*, ur.role
         FROM tb_users u
-        LEFT JOIN tb_user_roles ur ON u.id = ur.user_id
+        LEFT JOIN tb_user_roles ur ON u.id = ur.user_id::uuid
         WHERE u.id = #{id}
     </select>
 
@@ -27,7 +27,7 @@
     <select id="selectUserWithRolesByUsername" parameterType="string" resultMap="UserResultMap">
         SELECT u.*, ur.role
         FROM tb_users u
-        LEFT JOIN tb_user_roles ur ON u.id = ur.user_id
+        LEFT JOIN tb_user_roles ur ON u.id = ur.user_id::uuid
         WHERE u.username = #{username}
     </select>
 
