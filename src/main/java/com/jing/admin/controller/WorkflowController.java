@@ -62,4 +62,14 @@ public class WorkflowController {
     public HttpResult<PageResult<WorkflowDTO>> getWorkflowPage(WorkflowQueryRequest queryRequest) {
         return HttpResult.success(workflowService.getWorkflowPage(queryRequest));
     }
+    /**
+     * 获取工作流列表（分页）
+     *
+     * @param queryRequest 查询请求参数
+     * @return 分页的工作流列表
+     */
+    @GetMapping("/getWorkflowInfo")
+    public HttpResult<Workflow> getWorkflowInfo(WorkflowQueryRequest queryRequest) {
+        return HttpResult.success(workflowService.getWorkflowInfo(queryRequest));
+    }
 }

@@ -9,6 +9,7 @@ import lombok.Data;
  */
 @Data
 public class WorkflowQueryRequest {
+    private String id;
     /**
      * 当前页码，从1开始
      */

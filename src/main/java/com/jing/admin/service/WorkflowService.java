@@ -1,6 +1,7 @@
 package com.jing.admin.service;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jing.admin.core.PageResult;
@@ -72,11 +73,11 @@ public class WorkflowService {
         workflow.setCreateTime(System.currentTimeMillis());
         workflow.setUpdateTime(workflow.getCreateTime());
         workflow.setVersion(workflowRequest.getVersion());
-        workflow.setStatus("1");
-        workflow.setDescription("");
-        workflow.setCreateUserId(MDC.get("userId"));
         workflow.setUpdateUserId(MDC.get("userId"));
-        workflowRepository.updateWorkflow(workflow);
+        int success = workflowRepository.updateWorkflow(workflow);
+        if(success == 0){
+            throw new RuntimeException("版本可能不一致更新失败");
+        }
         return workflow;
     }
 
@@ -124,6 +125,10 @@ public class WorkflowService {
         );
 
         return pageResult;
+    }
+
+    public Workflow getWorkflowInfo(WorkflowQueryRequest workflowQueryRequest){
+        return workflowRepository.getById(workflowQueryRequest.getId());
     }
 
     /**
