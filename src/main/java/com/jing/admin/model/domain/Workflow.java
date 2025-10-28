@@ -34,7 +34,7 @@ public class Workflow extends Base {
     private Integer version;
     
     /**
-     * 状态：0-草稿，1-发布
+     * 状态：0-停用，1-发布
      */
-    private Integer status;
+    private String status;
 }

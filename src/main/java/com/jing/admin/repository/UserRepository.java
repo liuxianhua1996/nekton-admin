@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -69,5 +70,17 @@ public class UserRepository {
     
     public Optional<User> findById(String id) {
         return Optional.ofNullable(userMapper.selectUserWithRoles(id));
+    }
+    
+    /**
+     * 根据ID列表批量查询用户
+     * @param ids 用户ID列表
+     * @return 用户列表
+     */
+    public List<User> findAllByIds(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return userMapper.selectBatchIds(ids);
     }
 }

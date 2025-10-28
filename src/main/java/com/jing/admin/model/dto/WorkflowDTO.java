@@ -37,12 +37,30 @@ public class WorkflowDTO {
     private Integer version;
     
     /**
-     * 状态：0-草稿，1-发布
+     * 状态：0-停用，1-发布
      */
-    private Integer status;
+    private String status;
     
     /**
      * 创建人ID
      */
     private String createUserId;
+    
+    /**
+     * 创建人名称
+     */
+    private String createUserName;
+
+    /**
+     * 更新人ID
+     */
+    private String updateUserId;
+    
+    /**
+     * 更新人名称
+     */
+    private String updateUserName;
+
+    private long createTime;
+    private long updateTime;
 }

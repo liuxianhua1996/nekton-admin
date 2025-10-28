@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS tb_workflow (
     json_data TEXT NOT NULL,
     version INT DEFAULT 1,
     status char(2) NOT NULL,
+    tenant_id VARCHAR(255),
     create_time BIGINT,
     update_time BIGINT,
     create_user_id VARCHAR(255),

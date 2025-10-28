@@ -1,6 +1,9 @@
 package com.jing.admin.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.jing.admin.core.HttpResult;
+import com.jing.admin.core.PageResult;
+import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
 import com.jing.admin.model.domain.Workflow;
 import com.jing.admin.model.dto.WorkflowDTO;
@@ -47,5 +50,16 @@ public class WorkflowController {
     public HttpResult<Workflow> updateWorkflow(@RequestBody WorkflowRequest workflow) {
         Workflow savedWorkflow = workflowService.updateWorkflow(workflow);
         return HttpResult.success(savedWorkflow);
+    }
+
+    /**
+     * 获取工作流列表（分页）
+     *
+     * @param queryRequest 查询请求参数
+     * @return 分页的工作流列表
+     */
+    @GetMapping("/page")
+    public HttpResult<PageResult<WorkflowDTO>> getWorkflowPage(WorkflowQueryRequest queryRequest) {
+        return HttpResult.success(workflowService.getWorkflowPage(queryRequest));
     }
 }

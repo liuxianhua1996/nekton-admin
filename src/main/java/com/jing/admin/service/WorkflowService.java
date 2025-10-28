@@ -1,9 +1,14 @@
 package com.jing.admin.service;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jing.admin.core.PageResult;
+import com.jing.admin.mapper.WorkflowCustomMapper;
+import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
 import com.jing.admin.model.domain.Workflow;
-import com.jing.admin.model.mapping.WorkflowMapping;
+import com.jing.admin.model.dto.WorkflowDTO;
 import com.jing.admin.repository.WorkflowRepository;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +30,9 @@ public class WorkflowService {
 
     @Autowired
     private WorkflowRepository workflowRepository;
+    
+    @Autowired
+    private WorkflowCustomMapper workflowCustomMapper;
 
     /**
      * 保存或更新工作流
@@ -41,7 +49,7 @@ public class WorkflowService {
         workflow.setCreateTime(System.currentTimeMillis());
         workflow.setUpdateTime(workflow.getCreateTime());
         workflow.setVersion(1);
-        workflow.setStatus(1);
+        workflow.setStatus("1");
         workflow.setDescription(workflowRequest.getDescription());
         workflow.setCreateUserId(MDC.get("userId"));
         workflow.setUpdateUserId(MDC.get("userId"));
@@ -64,7 +72,7 @@ public class WorkflowService {
         workflow.setCreateTime(System.currentTimeMillis());
         workflow.setUpdateTime(workflow.getCreateTime());
         workflow.setVersion(workflowRequest.getVersion());
-        workflow.setStatus(1);
+        workflow.setStatus("1");
         workflow.setDescription("");
         workflow.setCreateUserId(MDC.get("userId"));
         workflow.setUpdateUserId(MDC.get("userId"));
@@ -89,6 +97,33 @@ public class WorkflowService {
      */
     public List<Workflow> getAllWorkflows() {
         return workflowRepository.list();
+    }
+
+    /**
+     * 分页查询工作流
+     *
+     * @param queryRequest 查询请求参数
+     * @return 分页结果
+     */
+    public PageResult<WorkflowDTO> getWorkflowPage(WorkflowQueryRequest queryRequest) {
+        // 创建分页对象
+        Page<WorkflowDTO> page = new Page<>(queryRequest.getCurrent(), queryRequest.getSize());
+        
+        // 执行分页查询（关联用户表）
+        IPage<WorkflowDTO> workflowPage = workflowCustomMapper.selectWorkflowPageWithUser(
+                page,
+                queryRequest
+        );
+
+        // 构建分页结果
+        PageResult<WorkflowDTO> pageResult = PageResult.of(
+                workflowPage.getRecords(),
+                workflowPage.getTotal(),
+                workflowPage.getCurrent(),
+                workflowPage.getSize()
+        );
+
+        return pageResult;
     }
 
     /**
