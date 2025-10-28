@@ -1,9 +1,12 @@
 package com.jing.admin.config;
 
+import com.jing.admin.core.exception.BusinessException;
+import com.jing.admin.core.exception.LoginException;
 import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.service.JwtUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,6 +57,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             // 只处理Bearer类型的token
             if (requestTokenHeader != null) {
                 jwtToken = requestTokenHeader.startsWith("Bearer ") ? requestTokenHeader.substring(7) : requestTokenHeader;
+                if (jwtTokenUtil.validateToken(jwtToken)) {
+                    throw new LoginException("Token已过期或已过期");
+                }
                 try {
                     username = jwtTokenUtil.getUsernameFromToken(jwtToken);
                     MDC.put("username", username);
@@ -78,6 +84,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 }
             }
             chain.doFilter(request, response);
+        } catch (LoginException e) {
+            throw e;
         } finally {
             log.debug("Request completed, MDC cleared");
         }

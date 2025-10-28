@@ -1,0 +1,198 @@
+{
+  "nodes": [
+    {
+      "id": "3155a9acbdd9428ea0bb8c7697b934d4",
+      "type": "custom",
+      "position": {
+        "x": 306,
+        "y": 50
+      },
+      "width": 200,
+      "height": 52,
+      "data": {
+        "icon": "https://ylys.shop/icon/qidong.png",
+        "label": "开始",
+        "description": "",
+        "type": "start",
+        "content": {
+          "conditions": [
+
+          ],
+          "inParams": {
+
+          },
+          "outParams": {
+
+          }
+        },
+        "selected": false,
+        "error": false
+      },
+      "positionAbsolute": {
+        "x": 306,
+        "y": 50
+      },
+      "selected": false
+    },
+    {
+      "id": "90889a9cfd0343ba881d8560e76da852",
+      "type": "custom",
+      "position": {
+        "x": 1000,
+        "y": 50
+      },
+      "width": 200,
+      "height": 52,
+      "data": {
+        "icon": "https://ylys.shop/icon/qidong.png",
+        "label": "结束",
+        "description": "",
+        "type": "end",
+        "content": {
+          "conditions": [
+
+          ],
+          "inParams": {
+
+          },
+          "outParams": {
+
+          }
+        },
+        "selected": false,
+        "error": false
+      },
+      "positionAbsolute": {
+        "x": 1000,
+        "y": 50
+      }
+    },
+    {
+      "id": "1eb3bcdfa267439b93114dc320195fe0",
+      "type": "custom",
+      "data": {
+        "label": "系统集成",
+        "code": "sdk",
+        "type": "sdk",
+        "content": {
+          "inParams": {
+
+          },
+          "outParams": {
+            "result": {
+              "name": "result",
+              "dataType": "array",
+              "description": "查询结果",
+              "required": "false"
+            }
+          },
+          "conditions": [
+
+          ],
+          "sdkParams": {
+            "system": "kingdee_sky",
+            "method": "query",
+            "params": {
+              "formId": {
+                "label": "查询表",
+                "name": "formId",
+                "dataType": "string",
+                "desc": "查询表",
+                "required": true,
+                "value": "",
+                "valueType": "input",
+                "sort": 0
+              },
+              "fields": {
+                "label": "查询字段",
+                "name": "fields",
+                "dataType": "string",
+                "desc": "查询字段",
+                "required": true,
+                "value": "",
+                "valueType": "input",
+                "sort": 1
+              },
+              "condition": {
+                "label": "查询条件",
+                "name": "condition",
+                "dataType": "string",
+                "desc": "查询条件",
+                "required": true,
+                "value": "",
+                "valueType": "input",
+                "sort": 2
+              },
+              "order": {
+                "label": "查询排序",
+                "name": "order",
+                "dataType": "string",
+                "desc": "查询排序",
+                "required": false,
+                "value": "",
+                "valueType": "input",
+                "sort": 3
+              },
+              "page": {
+                "label": "查询分页",
+                "name": "page",
+                "dataType": "string",
+                "desc": "查询分页",
+                "required": false,
+                "value": "",
+                "valueType": "input",
+                "sort": 4
+              },
+              "pageSize": {
+                "label": "查询分页大小",
+                "name": "pageSize",
+                "dataType": "string",
+                "desc": "查询分页大小",
+                "required": false,
+                "value": "",
+                "valueType": "input",
+                "sort": 5
+              }
+            },
+            "apiKeyId": ""
+          }
+        },
+        "selected": false,
+        "error": false
+      },
+      "position": {
+        "x": 572,
+        "y": 116
+      },
+      "targetPosition": "left",
+      "sourcePosition": "right",
+      "width": 200,
+      "height": 52,
+      "positionAbsolute": {
+        "x": 572,
+        "y": 116
+      },
+      "selected": true
+    }
+  ],
+  "edges": [
+    {
+      "id": "source-3155a9acbdd9428ea0bb8c7697b934d4-1eb3bcdfa267439b93114dc320195fe0",
+      "type": "custom",
+      "source": "3155a9acbdd9428ea0bb8c7697b934d4",
+      "sourceHandle": "source-3155a9acbdd9428ea0bb8c7697b934d4",
+      "target": "1eb3bcdfa267439b93114dc320195fe0",
+      "targetHandle": "target-1eb3bcdfa267439b93114dc320195fe0",
+      "style": {
+
+      }
+    },
+    {
+      "id": "source-1eb3bcdfa267439b93114dc320195fe0-90889a9cfd0343ba881d8560e76da852",
+      "source": "1eb3bcdfa267439b93114dc320195fe0",
+      "target": "90889a9cfd0343ba881d8560e76da852",
+      "sourceHandle": "source-1eb3bcdfa267439b93114dc320195fe0",
+      "type": "custom"
+    }
+  ]
+}

@@ -121,9 +121,9 @@ public class JwtTokenUtil {
     // 验证token是否有效（不检查用户信息）
     public Boolean validateToken(String token) {
         try {
-            return !isTokenExpired(token);
+            return !!isTokenExpired(token);
         } catch (Exception e) {
-            return false;
+            return true;
         }
     }
     public static void main(String[] args) {

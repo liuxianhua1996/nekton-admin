@@ -14,28 +14,38 @@ import java.util.stream.Collectors;
 
 /**
  * 工作流控制器
+ *
  * @author lxh
  * @date 2025/9/19
  */
 @RestController
 @RequestMapping("/workflow")
 public class WorkflowController {
-    
+
     @Autowired
     private WorkflowService workflowService;
-    
+
     /**
-     * 保存或更新工作流 (实体类方式)
+     * 创建工作流 (实体类方式)
+     *
+     * @param workflow 工作流对象
+     * @return 保存结果
+     */
+    @PostMapping("/create")
+    public HttpResult<Workflow> createWorkflow(@RequestBody WorkflowRequest workflow) {
+        Workflow savedWorkflow = workflowService.createWorkflow(workflow);
+        return HttpResult.success(savedWorkflow);
+    }
+
+    /**
+     * 更新工作流 (实体类方式)
+     *
      * @param workflow 工作流对象
      * @return 保存结果
      */
     @PostMapping("/save")
-    public HttpResult<Workflow> saveOrUpdateWorkflow(@RequestBody WorkflowRequest workflow) {
-        try {
-            Workflow savedWorkflow = workflowService.saveOrUpdateWorkflow(workflow);
-            return HttpResult.success(savedWorkflow);
-        } catch (Exception e) {
-            return HttpResult.fail("保存失败: " + e.getMessage());
-        }
+    public HttpResult<Workflow> updateWorkflow(@RequestBody WorkflowRequest workflow) {
+        Workflow savedWorkflow = workflowService.updateWorkflow(workflow);
+        return HttpResult.success(savedWorkflow);
     }
 }

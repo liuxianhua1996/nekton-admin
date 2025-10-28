@@ -12,10 +12,12 @@ import java.util.List;
 @Data
 public class WorkflowRequest {
    private String id;
-
+   private String description;
    private String name;
    private List<JSONObject> nodes;
 
    private List<JSONObject> edges;
+
+   private int version;
 
 }

@@ -1,6 +1,8 @@
 package com.jing.admin.config;
 
 import com.jing.admin.core.HttpResult;
+import com.jing.admin.core.exception.BusinessException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,6 +19,7 @@ import java.util.Map;
  * @date 2025/9/18
  **/
 @RestControllerAdvice // 全局异常处理器
+@Slf4j
 public class GlobalExceptionHandler {
     /**
      * 处理参数校验异常（如 @Valid 注解触发的异常）
@@ -28,6 +31,7 @@ public class GlobalExceptionHandler {
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.add(error.getField()+error.getDefaultMessage());
         }
+        log.error( String.format("参数校验失败：%s",String.join(",",errors)));
         return HttpResult.fail(String.valueOf(HttpStatus.BAD_REQUEST.value()), String.format("参数校验失败：%s",String.join(",",errors)));
     }
 
@@ -36,8 +40,17 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(RuntimeException.class)
     public HttpResult handleRuntimeExceptions(RuntimeException ex) {
+        log.error( String.format("运行时异常：%s",String.join(",",ex.getMessage())));
+        return HttpResult.fail(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()),"服务器内部错误");
+    }
 
-        return HttpResult.fail(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), ex.getMessage());
+    /**
+     * 处理自定义异常BusinessException
+     */
+    @ExceptionHandler(BusinessException.class)
+    public HttpResult handleRuntimeExceptions(BusinessException ex) {
+        log.error(String.format("业务异常：%s",String.join(",",ex.getMessage())));
+        return HttpResult.fail(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()),ex.getMessage());
     }
 
     /**
@@ -45,6 +58,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public HttpResult handleGeneralExceptions(Exception ex) {
-        return HttpResult.fail(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()),  String.format("服务器内部错误：%s",ex.getMessage()));
+        log.error( String.format("服务器内部错误：%s",ex.getMessage()));
+        return HttpResult.fail(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()),  "服务器内部错误");
     }
 }
