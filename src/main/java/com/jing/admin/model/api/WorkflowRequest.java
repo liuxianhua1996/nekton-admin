@@ -14,10 +14,7 @@ public class WorkflowRequest {
    private String id;
    private String description;
    private String name;
-   private List<JSONObject> nodes;
-
-   private List<JSONObject> edges;
-
+   private JSONObject jsonData;
    private int version;
 
 }

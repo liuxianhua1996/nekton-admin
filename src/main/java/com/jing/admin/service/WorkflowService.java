@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jing.admin.core.PageResult;
+import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.mapper.WorkflowCustomMapper;
 import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
@@ -67,16 +68,22 @@ public class WorkflowService {
     public Workflow updateWorkflow(WorkflowRequest workflowRequest) {
         // 如果是新增，设置ID和创建时间
         Workflow workflow = new Workflow();
-        JSONObject jsonData = new JSONObject().fluentPut("nodes", workflowRequest.getNodes()).fluentPut("edges", workflowRequest.getEdges());
-        workflow.setName(workflowRequest.getName());
+        JSONObject jsonData = workflowRequest.getJsonData();
+        workflow.setId(workflowRequest.getId());
         workflow.setJsonData(jsonData.toJSONString());
         workflow.setCreateTime(System.currentTimeMillis());
         workflow.setUpdateTime(workflow.getCreateTime());
-        workflow.setVersion(workflowRequest.getVersion());
+        workflow.setVersion(workflowRequest.getVersion()+1);
         workflow.setUpdateUserId(MDC.get("userId"));
-        int success = workflowRepository.updateWorkflow(workflow);
+        int success = workflowRepository.updateWorkflow(workflow,workflowRequest.getVersion());
         if(success == 0){
-            throw new RuntimeException("版本可能不一致更新失败");
+            Workflow lastWorkflow = workflowRepository.getById(workflow.getId());
+            if(lastWorkflow == null){
+                throw new BusinessException("工作流不存在");
+            } else {
+                throw new BusinessException("版本不一致更新失败");
+            }
+
         }
         return workflow;
     }
