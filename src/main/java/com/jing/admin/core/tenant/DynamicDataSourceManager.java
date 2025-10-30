@@ -3,6 +3,7 @@ package com.jing.admin.core.tenant;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +18,14 @@ public class DynamicDataSourceManager {
 
     private final Map<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
     private DataSource defaultDataSource;
-    @Autowired
     private DataSource dataSource;
+    // 使用 setter 注入而不是字段注入
+    @Autowired
+    public void setDataSource(@Qualifier("commonDataSource") DataSource dataSource) {
+        this.dataSource = dataSource;
+        this.defaultDataSource = dataSource;
+    }
+
 
     @PostConstruct
     public void init() {
