@@ -9,25 +9,19 @@
         <result column="password" property="password"/>
         <result column="email" property="email"/>
         <result column="enabled" property="enabled"/>
-        <!-- 角色映射 -->
-        <collection property="roles" ofType="com.jing.admin.core.constant.Role">
-            <result column="role" property="name"/>
-        </collection>
     </resultMap>
 
     <!-- 查询用户及其角色 -->
     <select id="selectUserWithRoles" parameterType="long" resultMap="UserResultMap">
-        SELECT u.*, ur.role
+        SELECT u.*,
         FROM tb_users u
-        LEFT JOIN tb_user_roles ur ON u.id = ur.user_id::uuid
         WHERE u.id = #{id}
     </select>
 
     <!-- 根据用户名查询用户及其角色 -->
     <select id="selectUserWithRolesByUsername" parameterType="string" resultMap="UserResultMap">
-        SELECT u.*, ur.role
+        SELECT u.*
         FROM tb_users u
-        LEFT JOIN tb_user_roles ur ON u.id = ur.user_id::uuid
         WHERE u.username = #{username}
     </select>
 

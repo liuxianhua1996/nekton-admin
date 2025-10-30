@@ -40,6 +40,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(RuntimeException.class)
     public HttpResult handleRuntimeExceptions(RuntimeException ex) {
+        ex.printStackTrace();
         log.error( String.format("运行时异常：%s",String.join(",",ex.getMessage())));
         return HttpResult.fail(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()),"服务器内部错误");
     }
