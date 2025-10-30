@@ -20,9 +20,6 @@ import java.util.UUID;
 @Mapper(imports = {UUID.class, System.class})
 public interface WorkflowMapping {
     WorkflowMapping INSTANCE = Mappers.getMapper(WorkflowMapping.class);
-    @Mapping(target = "createTime", expression = "java(System.currentTimeMillis())")
-    @Mapping(target = "updateTime", expression = "java(System.currentTimeMillis())")
-    Workflow toEntity(WorkflowRequest workflow);
     /**
      *
      * @param workflow
