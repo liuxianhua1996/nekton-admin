@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
  **/
 @Data
 public class LoginUser extends User implements UserDetails {
+    private Collection<Role> roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

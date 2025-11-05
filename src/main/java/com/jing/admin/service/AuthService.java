@@ -3,11 +3,15 @@ package com.jing.admin.service;
 import com.jing.admin.config.JwtTokenUtil;
 import com.jing.admin.core.constant.Role;
 import com.jing.admin.model.domain.LoginUser;
+import com.jing.admin.model.domain.TenantUser;
 import com.jing.admin.model.domain.User;
 import com.jing.admin.model.dto.MenuDTO;
+import com.jing.admin.model.dto.TenantUseDTO;
 import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.model.mapping.UserMapping;
+import com.jing.admin.repository.TenantUserRepository;
 import com.jing.admin.repository.UserRepository;
+import com.jing.admin.repository.WorkflowRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,9 +40,12 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    @Autowired
+    private TenantUserRepository tenantUserRepository;
     @Autowired
     private MenuService menuService;
+    @Autowired
+    private WorkflowRepository workflowRepository;
 
     public Map<String, Object> authenticate(String username, String password) {
         try {
@@ -47,13 +54,17 @@ public class AuthService {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = userRepository.findByUsername(username).orElse(null);
+
+            List<TenantUseDTO> tenantUsers = this.tenantUserRepository.queryUserTenants(user.getId());
             LoginUser loginUser = UserMapping.INSTANCE.toLoginUser(user);
             String accessToken = jwtTokenUtil.generateToken(loginUser);
             String refreshToken = jwtTokenUtil.generateRefreshToken(loginUser);
+            UserDTO userDTO = UserMapping.INSTANCE.toDTO(user);
+            userDTO.setTenant(tenantUsers);
             Map<String, Object> response = new HashMap<>();
             response.put("accessToken", accessToken);
             response.put("refreshToken", refreshToken);
-            response.put("user", UserMapping.INSTANCE.toDTO(user));
+            response.put("user", userDTO);
             
             return response;
         } catch (BadCredentialsException e) {
@@ -111,11 +122,10 @@ public class AuthService {
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
-        user.setRoles(Collections.singleton(role));
         user.setCreateTime(System.currentTimeMillis());
         user.setUpdateTime(user.getCreateTime());
         
-        return userRepository.save(user);
+        return userRepository.saveUser(user);
     }
 
     public Optional<User> findByUsername(String username) {
@@ -132,11 +142,6 @@ public class AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("用户不存在: " + username));
         
-        if (!user.getRoles().contains(role)) {
-            user.getRoles().add(role);
-            return userRepository.save(user);
-        }
-        
         return user;
     }
 
@@ -150,11 +155,6 @@ public class AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("用户不存在: " + username));
         
-        if (user.getRoles().contains(role)) {
-            user.getRoles().remove(role);
-            return userRepository.save(user);
-        }
-        
         return user;
     }
 
@@ -165,7 +165,7 @@ public class AuthService {
      */
     public List<MenuDTO> getMenusByUser(LoginUser user) {
         // 获取用户的角色，如果有管理员角色则直接返回所有菜单
-        Collection<Role> roles = user.getRoles();
+        Collection<Role> roles = Arrays.asList(Role.ADMIN);
         if (roles.contains(Role.ADMIN)) {
             return menuService.getMenuTreeByRole("ADMIN");
         }
