@@ -3,6 +3,7 @@ package com.jing.admin.service;
 import com.jing.admin.config.JwtTokenUtil;
 import com.jing.admin.config.LoginUserUtil;
 import com.jing.admin.core.constant.Role;
+import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.domain.TenantUser;
 import com.jing.admin.model.domain.User;
@@ -73,7 +74,7 @@ public class AuthService {
             
             return response;
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("用户名或密码不正确");
+            throw new BusinessException("用户名或密码不正确");
         }
     }
 

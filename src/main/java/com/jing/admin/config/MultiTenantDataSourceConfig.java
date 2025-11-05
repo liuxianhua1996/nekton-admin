@@ -1,12 +1,18 @@
 package com.jing.admin.config;
 
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.jing.admin.core.tenant.TenantDynamicDataSource;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.ibatis.logging.stdout.StdOutImpl;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.checkerframework.checker.units.qual.A;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +40,10 @@ public class MultiTenantDataSourceConfig {
 
     @Value("${app.datasource.common.max-pool-size:20}")
     private int maxPoolSize;
+    @Autowired
+    private MybatisPlusInterceptor mybatisPlusInterceptor;
+    @Autowired
+    GlobalConfig globalConfig;
 
     @Bean
     public DataSource commonDataSource() {
@@ -47,18 +57,20 @@ public class MultiTenantDataSourceConfig {
     }
     @Bean(name = "sqlSessionFactory")
     public SqlSessionFactory sqlSessionFactory(TenantDynamicDataSource dataSource) throws Exception {
-        SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+        MybatisSqlSessionFactoryBean sessionFactory = new MybatisSqlSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);  // 使用动态数据源
 
-        org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
-        configuration.setMapUnderscoreToCamelCase(true);
-        configuration.setLogImpl(StdOutImpl.class);
-        sessionFactory.setConfiguration(configuration);
+        MybatisConfiguration mybatisConfiguration = new MybatisConfiguration();
+        mybatisConfiguration.setMapUnderscoreToCamelCase(true);
+        mybatisConfiguration.setDefaultFetchSize(100);
+        mybatisConfiguration.setLogImpl(StdOutImpl.class);
+        mybatisConfiguration.setCacheEnabled(true);
 
-        sessionFactory.setTypeAliasesPackage("com.jing.model.domain");
+        sessionFactory.setConfiguration(mybatisConfiguration);
+        sessionFactory.setTypeAliasesPackage("com.jing.admin.model.domain");
         sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver()
                 .getResources("classpath:mapper/*.xml"));
-
+        sessionFactory.setGlobalConfig(globalConfig);
         return sessionFactory.getObject();
     }
 

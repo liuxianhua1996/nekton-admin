@@ -76,40 +76,6 @@ public class AuthController {
         LoginUser loginUser = loginUserUtil.getLoginUser(jwtToken);
         return HttpResult.success(UserMapping.INSTANCE.toDTO(loginUser));
     }
-
-    @PostMapping("/add-role")
-    public ResponseEntity<?> addRole(@RequestBody Map<String, String> roleRequest) {
-        String username = roleRequest.get("username");
-        String roleName = roleRequest.get("role");
-        
-        Role role = Role.fromName(roleName);
-        User user = authService.addRole(username, role);
-        return ResponseEntity.ok(user);
-    }
-
-    @PostMapping("/remove-role")
-    public ResponseEntity<?> removeRole(@RequestBody Map<String, String> roleRequest) {
-        String username = roleRequest.get("username");
-        String roleName = roleRequest.get("role");
-        
-        Role role = Role.fromName(roleName);
-        User user = authService.removeRole(username, role);
-        return ResponseEntity.ok(user);
-    }
-
-    @GetMapping("/roles")
-    public ResponseEntity<?> getAllRoles() {
-       List roles =  Arrays.stream(Role.values())
-                .map(role -> Map.of(
-                        "name", role.name(),
-                        "description", role.getDescription(),
-                        "level", role.getLevel()
-                ))
-                .toList();
-        
-        return ResponseEntity.ok(roles);
-    }
-
     /**
      * 获取当前用户的菜单
      * @param request HTTP请求
