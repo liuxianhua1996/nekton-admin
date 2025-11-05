@@ -10,6 +10,7 @@ import com.jing.admin.model.mapping.UserMapping;
 import com.jing.admin.service.AuthService;
 import com.jing.admin.service.MenuService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -123,6 +124,26 @@ public class AuthController {
         } catch (Exception e) {
             e.printStackTrace();
             return HttpResult.error("获取菜单失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 确认用户租户
+     * @param confirmRequest 包含用户ID和租户ID的请求
+     * @param request HTTP请求
+     * @return 包含新JWT的响应
+     */
+    @PostMapping("/confirm-tenant")
+    public HttpResult<Map<String, Object>> confirmTenant(@RequestBody Map<String, String> confirmRequest, HttpServletRequest request) {
+        try {
+            // 从请求中获取租户ID
+            String tenantId = confirmRequest.get("tenantId");
+            LoginUser user = loginUserUtil.getLoginUser(MDC.get("jwtToken"));
+            String userId = user.getId();
+            return HttpResult.success(authService.confirmTenant(userId, tenantId));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return HttpResult.error("确认租户失败: " + e.getMessage());
         }
     }
 }

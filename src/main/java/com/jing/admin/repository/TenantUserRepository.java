@@ -31,4 +31,8 @@ public class TenantUserRepository extends ServiceImpl<TenantUserMapper, TenantUs
     public List<TenantUseDTO> queryUserTenants(String userId) {
         return tenantUserMapper.selectTenantUser(userId);
     }
+
+    public boolean checkUserTenantAccess(String userId, String tenantId){
+        return tenantUserMapper.checkUserTenantAccess(userId,tenantId);
+    }
 }

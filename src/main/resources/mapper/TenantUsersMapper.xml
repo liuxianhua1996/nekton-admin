@@ -2,11 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jing.admin.mapper.TenantUserMapper">
     <!-- 查询用户租住信息 -->
-    <select id="selectTenantUser" parameterType="String">
+    <select id="selectTenantUser" parameterType="String" resultType="com.jing.admin.model.dto.TenantUseDTO">
         SELECT t.*,tens.tenant_name  FROM (SELECT tut.tenant_id, tut.user_id
                 FROM tb_user_tenant tut
                 WHERE tut.user_id = #{userId}::uuid) t
         LEFT JOIN tb_tenants tens ON  tens.id = t.tenant_id::uuid
+    </select>
+    
+    <!-- 检查用户是否有指定租户的访问权限 -->
+    <select id="checkUserTenantAccess" resultType="boolean">
+        SELECT COUNT(*) > 0 
+        FROM tb_user_tenant 
+        WHERE user_id = #{userId}::uuid AND tenant_id = #{tenantId}::uuid
     </select>
 
 </mapper>

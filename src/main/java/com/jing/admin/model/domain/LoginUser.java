@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -17,6 +18,14 @@ import java.util.stream.Collectors;
  **/
 @Data
 public class LoginUser extends User implements UserDetails {
+    private String username;
+
+
+    private String email;
+
+    private int enabled;
+    private String selectedTenant;
+    private List tenant;
     private Collection<Role> roles;
 
     @Override

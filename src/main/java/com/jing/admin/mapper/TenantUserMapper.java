@@ -17,5 +17,13 @@ import java.util.List;
 public interface TenantUserMapper extends BaseMapper<TenantUser> {
 
     List<TenantUseDTO> selectTenantUser(@Param("userId") String userId);
+    
+    /**
+     * 检查用户是否有指定租户的访问权限
+     * @param userId 用户ID
+     * @param tenantId 租户ID
+     * @return 如果用户有权限访问该租户，返回true，否则返回false
+     */
+    boolean checkUserTenantAccess(@Param("userId") String userId, @Param("tenantId") String tenantId);
 
 }

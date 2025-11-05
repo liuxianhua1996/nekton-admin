@@ -45,6 +45,12 @@ public class JwtTokenUtil {
         getClaimFromToken(token, Claims::getSubject);
         return "";
     }
+    
+    // 从token中提取租户ID
+    public String getTenantIdFromToken(String token) {
+        final Claims claims = getAllClaimsFromToken(token);
+        return (String) claims.get("tenantId");
+    }
 
     // 从token中提取过期时间
     public Date getExpirationDateFromToken(String token) {
@@ -83,6 +89,19 @@ public class JwtTokenUtil {
         claims.put("iat", new Date());
         return doGenerateToken(claims, userDetails.getUsername(), expiration);
     }
+    
+    // 生成包含租户信息的访问token
+    public String generateTokenWithTenant(LoginUser userDetails, String tenantId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userDetails.getId());
+        claims.put("username", userDetails.getUsername());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        claims.put("tenantId", tenantId);
+        claims.put("iat", new Date());
+        return doGenerateToken(claims, userDetails.getUsername(), expiration);
+    }
 
     // 生成刷新token
     public String generateRefreshToken(LoginUser userDetails) {
@@ -92,6 +111,19 @@ public class JwtTokenUtil {
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
+        claims.put("iat", new Date());
+        return doGenerateToken(claims, userDetails.getUsername(), refreshExpiration);
+    }
+    
+    // 生成包含租户信息的刷新token
+    public String generateRefreshTokenWithTenant(LoginUser userDetails, String tenantId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userDetails.getId());
+        claims.put("username", userDetails.getUsername());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        claims.put("tenantId", tenantId);
         claims.put("iat", new Date());
         return doGenerateToken(claims, userDetails.getUsername(), refreshExpiration);
     }

@@ -2,6 +2,7 @@ package com.jing.admin.config;
 
 import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.core.exception.LoginException;
+import com.jing.admin.core.tenant.TenantContextHolder;
 import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.service.JwtUserDetailsService;
@@ -52,6 +53,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         final String requestTokenHeader = request.getHeader("Authorization");
         String username = null;
         String userId = null;
+        String tenantId = null;
         String jwtToken = null;
         try {
             // 只处理Bearer类型的token
@@ -74,7 +76,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             // 验证token
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 LoginUser user = loginUserUtil.getLoginUser(jwtToken);
+                tenantId = jwtTokenUtil.getTenantIdFromToken(jwtToken);
                 MDC.put("userId", user.getId());
+                MDC.put("jwtToken", jwtToken);
+                MDC.put("tenantId", tenantId);
+                TenantContextHolder.setTenantId(tenantId);
                 if (jwtTokenUtil.validateToken(jwtToken, user)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(

@@ -1,6 +1,7 @@
 package com.jing.admin.service;
 
 import com.jing.admin.config.JwtTokenUtil;
+import com.jing.admin.config.LoginUserUtil;
 import com.jing.admin.core.constant.Role;
 import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.domain.TenantUser;
@@ -13,6 +14,7 @@ import com.jing.admin.repository.TenantUserRepository;
 import com.jing.admin.repository.UserRepository;
 import com.jing.admin.repository.WorkflowRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -46,6 +48,10 @@ public class AuthService {
     private MenuService menuService;
     @Autowired
     private WorkflowRepository workflowRepository;
+    @Autowired
+    private com.jing.admin.mapper.TenantUserMapper tenantUserMapper;
+    @Autowired
+    LoginUserUtil loginUserUtil;
 
     public Map<String, Object> authenticate(String username, String password) {
         try {
@@ -178,5 +184,40 @@ public class AuthService {
                 .collect(Collectors.toList());
         
         return allMenus;
+    }
+    
+    /**
+     * 验证用户是否有指定租户的访问权限
+     * @param userId 用户ID
+     * @param tenantId 租户ID
+     * @return 如果用户有权限访问该租户，返回true，否则返回false
+     */
+    public boolean validateUserTenantAccess(String userId, String tenantId) {
+        return tenantUserMapper.checkUserTenantAccess(userId, tenantId);
+    }
+    
+    /**
+     * 确认用户租户并生成包含租户信息的JWT
+     * @param userId 用户ID
+     * @param tenantId 租户ID
+     * @return 包含新JWT的响应
+     */
+    public Map<String, Object> confirmTenant(String userId, String tenantId) {
+        // 验证用户是否有权限访问该租户
+        if (!validateUserTenantAccess(userId, tenantId)) {
+            throw new BadCredentialsException("用户无权访问该租户");
+        }
+        // 创建LoginUser对象
+        LoginUser user = loginUserUtil.getLoginUser(MDC.get("jwtToken"));
+        LoginUser loginUser = UserMapping.INSTANCE.toLoginUser(user);
+        loginUser.setSelectedTenant(tenantId);
+        // 生成包含租户信息的新JWT
+        String accessToken = jwtTokenUtil.generateTokenWithTenant(loginUser, tenantId);
+        String refreshToken = jwtTokenUtil.generateRefreshTokenWithTenant(loginUser, tenantId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("accessToken", accessToken);
+        response.put("refreshToken", refreshToken);
+        
+        return response;
     }
 }

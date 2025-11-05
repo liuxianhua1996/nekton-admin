@@ -32,4 +32,16 @@ public class LoginUserUtil {
         user.setRoles(roles);
         return  user;
     }
+    
+    /**
+     * 从JWT中获取租户ID
+     * @param token JWT令牌
+     * @return 租户ID，如果不存在则返回null
+     */
+    public String getTenantIdFromToken(String token) {
+        if(token.startsWith("Bearer ")){
+            token = token.substring(7);
+        }
+        return jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("tenantId", String.class));
+    }
 }
