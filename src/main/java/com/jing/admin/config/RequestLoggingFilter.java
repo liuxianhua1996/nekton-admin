@@ -1,6 +1,7 @@
 package com.jing.admin.config;
 
 import com.jing.admin.core.ThreadMdcUtils;
+import com.jing.admin.core.tenant.TenantContextHolder;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -53,6 +54,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             responseWrapper.copyBodyToResponse();
         } finally {
             MDC.clear();
+            TenantContextHolder.clear();
         }
     }
 

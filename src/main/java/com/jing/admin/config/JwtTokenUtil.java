@@ -1,5 +1,6 @@
 package com.jing.admin.config;
 
+import com.alibaba.fastjson2.JSON;
 import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.dto.UserDTO;
 import io.jsonwebtoken.Claims;
@@ -86,6 +87,7 @@ public class JwtTokenUtil {
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
+        claims.put("tenant", JSON.toJSONString(userDetails.getTenant()));
         claims.put("iat", new Date());
         return doGenerateToken(claims, userDetails.getUsername(), expiration);
     }
@@ -99,6 +101,7 @@ public class JwtTokenUtil {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
         claims.put("tenantId", tenantId);
+        claims.put("tenant", JSON.toJSONString(userDetails.getTenant()));
         claims.put("iat", new Date());
         return doGenerateToken(claims, userDetails.getUsername(), expiration);
     }

@@ -22,7 +22,6 @@ public class MenuController {
      * 获取所有菜单
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public HttpResult<List<Menu>> getAllMenus() {
         List<Menu> menus = menuService.getAllMenus();
         return HttpResult.success(menus);

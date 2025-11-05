@@ -5,9 +5,7 @@ VALUES ('ADMIN', '系统管理员角色，拥有所有权限'),
 
 -- 插入默认角色
 INSERT INTO tb_user_roles (user_id, role)
-SELECT id, 'ADMIN'
-FROM tb_users
-WHERE username = 'admin' ON CONFLICT DO NOTHING;
+VALUES ('a851255e-d9fa-4a3d-b238-ef7651f0c422','ADMIN')
 
 -- 删除已存在的菜单数据（用于重新初始化）
 DELETE

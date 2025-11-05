@@ -27,6 +27,7 @@ public interface UserMapping {
      * @return 用户DTO
      */
     UserDTO toDTO(User user);
+    UserDTO toDTO(LoginUser user);
 
     LoginUser toLoginUser(User user);
 }

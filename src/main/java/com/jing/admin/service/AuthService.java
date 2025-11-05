@@ -47,8 +47,6 @@ public class AuthService {
     @Autowired
     private MenuService menuService;
     @Autowired
-    private WorkflowRepository workflowRepository;
-    @Autowired
     private com.jing.admin.mapper.TenantUserMapper tenantUserMapper;
     @Autowired
     LoginUserUtil loginUserUtil;
@@ -63,6 +61,7 @@ public class AuthService {
 
             List<TenantUseDTO> tenantUsers = this.tenantUserRepository.queryUserTenants(user.getId());
             LoginUser loginUser = UserMapping.INSTANCE.toLoginUser(user);
+            loginUser.setTenant(tenantUsers);
             String accessToken = jwtTokenUtil.generateToken(loginUser);
             String refreshToken = jwtTokenUtil.generateRefreshToken(loginUser);
             UserDTO userDTO = UserMapping.INSTANCE.toDTO(user);
@@ -209,11 +208,10 @@ public class AuthService {
         }
         // 创建LoginUser对象
         LoginUser user = loginUserUtil.getLoginUser(MDC.get("jwtToken"));
-        LoginUser loginUser = UserMapping.INSTANCE.toLoginUser(user);
-        loginUser.setSelectedTenant(tenantId);
+        user.setSelectedTenant(tenantId);
         // 生成包含租户信息的新JWT
-        String accessToken = jwtTokenUtil.generateTokenWithTenant(loginUser, tenantId);
-        String refreshToken = jwtTokenUtil.generateRefreshTokenWithTenant(loginUser, tenantId);
+        String accessToken = jwtTokenUtil.generateTokenWithTenant(user, tenantId);
+        String refreshToken = jwtTokenUtil.generateRefreshTokenWithTenant(user, tenantId);
         Map<String, Object> response = new HashMap<>();
         response.put("accessToken", accessToken);
         response.put("refreshToken", refreshToken);

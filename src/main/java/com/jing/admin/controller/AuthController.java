@@ -71,9 +71,10 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public HttpResult getCurrentUser(HttpServletRequest request) {
-        String jwtToken = request.getHeader("Authorization").substring(7);
-        return HttpResult.success(UserMapping.INSTANCE.toDTO(loginUserUtil.getLoginUser(jwtToken)));
+    public HttpResult getCurrentUser() {
+        String jwtToken = MDC.get("jwtToken");
+        LoginUser loginUser = loginUserUtil.getLoginUser(jwtToken);
+        return HttpResult.success(UserMapping.INSTANCE.toDTO(loginUser));
     }
 
     @PostMapping("/add-role")

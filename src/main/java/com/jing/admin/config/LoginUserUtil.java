@@ -1,8 +1,13 @@
 package com.jing.admin.config;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.jing.admin.core.constant.Role;
 import com.jing.admin.model.domain.LoginUser;
+import com.jing.admin.model.dto.TenantUseDTO;
 import com.jing.admin.model.dto.UserDTO;
+import com.jing.admin.repository.TenantUserRepository;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +23,8 @@ import java.util.stream.Collectors;
 public class LoginUserUtil {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private TenantUserRepository tenantUserRepository;
     public LoginUser getLoginUser(String token){
         if(token.startsWith("Bearer ")){
             token = token.substring(7);
@@ -30,6 +37,9 @@ public class LoginUserUtil {
                 .map(Role::fromName) // 使用你定义的 Role.fromName(String) 方法
                 .collect(Collectors.toList());
         user.setRoles(roles);
+        List<TenantUseDTO> tenantUseDTOS = JSONObject.parseObject( jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("tenant", String.class)),List.class);
+        user.setTenant(tenantUseDTOS);
+        user.setSelectedTenant(MDC.get("tenantId"));
         return  user;
     }
     
