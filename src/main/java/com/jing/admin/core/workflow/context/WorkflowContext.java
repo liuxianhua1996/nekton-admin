@@ -1,5 +1,8 @@
 package com.jing.admin.core.workflow.context;
 
+import com.jing.admin.core.workflow.definition.NodeResult;
+import lombok.Data;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,6 +10,7 @@ import java.util.Map;
  * 工作流执行上下文
  * 用于存储工作流执行过程中的数据和状态
  */
+@Data
 public class WorkflowContext {
     
     /**
@@ -23,6 +27,7 @@ public class WorkflowContext {
      * 当前执行的节点ID
      */
     private String currentNodeId;
+    private String currentNodeName;
     
     /**
      * 工作流执行状态
@@ -37,7 +42,7 @@ public class WorkflowContext {
     /**
      * 节点执行结果存储
      */
-    private Map<String, Object> nodeResults;
+    private Map<String, NodeResult> nodeResults;
     
     /**
      * 错误信息
@@ -58,78 +63,6 @@ public class WorkflowContext {
         this.variables = new HashMap<>();
         this.nodeResults = new HashMap<>();
         this.status = WorkflowStatus.CREATED;
-    }
-    
-    public String getInstanceId() {
-        return instanceId;
-    }
-    
-    public void setInstanceId(String instanceId) {
-        this.instanceId = instanceId;
-    }
-    
-    public String getDefinitionId() {
-        return definitionId;
-    }
-    
-    public void setDefinitionId(String definitionId) {
-        this.definitionId = definitionId;
-    }
-    
-    public String getCurrentNodeId() {
-        return currentNodeId;
-    }
-    
-    public void setCurrentNodeId(String currentNodeId) {
-        this.currentNodeId = currentNodeId;
-    }
-    
-    public WorkflowStatus getStatus() {
-        return status;
-    }
-    
-    public void setStatus(WorkflowStatus status) {
-        this.status = status;
-    }
-    
-    public Map<String, Object> getVariables() {
-        return variables;
-    }
-    
-    public void setVariables(Map<String, Object> variables) {
-        this.variables = variables;
-    }
-    
-    public Map<String, Object> getNodeResults() {
-        return nodeResults;
-    }
-    
-    public void setNodeResults(Map<String, Object> nodeResults) {
-        this.nodeResults = nodeResults;
-    }
-    
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-    
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
-    
-    public Long getStartTime() {
-        return startTime;
-    }
-    
-    public void setStartTime(Long startTime) {
-        this.startTime = startTime;
-    }
-    
-    public Long getEndTime() {
-        return endTime;
-    }
-    
-    public void setEndTime(Long endTime) {
-        this.endTime = endTime;
     }
     
     /**
@@ -155,7 +88,7 @@ public class WorkflowContext {
     /**
      * 设置节点执行结果
      */
-    public void setNodeResult(String nodeId, Object result) {
+    public void setNodeResult(String nodeId, NodeResult result) {
         if (nodeResults == null) {
             nodeResults = new HashMap<>();
         }

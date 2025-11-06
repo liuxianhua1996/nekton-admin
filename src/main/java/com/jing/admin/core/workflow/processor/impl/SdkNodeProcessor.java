@@ -3,6 +3,7 @@ package com.jing.admin.core.workflow.processor.impl;
 import com.jing.admin.core.workflow.context.WorkflowContext;
 import com.jing.admin.core.workflow.definition.NodeData;
 import com.jing.admin.core.workflow.definition.NodeDefinition;
+import com.jing.admin.core.workflow.definition.NodeResult;
 import com.jing.admin.core.workflow.node.NodeExecutionResult;
 import com.jing.admin.core.workflow.node.NodeExecutor;
 import org.springframework.stereotype.Component;
@@ -46,7 +47,8 @@ public class SdkNodeProcessor implements NodeExecutor {
             Object result = executeSdkCall(system, method, sdkParams, context);
             
             // 设置节点执行结果
-            context.setNodeResult(nodeDefinition.getId(), result);
+            context.setNodeResult(nodeDefinition.getId(), NodeResult.builder()
+                    .nodeId(nodeDefinition.getId()).nodeName(nodeDefinition.getData().getLabel()).executeResult(result).build());
             
             // 将结果添加到上下文变量中
             if (nodeData.getContent().getOutParams() != null) {

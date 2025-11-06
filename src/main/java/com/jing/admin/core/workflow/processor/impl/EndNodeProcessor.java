@@ -2,6 +2,7 @@ package com.jing.admin.core.workflow.processor.impl;
 
 import com.jing.admin.core.workflow.context.WorkflowContext;
 import com.jing.admin.core.workflow.definition.NodeDefinition;
+import com.jing.admin.core.workflow.definition.NodeResult;
 import com.jing.admin.core.workflow.node.NodeExecutionResult;
 import com.jing.admin.core.workflow.node.NodeExecutor;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,8 @@ public class EndNodeProcessor implements NodeExecutor {
             context.setStatus(WorkflowContext.WorkflowStatus.COMPLETED);
             
             // 设置节点执行结果
-            context.setNodeResult(nodeDefinition.getId(), "工作流已结束");
+            context.setNodeResult(nodeDefinition.getId(), NodeResult.builder()
+                    .nodeId(nodeDefinition.getId()).nodeName(nodeDefinition.getData().getLabel()).executeResult("工作流已结束").build());
             
             long executionTime = System.currentTimeMillis() - startTime;
             NodeExecutionResult result = NodeExecutionResult.success("工作流已结束");

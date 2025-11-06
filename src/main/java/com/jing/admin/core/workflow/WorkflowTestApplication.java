@@ -8,6 +8,7 @@ import com.jing.admin.core.workflow.definition.WorkflowDefinition;
 import com.jing.admin.core.workflow.engine.WorkflowEngine;
 import com.jing.admin.core.workflow.engine.WorkflowExecutionResult;
 import com.jing.admin.core.workflow.engine.WorkflowExecutor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,6 +25,7 @@ import java.io.InputStream;
  * 用于测试工作流执行引擎
  */
 @Component
+@Slf4j
 public class WorkflowTestApplication {
     @Autowired
     WorkflowExecutor workflowExecutor;
@@ -40,35 +42,35 @@ public class WorkflowTestApplication {
             // 读取JSON文件内容为字符串
             String workflowJson = new String(inputStream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             
-            System.out.println("开始执行工作流...");
-            System.out.println("工作流JSON内容:");
-            System.out.println(workflowJson);
-            System.out.println("----------------------------------------");
+            log.info("开始执行工作流...");
+            log.info("工作流JSON内容:");
+            log.info(workflowJson);
+            log.info("----------------------------------------");
             
             // 执行工作流
             WorkflowExecutionResult result = workflowExecutor.executeFromJson(workflowJson);
             
             // 输出执行结果
-            System.out.println("工作流执行结果:");
-            System.out.println("执行状态: " + (result.isSuccess() ? "成功" : "失败"));
-            System.out.println("执行消息: " + result.getMessage());
+            log.info("工作流执行结果:");
+            log.info("执行状态: " + (result.isSuccess() ? "成功" : "失败"));
+            log.info("执行消息: " + result.getMessage());
             
             if (result.getContext() != null) {
                 WorkflowContext workflowContext = result.getContext();
-                System.out.println("工作流实例ID: " + workflowContext.getInstanceId());
-                System.out.println("工作流状态: " + workflowContext.getStatus());
+                log.info("工作流实例ID: " + workflowContext.getInstanceId());
+                log.info("工作流状态: " + workflowContext.getStatus());
                 
                 if (workflowContext.getNodeResults() != null && !workflowContext.getNodeResults().isEmpty()) {
-                    System.out.println("\n节点执行结果:");
+                    log.info("\n节点执行结果:");
                     workflowContext.getNodeResults().forEach((nodeId, nodeResult) -> {
-                        System.out.println("节点ID: " + nodeId + ", 结果: " + nodeResult);
+                        log.info("节点ID: {} 节点名称: {} 结果: {}", nodeResult.getNodeId(),nodeResult.getNodeName(),nodeResult.getExecuteResult());
                     });
                 }
                 
                 if (workflowContext.getVariables() != null && !workflowContext.getVariables().isEmpty()) {
-                    System.out.println("\n工作流变量:");
+                    log.info("\n工作流变量:");
                     workflowContext.getVariables().forEach((key, value) -> {
-                        System.out.println("变量名: " + key + ", 值: " + value);
+                        log.info("变量名: " + key + ", 值: " + value);
                     });
                 }
             }

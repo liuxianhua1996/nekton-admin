@@ -17,7 +17,7 @@ import java.util.UUID;
  */
 @Component
 public class WorkflowEngine {
-    
+
     @Autowired
     private List<NodeExecutor> nodeExecutors;
     
@@ -47,6 +47,7 @@ public class WorkflowEngine {
         
         // 设置当前节点
         context.setCurrentNodeId(currentNode.getId());
+        context.setCurrentNodeName(currentNode.getData().getLabel());
         
         try {
             // 遍历执行节点
