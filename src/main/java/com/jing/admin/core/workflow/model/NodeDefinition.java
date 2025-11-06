@@ -1,8 +1,6 @@
-package com.jing.admin.core.workflow.definition;
+package com.jing.admin.core.workflow.model;
 
 import lombok.Data;
-
-import java.util.Map;
 
 /**
  * 节点定义类

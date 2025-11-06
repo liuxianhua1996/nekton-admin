@@ -1,6 +1,6 @@
-package com.jing.admin.core.workflow.context;
+package com.jing.admin.core.workflow.core.context;
 
-import com.jing.admin.core.workflow.definition.NodeResult;
+import com.jing.admin.core.workflow.model.NodeResult;
 import lombok.Data;
 
 import java.util.HashMap;

@@ -1,7 +1,7 @@
-package com.jing.admin.core.workflow.node;
+package com.jing.admin.core.workflow.exception;
 
-import com.jing.admin.core.workflow.context.WorkflowContext;
-import com.jing.admin.core.workflow.definition.NodeDefinition;
+import com.jing.admin.core.workflow.core.context.WorkflowContext;
+import com.jing.admin.core.workflow.model.NodeDefinition;
 
 /**
  * 节点执行器接口

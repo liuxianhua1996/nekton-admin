@@ -1,15 +1,12 @@
-package com.jing.admin.core.workflow.processor.impl;
+package com.jing.admin.core.workflow.node.impl;
 
-import com.jing.admin.core.workflow.conversion.ParameterConverter;
-import com.jing.admin.core.workflow.context.WorkflowContext;
-import com.jing.admin.core.workflow.definition.NodeData;
-import com.jing.admin.core.workflow.definition.NodeDefinition;
-import com.jing.admin.core.workflow.definition.NodeResult;
-import com.jing.admin.core.workflow.node.NodeExecutionResult;
-import com.jing.admin.core.workflow.node.NodeExecutor;
-import com.jing.admin.core.workflow.processor.BaseProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.jing.admin.core.workflow.core.conversion.ParameterConverter;
+import com.jing.admin.core.workflow.core.context.WorkflowContext;
+import com.jing.admin.core.workflow.model.NodeData;
+import com.jing.admin.core.workflow.model.NodeDefinition;
+import com.jing.admin.core.workflow.model.NodeResult;
+import com.jing.admin.core.workflow.exception.NodeExecutionResult;
+import com.jing.admin.core.workflow.node.BaseNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,9 +15,9 @@ import java.util.Map;
  * SDK节点处理器
  * 处理系统集成类型的节点
  */
-public class SdkNodeProcessor extends BaseProcessor {
+public class SdkNode extends BaseNode {
 
-    public SdkNodeProcessor(ParameterConverter parameterConverter) {
+    public SdkNode(ParameterConverter parameterConverter) {
         super(parameterConverter);
     }
 

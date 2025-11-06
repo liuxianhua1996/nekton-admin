@@ -1,4 +1,4 @@
-package com.jing.admin.core.workflow.node;
+package com.jing.admin.core.workflow.exception;
 
 import lombok.Data;
 

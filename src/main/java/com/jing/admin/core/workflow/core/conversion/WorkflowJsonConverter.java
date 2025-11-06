@@ -1,11 +1,10 @@
-package com.jing.admin.core.workflow.conversion;
+package com.jing.admin.core.workflow.core.conversion;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jing.admin.core.workflow.definition.EdgeDefinition;
-import com.jing.admin.core.workflow.definition.NodeData;
-import com.jing.admin.core.workflow.definition.NodeDefinition;
-import com.jing.admin.core.workflow.definition.WorkflowDefinition;
-import org.springframework.stereotype.Component;
+import com.jing.admin.core.workflow.model.EdgeDefinition;
+import com.jing.admin.core.workflow.model.NodeData;
+import com.jing.admin.core.workflow.model.NodeDefinition;
+import com.jing.admin.core.workflow.model.WorkflowDefinition;
 
 import java.io.IOException;
 import java.util.ArrayList;

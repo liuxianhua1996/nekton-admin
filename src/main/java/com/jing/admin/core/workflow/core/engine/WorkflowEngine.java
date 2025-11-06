@@ -1,10 +1,10 @@
-package com.jing.admin.core.workflow.engine;
+package com.jing.admin.core.workflow.core.engine;
 
-import com.jing.admin.core.workflow.context.WorkflowContext;
-import com.jing.admin.core.workflow.definition.NodeDefinition;
-import com.jing.admin.core.workflow.definition.WorkflowDefinition;
-import com.jing.admin.core.workflow.node.NodeExecutionResult;
-import com.jing.admin.core.workflow.node.NodeExecutor;
+import com.jing.admin.core.workflow.core.context.WorkflowContext;
+import com.jing.admin.core.workflow.model.NodeDefinition;
+import com.jing.admin.core.workflow.model.WorkflowDefinition;
+import com.jing.admin.core.workflow.exception.NodeExecutionResult;
+import com.jing.admin.core.workflow.exception.NodeExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

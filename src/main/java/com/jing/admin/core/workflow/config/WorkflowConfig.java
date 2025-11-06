@@ -1,13 +1,12 @@
 package com.jing.admin.core.workflow.config;
 
-import com.jing.admin.core.workflow.conversion.ParameterConverter;
-import com.jing.admin.core.workflow.node.NodeExecutor;
-import com.jing.admin.core.workflow.processor.impl.EndNodeProcessor;
-import com.jing.admin.core.workflow.processor.impl.SdkNodeProcessor;
-import com.jing.admin.core.workflow.processor.impl.StartNodeProcessor;
+import com.jing.admin.core.workflow.core.conversion.ParameterConverter;
+import com.jing.admin.core.workflow.exception.NodeExecutor;
+import com.jing.admin.core.workflow.node.impl.EndNode;
+import com.jing.admin.core.workflow.node.impl.SdkNode;
+import com.jing.admin.core.workflow.node.impl.StartNode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.parameters.P;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +25,9 @@ public class WorkflowConfig {
     public List<NodeExecutor> nodeExecutors() {
         ParameterConverter parameterConverter = new ParameterConverter();
         List<NodeExecutor> executors = new ArrayList<>();
-        executors.add(new StartNodeProcessor(parameterConverter));
-        executors.add(new EndNodeProcessor(parameterConverter));
-        executors.add(new SdkNodeProcessor(parameterConverter));
+        executors.add(new StartNode(parameterConverter));
+        executors.add(new EndNode(parameterConverter));
+        executors.add(new SdkNode(parameterConverter));
         return executors;
     }
 }

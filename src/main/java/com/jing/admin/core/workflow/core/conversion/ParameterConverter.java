@@ -1,9 +1,8 @@
-package com.jing.admin.core.workflow.conversion;
+package com.jing.admin.core.workflow.core.conversion;
 
 import com.jing.admin.core.exception.BusinessException;
-import com.jing.admin.core.workflow.context.WorkflowContext;
-import com.jing.admin.core.workflow.definition.NodeResult;
-import org.springframework.stereotype.Component;
+import com.jing.admin.core.workflow.core.context.WorkflowContext;
+import com.jing.admin.core.workflow.model.NodeResult;
 
 import java.util.Map;
 import java.util.regex.Matcher;

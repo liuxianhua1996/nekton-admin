@@ -1,7 +1,6 @@
-package com.jing.admin.core.workflow.definition;
+package com.jing.admin.core.workflow.model;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 工作流定义类

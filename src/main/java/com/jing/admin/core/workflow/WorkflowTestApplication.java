@@ -1,20 +1,10 @@
 package com.jing.admin.core.workflow;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jing.admin.AdminApplication;
-import com.jing.admin.core.workflow.context.WorkflowContext;
-import com.jing.admin.core.workflow.conversion.WorkflowJsonConverter;
-import com.jing.admin.core.workflow.definition.WorkflowDefinition;
-import com.jing.admin.core.workflow.engine.WorkflowEngine;
-import com.jing.admin.core.workflow.engine.WorkflowExecutionResult;
-import com.jing.admin.core.workflow.engine.WorkflowExecutor;
+import com.jing.admin.core.workflow.core.context.WorkflowContext;
+import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
+import com.jing.admin.core.workflow.core.engine.WorkflowExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;

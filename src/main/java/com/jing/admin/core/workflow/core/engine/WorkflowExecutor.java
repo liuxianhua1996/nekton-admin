@@ -1,9 +1,9 @@
-package com.jing.admin.core.workflow.engine;
+package com.jing.admin.core.workflow.core.engine;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jing.admin.core.workflow.context.WorkflowContext;
-import com.jing.admin.core.workflow.conversion.WorkflowJsonConverter;
-import com.jing.admin.core.workflow.definition.WorkflowDefinition;
+import com.jing.admin.core.workflow.core.context.WorkflowContext;
+import com.jing.admin.core.workflow.core.conversion.WorkflowJsonConverter;
+import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

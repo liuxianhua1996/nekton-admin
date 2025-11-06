@@ -1,4 +1,4 @@
-package com.jing.admin.core.workflow.definition;
+package com.jing.admin.core.workflow.model;
 
 import lombok.Builder;
 import lombok.Data;

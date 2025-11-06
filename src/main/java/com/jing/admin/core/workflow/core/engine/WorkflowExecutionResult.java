@@ -1,6 +1,6 @@
-package com.jing.admin.core.workflow.engine;
+package com.jing.admin.core.workflow.core.engine;
 
-import com.jing.admin.core.workflow.context.WorkflowContext;
+import com.jing.admin.core.workflow.core.context.WorkflowContext;
 
 /**
  * 工作流执行结果类
