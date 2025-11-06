@@ -41,20 +41,10 @@ public class WorkflowTestApplication {
             
             // 读取JSON文件内容为字符串
             String workflowJson = new String(inputStream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-            
-            log.info("开始执行工作流...");
-            log.info("工作流JSON内容:");
-            log.info(workflowJson);
             log.info("----------------------------------------");
-            
+            log.info("开始执行工作流...");
             // 执行工作流
             WorkflowExecutionResult result = workflowExecutor.executeFromJson(workflowJson);
-            
-            // 输出执行结果
-            log.info("工作流执行结果:");
-            log.info("执行状态: " + (result.isSuccess() ? "成功" : "失败"));
-            log.info("执行消息: " + result.getMessage());
-            
             if (result.getContext() != null) {
                 WorkflowContext workflowContext = result.getContext();
                 log.info("工作流实例ID: " + workflowContext.getInstanceId());
@@ -74,7 +64,12 @@ public class WorkflowTestApplication {
                     });
                 }
             }
-            
+
+            // 输出执行结果
+            log.info("工作流执行结果:");
+            log.info("执行状态: " + (result.isSuccess() ? "成功" : "失败"));
+            log.info("执行消息: " + result.getMessage());
+            log.info("----------------------------------------");
         } catch (IOException e) {
             System.err.println("读取工作流JSON文件失败: " + e.getMessage());
             e.printStackTrace();
