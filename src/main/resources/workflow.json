@@ -16,13 +16,10 @@
         "type": "start",
         "content": {
           "conditions": [
-
           ],
           "inParams": {
-
           },
           "outParams": {
-
           }
         },
         "selected": false,
@@ -50,13 +47,10 @@
         "type": "end",
         "content": {
           "conditions": [
-
           ],
           "inParams": {
-
           },
           "outParams": {
-
           }
         },
         "selected": false,
@@ -76,7 +70,6 @@
         "type": "sdk",
         "content": {
           "inParams": {
-
           },
           "outParams": {
             "result": {
@@ -87,7 +80,6 @@
             }
           },
           "conditions": [
-
           ],
           "sdkParams": {
             "system": "kingdee_sky",
@@ -109,8 +101,8 @@
                 "dataType": "string",
                 "desc": "查询字段",
                 "required": true,
-                "value": "",
-                "valueType": "input",
+                "value": "{{3155a9acbdd9428ea0bb8c7697b934d4.test}}",
+                "valueType": "column",
                 "sort": 1
               },
               "condition": {
@@ -184,7 +176,6 @@
       "target": "1eb3bcdfa267439b93114dc320195fe0",
       "targetHandle": "target-1eb3bcdfa267439b93114dc320195fe0",
       "style": {
-
       }
     },
     {

@@ -1,76 +1,130 @@
 package com.jing.admin.core.workflow.processor.impl;
 
+import com.jing.admin.core.workflow.conversion.ParameterConverter;
 import com.jing.admin.core.workflow.context.WorkflowContext;
 import com.jing.admin.core.workflow.definition.NodeData;
 import com.jing.admin.core.workflow.definition.NodeDefinition;
 import com.jing.admin.core.workflow.definition.NodeResult;
 import com.jing.admin.core.workflow.node.NodeExecutionResult;
 import com.jing.admin.core.workflow.node.NodeExecutor;
+import com.jing.admin.core.workflow.processor.BaseProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * SDK节点处理器
  * 处理系统集成类型的节点
  */
-@Component
-public class SdkNodeProcessor implements NodeExecutor {
-    
+public class SdkNodeProcessor extends BaseProcessor {
+
+    public SdkNodeProcessor(ParameterConverter parameterConverter) {
+        super(parameterConverter);
+    }
+
     @Override
     public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context) {
         long startTime = System.currentTimeMillis();
-        
+
         try {
             // 获取节点数据
             NodeData nodeData = nodeDefinition.getData();
             if (nodeData == null || nodeData.getContent() == null) {
                 return NodeExecutionResult.failure("SDK节点数据为空");
             }
-            
+
             // 获取SDK参数
             Map<String, Object> sdkParams = nodeData.getContent().getSdkParams();
             if (sdkParams == null) {
                 return NodeExecutionResult.failure("SDK参数为空");
             }
-            
+
+            // 处理参数中的引用
+            Map<String, Object> processedParams = processSdkParams(sdkParams, context);
+
             // 获取系统和方法信息
-            String system = (String) sdkParams.get("system");
-            String method = (String) sdkParams.get("method");
-            
+            String system = (String) processedParams.get("system");
+            String method = (String) processedParams.get("method");
+
             if (system == null || method == null) {
                 return NodeExecutionResult.failure("系统或方法参数为空");
             }
-            
+
             // 这里应该根据不同的系统和方法调用相应的SDK
             // 由于是示例，这里只做模拟处理
-            Object result = executeSdkCall(system, method, sdkParams, context);
-            
+            Object result = executeSdkCall(system, method, processedParams, context);
+
             // 设置节点执行结果
             context.setNodeResult(nodeDefinition.getId(), NodeResult.builder()
                     .nodeId(nodeDefinition.getId()).nodeName(nodeDefinition.getData().getLabel()).executeResult(result).build());
-            
+
             // 将结果添加到上下文变量中
             if (nodeData.getContent().getOutParams() != null) {
                 nodeData.getContent().getOutParams().forEach((key, param) -> {
                     context.setVariable(key, result);
                 });
             }
-            
+
             long executionTime = System.currentTimeMillis() - startTime;
             NodeExecutionResult executionResult = NodeExecutionResult.success(result);
             executionResult.setExecutionTime(executionTime);
-            
+
             return executionResult;
         } catch (Exception e) {
             long executionTime = System.currentTimeMillis() - startTime;
             NodeExecutionResult result = NodeExecutionResult.failure("SDK节点执行失败: " + e.getMessage());
             result.setExecutionTime(executionTime);
-            
+
             return result;
         }
     }
-    
+
+    /**
+     * 处理SDK参数中的引用
+     *
+     * @param sdkParams 原始SDK参数
+     * @param context   工作流执行上下文
+     * @return 处理后的SDK参数
+     */
+    private Map<String, Object> processSdkParams(Map<String, Object> sdkParams, WorkflowContext context) {
+        Map<String, Object> processedParams = new HashMap<>();
+
+        // 处理系统和方法参数
+        processedParams.put("system", sdkParams.get("system"));
+        processedParams.put("method", sdkParams.get("method"));
+        processedParams.put("apiKeyId", sdkParams.get("apiKeyId"));
+
+        // 处理params参数
+        Map<String, Object> params = (Map<String, Object>) sdkParams.get("params");
+        if (params != null) {
+            Map<String, Object> processedParamsMap = new HashMap<>();
+
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                String paramName = entry.getKey();
+                Map<String, Object> paramDetails = (Map<String, Object>) entry.getValue();
+
+                // 获取参数值和类型
+                Object value = paramDetails.get("value");
+                String valueType = (String) paramDetails.get("valueType");
+
+                // 使用参数转换器处理参数值
+                Object convertedValue = parameterConverter.convertParameter(value, valueType, context);
+
+                // 创建新的参数详情
+                Map<String, Object> newParamDetails = new HashMap<>(paramDetails);
+                newParamDetails.put("value", convertedValue);
+
+                processedParamsMap.put(paramName, newParamDetails);
+            }
+
+            processedParams.put("params", processedParamsMap);
+        }
+
+        return processedParams;
+    }
+
     /**
      * 执行SDK调用
      * 这里是示例实现，实际应用中应该根据具体的系统和方法实现
@@ -78,14 +132,31 @@ public class SdkNodeProcessor implements NodeExecutor {
     private Object executeSdkCall(String system, String method, Map<String, Object> params, WorkflowContext context) {
         // 模拟SDK调用
         if ("kingdee_sky".equals(system) && "query".equals(method)) {
-            // 模拟金蝶查询
-            return "金蝶系统查询结果";
+            // 获取查询参数
+            Map<String, Object> queryParams = (Map<String, Object>) params.get("params");
+
+            // 构建模拟查询结果
+            Map<String, Object> result = new HashMap<>();
+            result.put("formId", queryParams.get("formId"));
+            result.put("fields", queryParams.get("fields"));
+            result.put("condition", queryParams.get("condition"));
+            result.put("order", queryParams.get("order"));
+            result.put("page", queryParams.get("page"));
+            result.put("pageSize", queryParams.get("pageSize"));
+
+            // 返回模拟查询结果
+            Map<String, Object> queryResult = new HashMap<>();
+            queryResult.put("success", true);
+            queryResult.put("data", result);
+            queryResult.put("message", "查询成功");
+
+            return queryResult;
         }
-        
+
         // 默认返回模拟结果
         return "SDK调用结果: " + system + "." + method;
     }
-    
+
     @Override
     public boolean supports(String nodeType) {
         return "sdk".equals(nodeType);

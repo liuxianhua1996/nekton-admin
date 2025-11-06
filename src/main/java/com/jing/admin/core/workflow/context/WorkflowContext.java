@@ -98,7 +98,7 @@ public class WorkflowContext {
     /**
      * 获取节点执行结果
      */
-    public Object getNodeResult(String nodeId) {
+    public NodeResult getNodeResult(String nodeId) {
         if (nodeResults == null) {
             return null;
         }

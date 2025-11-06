@@ -1,19 +1,24 @@
 package com.jing.admin.core.workflow.processor.impl;
 
 import com.jing.admin.core.workflow.context.WorkflowContext;
+import com.jing.admin.core.workflow.conversion.ParameterConverter;
 import com.jing.admin.core.workflow.definition.NodeDefinition;
 import com.jing.admin.core.workflow.definition.NodeResult;
 import com.jing.admin.core.workflow.node.NodeExecutionResult;
 import com.jing.admin.core.workflow.node.NodeExecutor;
+import com.jing.admin.core.workflow.processor.BaseProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
  * 结束节点处理器
  * 处理工作流的结束节点
  */
-@Component
-public class EndNodeProcessor implements NodeExecutor {
-    
+public class EndNodeProcessor extends BaseProcessor {
+    public EndNodeProcessor(ParameterConverter parameterConverter) {
+        super(parameterConverter);
+    }
+
     @Override
     public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context) {
         long startTime = System.currentTimeMillis();
