@@ -33,7 +33,7 @@ public class StartNode extends BaseNode {
             // 处理输出参数
             NodeData nodeData = nodeDefinition.getData();
             Map<String, Object> outputData = new HashMap<>();
-            outputData.put("test","heihei");
+            Map outputParams = nodeData.getContent().getOutParams();
             // 设置节点执行结果
             context.setNodeResult(nodeDefinition.getId(), NodeResult.builder()
                     .nodeId(nodeDefinition.getId()).nodeName(nodeDefinition.getData().getLabel()).executeResult(outputData).build());

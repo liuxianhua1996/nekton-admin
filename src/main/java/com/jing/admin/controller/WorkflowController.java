@@ -8,6 +8,7 @@ import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
 import com.jing.admin.model.api.WorkflowTestRequest;
 import com.jing.admin.model.domain.Workflow;
+import com.jing.admin.model.dto.TestWorkflowDTO;
 import com.jing.admin.model.dto.WorkflowDTO;
 import com.jing.admin.model.mapping.WorkflowMapping;
 import com.jing.admin.service.WorkflowService;
@@ -85,9 +86,9 @@ public class WorkflowController {
      */
     @PostMapping("/test")
     @Operation(summary = "测试工作流", description = "测试工作流执行")
-    public HttpResult<WorkflowExecutionResult> testWorkflow(@RequestBody WorkflowTestRequest workflowTestRequest) {
+    public HttpResult<TestWorkflowDTO> testWorkflow(@RequestBody WorkflowTestRequest workflowTestRequest) {
         try {
-            WorkflowExecutionResult result = workflowService.testWorkflow(workflowTestRequest);
+            TestWorkflowDTO result = workflowService.testWorkflow(workflowTestRequest);
             return HttpResult.success(result);
         } catch (Exception e) {
             return HttpResult.error("测试工作流失败：" + e.getMessage());

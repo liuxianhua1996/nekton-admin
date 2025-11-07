@@ -13,6 +13,7 @@ import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
 import com.jing.admin.model.api.WorkflowTestRequest;
 import com.jing.admin.model.domain.Workflow;
+import com.jing.admin.model.dto.TestWorkflowDTO;
 import com.jing.admin.model.dto.WorkflowDTO;
 import com.jing.admin.repository.WorkflowRepository;
 import org.slf4j.MDC;
@@ -148,7 +149,7 @@ public class WorkflowService {
      * @param workflowTestRequest 工作流测试请求
      * @return 工作流执行结果
      */
-    public WorkflowExecutionResult testWorkflow(WorkflowTestRequest workflowTestRequest) {
+    public TestWorkflowDTO testWorkflow(WorkflowTestRequest workflowTestRequest) {
         // 获取工作流信息
         Workflow workflow = workflowRepository.getById(workflowTestRequest.getId());
         if (workflow == null) {
@@ -166,9 +167,11 @@ public class WorkflowService {
         if (workflowTestRequest.getParams() != null) {
             params = workflowTestRequest.getParams();
         }
-        
+        TestWorkflowDTO testWorkflowDTO = new TestWorkflowDTO();
+        testWorkflowDTO.setRunResult(workflowExecutor.executeFromJson(workflowJson, params));
+        testWorkflowDTO.setRunLogs(new ArrayList<>());
         // 执行工作流
-        return workflowExecutor.executeFromJson(workflowJson, params);
+        return testWorkflowDTO;
     }
 
     /**
