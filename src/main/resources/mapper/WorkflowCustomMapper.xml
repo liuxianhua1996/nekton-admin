@@ -36,9 +36,9 @@
         FROM 
             tb_workflow w
         LEFT JOIN
-            tb_users cu ON w.create_user_id::uuid = cu.id
+            tb_users cu ON w.create_user_id = cu.uuid
         LEFT JOIN
-            tb_users uu ON w.update_user_id::uuid = uu.id
+            tb_users uu ON w.update_user_id = uu.uuid
         <where>
             <if test="query.name != null and query.name != ''">
                 AND w.name LIKE CONCAT('%', #{name}, '%')

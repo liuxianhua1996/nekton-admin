@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS tb_users (
     update_time BIGINT,
     create_user_id VARCHAR(255),
     update_user_id VARCHAR(255)
-    );
+);
 
 -- 租户基本信息表
 CREATE TABLE IF NOT EXISTS tb_tenants (
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS tb_tenants (
     update_time BIGINT,
     create_user_id VARCHAR(255),
     update_user_id VARCHAR(255)
-    );
+    ;
 
 -- 用户-租户关联表（解决多对多关系）
 CREATE TABLE IF NOT EXISTS tb_user_tenant (

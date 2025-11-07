@@ -20,6 +20,16 @@
           "inParams": {
           },
           "outParams": {
+            "test": {
+              "dataType": "string",
+              "description": "",
+              "id": "8e48222eaf444db68f1596950d62bf4a",
+              "name": "test",
+              "required": "false",
+              "sort": 0,
+              "value": "111",
+              "valueType": "input"
+            }
           }
         },
         "selected": false,
