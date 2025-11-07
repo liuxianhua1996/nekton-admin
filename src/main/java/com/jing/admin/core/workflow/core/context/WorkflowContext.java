@@ -92,6 +92,7 @@ public class WorkflowContext {
         if (nodeResults == null) {
             nodeResults = new HashMap<>();
         }
+        result.setSort(nodeResults.size());
         nodeResults.put(nodeId, result);
     }
     

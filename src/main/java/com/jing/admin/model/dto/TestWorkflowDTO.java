@@ -1,6 +1,7 @@
 package com.jing.admin.model.dto;
 
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
@@ -12,6 +13,19 @@ import java.util.Map;
  **/
 @Data
 public class TestWorkflowDTO {
-    private WorkflowExecutionResult runResult;
-    private List<Map> runLogs;
+    private List<NodeTestResult> nodeTestResults;
+    private String status;
+
+    @Data
+    @Builder
+    public static class  NodeTestResult {
+        private String nodeId;
+        private String nodeName;
+        private int sort;
+        private String status;
+        private Object executeResult;
+
+        private String errorMessage;
+
+    }
 }

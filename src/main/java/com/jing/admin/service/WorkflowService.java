@@ -8,6 +8,7 @@ import com.jing.admin.core.PageResult;
 import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutor;
+import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.mapper.WorkflowCustomMapper;
 import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
@@ -16,11 +17,13 @@ import com.jing.admin.model.domain.Workflow;
 import com.jing.admin.model.dto.TestWorkflowDTO;
 import com.jing.admin.model.dto.WorkflowDTO;
 import com.jing.admin.repository.WorkflowRepository;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.sql.Array;
 import java.util.*;
 
 /**
@@ -168,8 +171,19 @@ public class WorkflowService {
             params = workflowTestRequest.getParams();
         }
         TestWorkflowDTO testWorkflowDTO = new TestWorkflowDTO();
-        testWorkflowDTO.setRunResult(workflowExecutor.executeFromJson(workflowJson, params));
-        testWorkflowDTO.setRunLogs(new ArrayList<>());
+        List<TestWorkflowDTO.NodeTestResult> nodeTestResults = new ArrayList();
+        WorkflowExecutionResult workflowExecutionResult = workflowExecutor.executeFromJson(workflowJson);
+        Map<String, NodeResult> nodeResultMap = workflowExecutionResult.getContext().getNodeResults();
+        nodeResultMap.forEach((id,nodeTestResult)->{
+            nodeTestResults.add(TestWorkflowDTO.NodeTestResult.builder()
+                            .nodeId(nodeTestResult.getNodeId())
+                            .nodeName(nodeTestResult.getNodeName())
+                            .status("COMPLETED")
+                            .sort(nodeTestResult.getSort())
+                            .executeResult(nodeTestResult.getExecuteResult())
+                    .build());
+        });
+        testWorkflowDTO.setNodeTestResults(nodeTestResults);
         // 执行工作流
         return testWorkflowDTO;
     }
