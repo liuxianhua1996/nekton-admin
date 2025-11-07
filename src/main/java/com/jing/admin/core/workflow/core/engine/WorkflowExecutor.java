@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 /**
  * 工作流执行器
@@ -35,6 +36,39 @@ public class WorkflowExecutor {
             
             // 创建工作流执行上下文
             WorkflowContext context = new WorkflowContext();
+            
+            // 执行工作流
+            return workflowEngine.execute(workflowDefinition, context);
+        } catch (IOException e) {
+            WorkflowContext context = new WorkflowContext();
+            context.setStatus(WorkflowContext.WorkflowStatus.FAILED);
+            context.setErrorMessage("工作流JSON解析失败: " + e.getMessage());
+            
+            return new WorkflowExecutionResult(false, context, "工作流JSON解析失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 从JSON字符串执行工作流，并传入参数
+     * 
+     * @param workflowJson 工作流JSON字符串
+     * @param params 执行参数
+     * @return 执行结果
+     */
+    public WorkflowExecutionResult executeFromJson(String workflowJson, Map<String, Object> params) {
+        try {
+            // 转换JSON为工作流定义
+            WorkflowDefinition workflowDefinition = WorkflowJsonConverter.convertFromJson(workflowJson);
+            
+            // 创建工作流执行上下文
+            WorkflowContext context = new WorkflowContext();
+            
+            // 设置传入的参数到上下文中
+            if (params != null && !params.isEmpty()) {
+                for (Map.Entry<String, Object> entry : params.entrySet()) {
+                    context.setVariable(entry.getKey(), entry.getValue());
+                }
+            }
             
             // 执行工作流
             return workflowEngine.execute(workflowDefinition, context);

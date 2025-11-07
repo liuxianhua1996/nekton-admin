@@ -3,12 +3,16 @@ package com.jing.admin.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.jing.admin.core.HttpResult;
 import com.jing.admin.core.PageResult;
+import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
+import com.jing.admin.model.api.WorkflowTestRequest;
 import com.jing.admin.model.domain.Workflow;
 import com.jing.admin.model.dto.WorkflowDTO;
 import com.jing.admin.model.mapping.WorkflowMapping;
 import com.jing.admin.service.WorkflowService;
+import io.swagger.v3.oas.annotations.Operation;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,6 +66,7 @@ public class WorkflowController {
     public HttpResult<PageResult<WorkflowDTO>> getWorkflowPage(WorkflowQueryRequest queryRequest) {
         return HttpResult.success(workflowService.getWorkflowPage(queryRequest));
     }
+
     /**
      * 获取工作流列表（分页）
      *
@@ -71,5 +76,21 @@ public class WorkflowController {
     @GetMapping("/getWorkflowInfo")
     public HttpResult<Workflow> getWorkflowInfo(WorkflowQueryRequest queryRequest) {
         return HttpResult.success(workflowService.getWorkflowInfo(queryRequest));
+    }
+
+    /**
+     * 测试工作流
+     * @param workflowTestRequest
+     * @return
+     */
+    @PostMapping("/test")
+    @Operation(summary = "测试工作流", description = "测试工作流执行")
+    public HttpResult<WorkflowExecutionResult> testWorkflow(@RequestBody WorkflowTestRequest workflowTestRequest) {
+        try {
+            WorkflowExecutionResult result = workflowService.testWorkflow(workflowTestRequest);
+            return HttpResult.success(result);
+        } catch (Exception e) {
+            return HttpResult.error("测试工作流失败：" + e.getMessage());
+        }
     }
 }

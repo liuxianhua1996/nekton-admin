@@ -6,9 +6,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jing.admin.core.PageResult;
 import com.jing.admin.core.exception.BusinessException;
+import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
+import com.jing.admin.core.workflow.core.engine.WorkflowExecutor;
 import com.jing.admin.mapper.WorkflowCustomMapper;
 import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
+import com.jing.admin.model.api.WorkflowTestRequest;
 import com.jing.admin.model.domain.Workflow;
 import com.jing.admin.model.dto.WorkflowDTO;
 import com.jing.admin.repository.WorkflowRepository;
@@ -17,9 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * 工作流服务实现类
@@ -35,6 +36,9 @@ public class WorkflowService {
     
     @Autowired
     private WorkflowCustomMapper workflowCustomMapper;
+    
+    @Autowired
+    private WorkflowExecutor workflowExecutor;
 
     /**
      * 保存或更新工作流
@@ -136,6 +140,35 @@ public class WorkflowService {
 
     public Workflow getWorkflowInfo(WorkflowQueryRequest workflowQueryRequest){
         return workflowRepository.getById(workflowQueryRequest.getId());
+    }
+
+    /**
+     * 测试执行工作流
+     *
+     * @param workflowTestRequest 工作流测试请求
+     * @return 工作流执行结果
+     */
+    public WorkflowExecutionResult testWorkflow(WorkflowTestRequest workflowTestRequest) {
+        // 获取工作流信息
+        Workflow workflow = workflowRepository.getById(workflowTestRequest.getId());
+        if (workflow == null) {
+            throw new BusinessException("工作流不存在");
+        }
+        
+        // 获取工作流JSON数据
+        String workflowJson = workflow.getJsonData();
+        if (workflowJson == null || workflowJson.isEmpty()) {
+            throw new BusinessException("工作流数据为空");
+        }
+        
+        // 获取测试参数
+        Map<String, Object> params = new HashMap<>();
+        if (workflowTestRequest.getParams() != null) {
+            params = workflowTestRequest.getParams();
+        }
+        
+        // 执行工作流
+        return workflowExecutor.executeFromJson(workflowJson, params);
     }
 
     /**
