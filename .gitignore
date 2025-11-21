@@ -1,9 +1,14 @@
 HELP.md
-
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+# 忽略所有环境的配置文件
+**/src/**/application-*.properties
+**/src/**/application-*.yml
+# 但保留主配置文件
+!**/src/**/application.properties
+!**/src/**/application.yml
 
 ### STS ###
 .apt_generated
@@ -16,7 +21,6 @@ target/
 
 ### IntelliJ IDEA ###
 .idea
-.trae
 *.iws
 *.iml
 *.ipr
@@ -33,3 +37,4 @@ build/
 
 ### VS Code ###
 .vscode/
+
