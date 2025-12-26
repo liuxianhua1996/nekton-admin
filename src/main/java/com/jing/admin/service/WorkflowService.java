@@ -39,9 +39,6 @@ public class WorkflowService {
     private WorkflowRepository workflowRepository;
     
     @Autowired
-    private WorkflowCustomMapper workflowCustomMapper;
-    
-    @Autowired
     private WorkflowExecutor workflowExecutor;
 
     /**
@@ -126,7 +123,7 @@ public class WorkflowService {
         Page<WorkflowDTO> page = new Page<>(queryRequest.getCurrent(), queryRequest.getSize());
         
         // 执行分页查询（关联用户表）
-        IPage<WorkflowDTO> workflowPage = workflowCustomMapper.selectWorkflowPageWithUser(
+        IPage<WorkflowDTO> workflowPage = workflowRepository.selectWorkflowPageWithUser(
                 page,
                 queryRequest
         );

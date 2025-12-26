@@ -27,3 +27,7 @@ SELECT
     'system'
 FROM tb_users u, tb_tenants t
 WHERE u.username = 'admin' AND t.tenant_code = 'fj_jxkj';
+
+INSERT INTO tb_tenant_metadata("id", "tenant_id", "db_name", "jdbc_url", "username", "password", "driver_class_name", "status", "max_pool_size", "min_idle", "created_at", "updated_at")
+VALUES ('32d4e70c-e71c-42c4-947f-0a0a141ac211', '053cf49d-d1e7-4751-a26b-cd82c05e6af8', 'jxkj', 'jdbc:postgresql://192.168.10.100:5432/jxkj', 'jxjk',
+        'jxkj123a!', 'org.postgresql.Driver', 'ACTIVE', 15, 3, '2025-12-26 06:43:03.474272+00', '2025-12-26 06:43:03.474272+00');

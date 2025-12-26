@@ -5,11 +5,10 @@ VALUES ('ADMIN', '系统管理员角色，拥有所有权限'),
 
 -- 插入默认角色
 INSERT INTO tb_user_roles (user_id, role)
-VALUES ('a851255e-d9fa-4a3d-b238-ef7651f0c422','ADMIN')
+VALUES ('a851255e-d9fa-4a3d-b238-ef7651f0c422','ADMIN');
 
 -- 删除已存在的菜单数据（用于重新初始化）
-DELETE
-FROM tb_menu;
+DELETE FROM tb_menu;
 
 -- 插入菜单数据
 INSERT INTO tb_menu (code, name, path, parent_code, sort_order, create_time, update_time, create_user_id, update_user_id)

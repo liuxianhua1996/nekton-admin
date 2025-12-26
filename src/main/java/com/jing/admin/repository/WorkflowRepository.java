@@ -2,9 +2,13 @@ package com.jing.admin.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jing.admin.mapper.WorkflowMapper;
+import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.domain.Workflow;
+import com.jing.admin.model.dto.WorkflowDTO;
 import org.mapstruct.ap.internal.model.assignment.UpdateWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -26,6 +30,9 @@ public class WorkflowRepository extends ServiceImpl<WorkflowMapper, Workflow> {
         this.workflowMapper = workflowMapper;
     }
 
+    public IPage<WorkflowDTO> selectWorkflowPageWithUser(Page<WorkflowDTO> page, WorkflowQueryRequest queryRequest){
+        return this.workflowMapper.selectWorkflowPageWithUser(page, queryRequest);
+    }
 
     public int updateWorkflow(Workflow workflow) {
         LambdaUpdateWrapper<Workflow> updateWrapper = new LambdaUpdateWrapper<>();
