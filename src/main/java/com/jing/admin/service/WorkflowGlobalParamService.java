@@ -23,7 +23,17 @@ public interface WorkflowGlobalParamService extends IService<WorkflowGlobalParam
      * @param pageSize 每页数量
      * @return 分页结果
      */
-    PageResult<WorkflowGlobalParam> getPage(String workflowId, String paramType, String valueType, String paramKey, int pageNum, int pageSize);
+    PageResult<WorkflowGlobalParam> getPage(String workflowId, String paramType, String valueType, String paramKey, long pageNum, long pageSize);
+    
+    /**
+     * 查询所有工作流全局参数
+     * @param workflowId 工作流ID(可选)
+     * @param paramType 参数用途类型(可选)
+     * @param valueType 值的数据类型(可选)
+     * @param paramKey 参数键(可选)
+     * @return 参数列表
+     */
+    List<WorkflowGlobalParam> getAll(String workflowId, String paramType, String valueType, String paramKey);
     
     /**
      * 根据参数键和工作流ID获取参数值

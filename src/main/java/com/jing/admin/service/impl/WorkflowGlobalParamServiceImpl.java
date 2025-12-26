@@ -1,4 +1,4 @@
-package com.jing.admin.service;
+package com.jing.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -6,8 +6,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jing.admin.config.LoginUserUtil;
 import com.jing.admin.core.PageResult;
+import com.jing.admin.core.ThreadMdcUtils;
 import com.jing.admin.mapper.WorkflowGlobalParamMapper;
 import com.jing.admin.model.domain.WorkflowGlobalParam;
+import com.jing.admin.service.WorkflowGlobalParamService;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,9 +24,11 @@ import java.util.List;
 @Service
 public class WorkflowGlobalParamServiceImpl extends ServiceImpl<WorkflowGlobalParamMapper, WorkflowGlobalParam> 
         implements WorkflowGlobalParamService {
-    
+
+    @Autowired
+    private LoginUserUtil loginUserUtil;
     @Override
-    public PageResult<WorkflowGlobalParam> getPage(String workflowId, String paramType, String valueType, String paramKey, int pageNum, int pageSize) {
+    public PageResult<WorkflowGlobalParam> getPage(String workflowId, String paramType, String valueType, String paramKey, long pageNum, long pageSize) {
         // 构建查询条件
         LambdaQueryWrapper<WorkflowGlobalParam> queryWrapper = new LambdaQueryWrapper<>();
         
@@ -55,7 +61,39 @@ public class WorkflowGlobalParamServiceImpl extends ServiceImpl<WorkflowGlobalPa
         
         return new PageResult<>(result.getRecords(), result.getTotal(), pageNum, pageSize);
     }
-    
+
+    @Override
+    public List<WorkflowGlobalParam> getAll(String workflowId, String paramType, String valueType, String paramKey) {
+        // 构建查询条件
+        LambdaQueryWrapper<WorkflowGlobalParam> queryWrapper = new LambdaQueryWrapper<>();
+        
+        // 工作流ID过滤（可选）
+        if (workflowId != null) {
+            queryWrapper.eq(WorkflowGlobalParam::getWorkflowId, workflowId);
+        }
+        
+        // 参数用途类型过滤（可选）
+        if (paramType != null && !paramType.trim().isEmpty()) {
+            queryWrapper.eq(WorkflowGlobalParam::getParamType, paramType);
+        }
+        
+        // 值的数据类型过滤（可选）
+        if (valueType != null && !valueType.trim().isEmpty()) {
+            queryWrapper.eq(WorkflowGlobalParam::getValueType, valueType);
+        }
+        
+        // 参数键模糊查询
+        if (paramKey != null && !paramKey.trim().isEmpty()) {
+            queryWrapper.like(WorkflowGlobalParam::getParamKey, paramKey);
+        }
+        
+        // 排序
+        queryWrapper.orderByDesc(WorkflowGlobalParam::getCreateTime);
+        
+        // 执行查询
+        return this.list(queryWrapper);
+    }
+
     @Override
     public String getParamValue(String paramKey, String workflowId) {
         LambdaQueryWrapper<WorkflowGlobalParam> queryWrapper = new LambdaQueryWrapper<>();
@@ -73,7 +111,7 @@ public class WorkflowGlobalParamServiceImpl extends ServiceImpl<WorkflowGlobalPa
     
     @Override
     public void batchSaveOrUpdate(List<WorkflowGlobalParam> params) {
-        String userId = LoginUserUtil.getCurrentUserId();
+        String userId = MDC.get("userId");
         
         for (WorkflowGlobalParam param : params) {
             // 检查是否已存在

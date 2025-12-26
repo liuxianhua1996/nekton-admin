@@ -1,5 +1,6 @@
 ## 代码规范
 - 在写controller时，要使用@RestController注解，而不是@Controller注解
+- 在写controller时，前端传的参数要在api包下创建xxxxRequest类来接受前端传的参数
 - 路由要使用@RequestMapping注解，路由地址不允许使用中划线(-).-要用“/”代替划分多层路由
 - 每一个数据库实体类的创建,当有DTO的时候 一定要有一个Mapping文件来进行转换
 ## 数据库规范
