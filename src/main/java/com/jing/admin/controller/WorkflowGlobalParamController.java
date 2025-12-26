@@ -1,10 +1,14 @@
 package com.jing.admin.controller;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.jing.admin.core.HttpResult;
 import com.jing.admin.core.PageResult;
 import com.jing.admin.model.api.WorkflowGlobalParamRequest;
 import com.jing.admin.model.domain.WorkflowGlobalParam;
 import com.jing.admin.service.WorkflowGlobalParamService;
+import org.apache.catalina.util.StringUtil;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,7 +57,7 @@ public class WorkflowGlobalParamController {
      */
     @GetMapping
     public HttpResult<List<WorkflowGlobalParam>> getAll(
-            @RequestParam(required = false) String workflowId,
+            @RequestParam String workflowId,
             @RequestParam(required = false) String paramType,
             @RequestParam(required = false) String valueType,
             @RequestParam(required = false) String paramKey) {
@@ -62,22 +66,6 @@ public class WorkflowGlobalParamController {
         filterSensitiveParams(params);
         return HttpResult.success(params);
     }
-    
-    /**
-     * 根据ID获取工作流全局参数
-     * @param id 参数ID
-     * @return 参数信息
-     */
-    @GetMapping("/{id}")
-    public HttpResult<WorkflowGlobalParam> getById(@PathVariable String id) {
-        WorkflowGlobalParam param = workflowGlobalParamService.getById(id);
-        if (param != null) {
-            List<WorkflowGlobalParam> params = List.of(param);
-            filterSensitiveParams(params);
-        }
-        return HttpResult.success(param);
-    }
-    
     /**
      * 保存工作流全局参数
      * @param request 参数信息请求
@@ -95,6 +83,9 @@ public class WorkflowGlobalParamController {
         param.setValueType(request.getValueType());
         param.setWorkflowId(request.getWorkflowId());
         param.setDescription(request.getRemark());
+        long currTime = System.currentTimeMillis();
+        param.setCreateTime(currTime);
+        param.setUpdateTime(currTime);
         workflowGlobalParamService.save(param);
         return HttpResult.success("保存成功");
     }
@@ -125,6 +116,7 @@ public class WorkflowGlobalParamController {
         param.setValueType(request.getValueType());
         param.setWorkflowId(request.getWorkflowId());
         param.setDescription(request.getRemark());
+        param.setUpdateTime(System.currentTimeMillis());
         workflowGlobalParamService.updateById(param);
         return HttpResult.success("更新成功");
     }
@@ -186,15 +178,19 @@ public class WorkflowGlobalParamController {
         }
         
         for (WorkflowGlobalParam param : params) {
-            if (param.getParamKey() != null) {
+            if (param.getParamValue() != null && !"".equals(param.getParamValue()) && "json".equals(param.getValueType())) {
                 String lowerKey = param.getParamKey().toLowerCase();
-                for (String sensitiveKey : SENSITIVE_PARAM_KEYS) {
-                    if (lowerKey.contains(sensitiveKey)) {
-                        // 将敏感参数的值设置为空字符串
-                        param.setParamValue("");
-                        break;
+                JSONObject jsonObject = JSONObject.parse(param.getParamValue());
+                for(String key : jsonObject.keySet()){
+                    for (String sensitiveKey : SENSITIVE_PARAM_KEYS) {
+                        if (lowerKey.contains(key)) {
+                            // 将敏感参数的值设置为空字符串
+                            jsonObject.put(key,"");
+                            break;
+                        }
                     }
                 }
+
             }
         }
     }
