@@ -1,34 +1,43 @@
 package com.jing.admin.model.domain;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * 工作流全局参数实体类
- * 用于存储工作流的全局参数配置，包括参数类型和具体的配置信息
- * 
- * @author lxh
- * @date 2025/9/19
- **/
+ * @author 
+ * @date 
+ */
 @Data
-@EqualsAndHashCode(callSuper = true)
 @TableName("tb_workflow_global_param")
 public class WorkflowGlobalParam extends Base {
+    /**
+     * 工作流ID，可为空表示全局参数
+     */
+    private String workflowId;
     
     /**
-     * 参数类型
-     * 用于区分不同类型的全局参数，如：数据库连接、API配置、邮件配置等
+     * 参数键
      */
-    @TableField("param_type")
+    private String paramKey;
+    
+    /**
+     * 参数值
+     */
+    private String paramValue;
+    
+    /**
+     * 参数用途类型 (global_variable, db_config, api_config等)
+     */
     private String paramType;
     
     /**
-     * 参数配置（JSON字符串）
-     * 存储具体的参数配置信息，以JSON格式保存
-     * 例如：{"host":"localhost","port":3306,"username":"root"}
+     * 值的数据类型 (string, number, boolean, json等)
      */
-    @TableField("param_config")
-    private String paramConfig;
+    private String valueType;
+    
+    /**
+     * 参数描述
+     */
+    private String description;
 }

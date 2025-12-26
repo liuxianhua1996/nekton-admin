@@ -82,3 +82,20 @@ CREATE TABLE IF NOT EXISTS tb_workflow (
     create_user_id VARCHAR(255),
     update_user_id VARCHAR(255)
 );
+
+-- 工作流全局参数表
+CREATE TABLE IF NOT EXISTS tb_workflow_global_param (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    workflow_id VARCHAR(255), -- 工作流ID，可为空表示全局参数
+    param_key VARCHAR(255) NOT NULL,
+    param_value TEXT,
+    param_type VARCHAR(50) DEFAULT 'global_variable', -- 参数用途类型：global_variable, db_config, api_config
+    value_type VARCHAR(50) DEFAULT 'string', -- 值的数据类型：string, number, boolean, json等
+    description TEXT,
+    tenant_id VARCHAR(255) NOT NULL,
+    create_time BIGINT,
+    update_time BIGINT,
+    create_user_id VARCHAR(255),
+    update_user_id VARCHAR(255),
+    UNIQUE (param_key, tenant_id, workflow_id)
+);

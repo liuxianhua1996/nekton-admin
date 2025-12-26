@@ -1,7 +1,6 @@
 package com.jing.admin.service;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jing.admin.core.PageResult;
@@ -9,7 +8,6 @@ import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutor;
 import com.jing.admin.core.workflow.model.NodeResult;
-import com.jing.admin.mapper.WorkflowCustomMapper;
 import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
 import com.jing.admin.model.api.WorkflowTestRequest;
@@ -17,13 +15,10 @@ import com.jing.admin.model.domain.Workflow;
 import com.jing.admin.model.dto.TestWorkflowDTO;
 import com.jing.admin.model.dto.WorkflowDTO;
 import com.jing.admin.repository.WorkflowRepository;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-import java.sql.Array;
 import java.util.*;
 
 /**

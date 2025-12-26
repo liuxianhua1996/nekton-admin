@@ -37,3 +37,11 @@ VALUES
  1696032000000, 'system', 'system'),
 ('ADMIN_MANAGE', '管理员管理', '/permission/admins','PERMISSION', 3, 1696032000000, 1696032000000,
  'system', 'system');
+
+-- 工作流全局参数示例数据
+-- 注意：在实际部署时，需要根据当前租户ID来插入数据
+-- INSERT INTO tb_workflow_global_param (param_key, param_value, param_type, description, tenant_id, create_time, update_time, create_user_id, update_user_id)
+-- VALUES
+-- ('api.base.url', 'https://api.example.com', 'string', 'API基础URL', 'your-tenant-id', 1696032000000, 1696032000000, 'system', 'system'),
+-- ('timeout.duration', '30000', 'number', '请求超时时间(毫秒)', 'your-tenant-id', 1696032000000, 1696032000000, 'system', 'system'),
+-- ('enable.logging', 'true', 'boolean', '是否启用详细日志', 'your-tenant-id', 1696032000000, 1696032000000, 'system', 'system');

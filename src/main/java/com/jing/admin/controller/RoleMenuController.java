@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 提供角色菜单相关的操作接口
  */
 @RestController
-@RequestMapping("/role-menus")
+@RequestMapping("/role/menus")
 public class RoleMenuController {
     
     @Autowired
