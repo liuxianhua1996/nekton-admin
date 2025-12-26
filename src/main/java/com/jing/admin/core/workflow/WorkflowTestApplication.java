@@ -2,13 +2,13 @@ package com.jing.admin.core.workflow;
 
 import com.jing.admin.core.workflow.core.context.WorkflowContext;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
-import com.jing.admin.core.workflow.core.engine.WorkflowExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 /**
  * 工作流测试类

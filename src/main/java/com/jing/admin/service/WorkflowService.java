@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jing.admin.core.PageResult;
 import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
-import com.jing.admin.core.workflow.core.engine.WorkflowExecutor;
+import com.jing.admin.core.workflow.WorkflowExecutor;
 import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
@@ -164,7 +164,7 @@ public class WorkflowService {
         }
         TestWorkflowDTO testWorkflowDTO = new TestWorkflowDTO();
         List<TestWorkflowDTO.NodeTestResult> nodeTestResults = new ArrayList();
-        WorkflowExecutionResult workflowExecutionResult = workflowExecutor.executeFromJson(workflowJson);
+        WorkflowExecutionResult workflowExecutionResult = workflowExecutor.executeFromJsonByWorkflowId(workflowJson, params);
         Map<String, NodeResult> nodeResultMap = workflowExecutionResult.getContext().getNodeResults();
         nodeResultMap.forEach((id,nodeTestResult)->{
             nodeTestResults.add(TestWorkflowDTO.NodeTestResult.builder()

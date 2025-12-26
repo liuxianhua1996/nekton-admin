@@ -1,12 +1,21 @@
 package com.jing.admin.core.workflow.model;
 
+import com.jing.admin.model.domain.WorkflowGlobalParam;
+import lombok.Data;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  * 工作流定义类
  * 用于表示整个工作流的结构，包含节点和边
  */
+@Data
 public class WorkflowDefinition {
+
+    private List<WorkflowGlobalParam> globalParams;
+
+    private Map startParams;
     
     /**
      * 工作流节点列表
@@ -23,22 +32,6 @@ public class WorkflowDefinition {
     
     public WorkflowDefinition(List<NodeDefinition> nodes, List<EdgeDefinition> edges) {
         this.nodes = nodes;
-        this.edges = edges;
-    }
-    
-    public List<NodeDefinition> getNodes() {
-        return nodes;
-    }
-    
-    public void setNodes(List<NodeDefinition> nodes) {
-        this.nodes = nodes;
-    }
-    
-    public List<EdgeDefinition> getEdges() {
-        return edges;
-    }
-    
-    public void setEdges(List<EdgeDefinition> edges) {
         this.edges = edges;
     }
     
