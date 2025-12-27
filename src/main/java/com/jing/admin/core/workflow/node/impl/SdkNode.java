@@ -7,6 +7,8 @@ import com.jing.admin.core.workflow.model.NodeDefinition;
 import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.node.BaseNode;
+import com.jing.admin.core.workflow.node.impl.sdk.ISdkClient;
+import com.jing.admin.core.workflow.node.impl.sdk.SdkManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -124,34 +126,25 @@ public class SdkNode extends BaseNode {
 
     /**
      * 执行SDK调用
-     * 这里是示例实现，实际应用中应该根据具体的系统和方法实现
+     * 根据系统标识获取对应的SDK客户端并执行方法
      */
     private Object executeSdkCall(String system, String method, Map<String, Object> params, WorkflowContext context) {
-        // 模拟SDK调用
-        if ("kingdee_sky".equals(system) && "query".equals(method)) {
-            // 获取查询参数
-            Map<String, Object> queryParams = (Map<String, Object>) params.get("params");
-
-            // 构建模拟查询结果
-            Map<String, Object> result = new HashMap<>();
-            result.put("formId", queryParams.get("formId"));
-            result.put("fields", queryParams.get("fields"));
-            result.put("condition", queryParams.get("condition"));
-            result.put("order", queryParams.get("order"));
-            result.put("page", queryParams.get("page"));
-            result.put("pageSize", queryParams.get("pageSize"));
-
-            // 返回模拟查询结果
-            Map<String, Object> queryResult = new HashMap<>();
-            queryResult.put("success", true);
-            queryResult.put("data", result);
-            queryResult.put("message", "查询成功");
-
-            return queryResult;
+        // 获取对应的SDK客户端
+        ISdkClient sdkClient = SdkManager.getSdkClient(system);
+        
+        if (sdkClient == null) {
+            // 如果没有找到对应的SDK客户端，返回错误信息
+            throw new RuntimeException("不支持的系统类型: " + system);
         }
-
-        // 默认返回模拟结果
-        return "SDK调用结果: " + system + "." + method;
+        
+        // 准备调用参数
+        Map<String, Object> methodParams = new HashMap<>();
+        if (params.containsKey("params")) {
+            methodParams = (Map<String, Object>) params.get("params");
+        }
+        
+        // 执行SDK调用
+        return sdkClient.execute(method, methodParams);
     }
 
     @Override

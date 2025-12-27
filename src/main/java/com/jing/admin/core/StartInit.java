@@ -17,6 +17,6 @@ public class StartInit implements  ApplicationRunner {
     WorkflowTestApplication workflowTestApplication;
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        workflowTestApplication.test();
+      //  workflowTestApplication.test();
     }
 }

@@ -150,13 +150,6 @@ public class WorkflowService {
         if (workflow == null) {
             throw new BusinessException("工作流不存在");
         }
-        
-        // 获取工作流JSON数据
-        String workflowJson = workflow.getJsonData();
-        if (workflowJson == null || workflowJson.isEmpty()) {
-            throw new BusinessException("工作流数据为空");
-        }
-        
         // 获取测试参数
         Map<String, Object> params = new HashMap<>();
         if (workflowTestRequest.getParams() != null) {
@@ -164,7 +157,7 @@ public class WorkflowService {
         }
         TestWorkflowDTO testWorkflowDTO = new TestWorkflowDTO();
         List<TestWorkflowDTO.NodeTestResult> nodeTestResults = new ArrayList();
-        WorkflowExecutionResult workflowExecutionResult = workflowExecutor.executeFromJsonByWorkflowId(workflowJson, params);
+        WorkflowExecutionResult workflowExecutionResult = workflowExecutor.executeFromJsonByWorkflowId(workflowTestRequest.getId(), params);
         Map<String, NodeResult> nodeResultMap = workflowExecutionResult.getContext().getNodeResults();
         nodeResultMap.forEach((id,nodeTestResult)->{
             nodeTestResults.add(TestWorkflowDTO.NodeTestResult.builder()
