@@ -50,8 +50,7 @@ public class SdkManager {
      */
     public static void initializeDefaultClients() {
         // 注册默认的SDK客户端
-        registerSdkClient("dingtalk", new DingtalkSDK());
+        registerSdkClient("dingtalk_app", new DingtalkSDK());
         registerSdkClient("kingdee_sky", new KingdeeSkySDK());
-        registerSdkClient("wechat", new WechatSDK());
     }
 }

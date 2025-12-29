@@ -36,7 +36,7 @@ public class DingtalkSDK implements ISdkClient {
     
     @Override
     public String getSystemIdentifier() {
-        return "dingtalk";
+        return "dingtalk_app";
     }
     
     @Override
