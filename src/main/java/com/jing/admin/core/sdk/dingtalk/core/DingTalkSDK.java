@@ -1,6 +1,6 @@
-package com.jing.admin.core.workflow.node.impl.sdk.dingtalk;
+package com.jing.admin.core.sdk.dingtalk.core;
 
-import com.jing.admin.core.workflow.node.impl.sdk.ISdkClient;
+import com.jing.admin.core.sdk.ISdkClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.Map;
  * @see
  * @since 2025/12/26
  */
-public class DingtalkSDK implements ISdkClient {
+public class DingTalkSDK implements ISdkClient {
     
     private Map<String, Object> config;
     

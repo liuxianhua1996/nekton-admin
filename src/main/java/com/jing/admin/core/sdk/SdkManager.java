@@ -1,8 +1,7 @@
-package com.jing.admin.core.workflow.node.impl.sdk;
+package com.jing.admin.core.sdk;
 
-import com.jing.admin.core.workflow.node.impl.sdk.dingtalk.DingtalkSDK;
-import com.jing.admin.core.workflow.node.impl.sdk.kingdee.KingdeeSkySDK;
-import com.jing.admin.core.workflow.node.impl.sdk.thirdparty.WechatSDK;
+
+import com.jing.admin.core.sdk.dingtalk.core.DingTalkSDK;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +49,8 @@ public class SdkManager {
      */
     public static void initializeDefaultClients() {
         // 注册默认的SDK客户端
-        registerSdkClient("dingtalk_app", new DingtalkSDK());
-        registerSdkClient("kingdee_sky", new KingdeeSkySDK());
+        registerSdkClient("dingtalk_app",new DingTalkSDK());
+//      registerSdkClient("kingdee_sky", new KingdeeSkySDK());
     }
+
 }

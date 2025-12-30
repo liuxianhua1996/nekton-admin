@@ -7,8 +7,8 @@ import com.jing.admin.core.workflow.model.NodeDefinition;
 import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.node.BaseNode;
-import com.jing.admin.core.workflow.node.impl.sdk.ISdkClient;
-import com.jing.admin.core.workflow.node.impl.sdk.SdkManager;
+import com.jing.admin.core.sdk.ISdkClient;
+import com.jing.admin.core.sdk.SdkManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -131,7 +131,6 @@ public class SdkNode extends BaseNode {
     private Object executeSdkCall(String system, String method, Map<String, Object> params, WorkflowContext context) {
         // 获取对应的SDK客户端
         ISdkClient sdkClient = SdkManager.getSdkClient(system);
-        
         if (sdkClient == null) {
             // 如果没有找到对应的SDK客户端，返回错误信息
             throw new RuntimeException("不支持的系统类型: " + system);

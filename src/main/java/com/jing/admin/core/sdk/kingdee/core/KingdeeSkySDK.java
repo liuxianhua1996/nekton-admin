@@ -1,6 +1,6 @@
-package com.jing.admin.core.workflow.node.impl.sdk.kingdee;
+package com.jing.admin.core.sdk.kingdee.core;
 
-import com.jing.admin.core.workflow.node.impl.sdk.ISdkClient;
+import com.jing.admin.core.sdk.ISdkClient;
 
 import java.util.HashMap;
 import java.util.Map;

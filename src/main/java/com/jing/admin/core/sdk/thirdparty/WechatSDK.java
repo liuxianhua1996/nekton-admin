@@ -1,6 +1,6 @@
-package com.jing.admin.core.workflow.node.impl.sdk.thirdparty;
+package com.jing.admin.core.sdk.thirdparty;
 
-import com.jing.admin.core.workflow.node.impl.sdk.ISdkClient;
+import com.jing.admin.core.sdk.ISdkClient;
 
 import java.util.HashMap;
 import java.util.Map;
