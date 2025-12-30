@@ -1,7 +1,7 @@
-package com.jing.admin.core.sdk;
+package com.jing.admin.core.workflow.sdk;
 
 
-import com.jing.admin.core.sdk.dingtalk.core.DingTalkSDK;
+import com.jing.admin.core.workflow.sdk.dingtalk.DingTalkSDK;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,17 +26,17 @@ public class SdkManager {
     
     /**
      * 获取SDK客户端
-     * 
+     *
      * @param systemIdentifier 系统标识
      * @return SDK客户端实例
      */
     public static ISdkClient getSdkClient(String systemIdentifier) {
         return sdkClients.get(systemIdentifier);
     }
-    
+
     /**
      * 检查是否支持指定的系统
-     * 
+     *
      * @param systemIdentifier 系统标识
      * @return 是否支持
      */

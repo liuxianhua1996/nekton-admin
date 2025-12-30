@@ -1,4 +1,4 @@
-package com.jing.admin.core.sdk;
+package com.jing.admin.core.workflow.sdk;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;

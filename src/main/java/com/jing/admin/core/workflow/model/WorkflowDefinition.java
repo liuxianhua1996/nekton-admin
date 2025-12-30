@@ -13,7 +13,7 @@ import java.util.Map;
 @Data
 public class WorkflowDefinition {
 
-    private List<WorkflowGlobalParam> globalParams;
+    private Map<String, GlobalParams> globalParams;
 
     private Map startParams;
     

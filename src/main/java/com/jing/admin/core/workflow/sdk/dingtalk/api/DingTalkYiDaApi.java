@@ -1,16 +1,16 @@
-package com.jing.admin.core.sdk.dingtalk.api;
+package com.jing.admin.core.workflow.sdk.dingtalk.api;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.jing.admin.core.sdk.dingtalk.request.YiDaBatchInstancesParams;
-import com.jing.admin.core.sdk.dingtalk.request.YiDaGetInstancesByIdParams;
-import com.jing.admin.core.sdk.dingtalk.request.YiDaInstancesOrUpParams;
+import com.jing.admin.core.workflow.sdk.dingtalk.request.YiDaBatchInstancesParams;
+import com.jing.admin.core.workflow.sdk.dingtalk.request.YiDaGetInstancesByIdParams;
+import com.jing.admin.core.workflow.sdk.dingtalk.request.YiDaInstancesOrUpParams;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import com.jing.admin.core.sdk.dingtalk.dto.*;
+import com.jing.admin.core.workflow.sdk.dingtalk.dto.*;
 
 /**
  * @author lxh

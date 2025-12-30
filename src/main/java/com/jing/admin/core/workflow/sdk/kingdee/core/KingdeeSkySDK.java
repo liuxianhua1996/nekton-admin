@@ -1,6 +1,7 @@
-package com.jing.admin.core.sdk.kingdee.core;
+package com.jing.admin.core.workflow.sdk.kingdee.core;
 
-import com.jing.admin.core.sdk.ISdkClient;
+import com.jing.admin.core.workflow.model.GlobalParams;
+import com.jing.admin.core.workflow.sdk.ISdkClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +18,7 @@ public class KingdeeSkySDK implements ISdkClient {
     private Map<String, Object> config;
     
     @Override
-    public Object execute(String method, Map<String, Object> params) {
+    public Object execute(String method, Map<String, Object> params, GlobalParams globalParams) {
         // 根据不同的方法执行不同的金蝶云星空API调用
         switch (method) {
             case "query":

@@ -2,16 +2,18 @@ package com.jing.admin.core.workflow.node.impl;
 
 import com.jing.admin.core.workflow.core.conversion.ParameterConverter;
 import com.jing.admin.core.workflow.core.context.WorkflowContext;
+import com.jing.admin.core.workflow.model.GlobalParams;
 import com.jing.admin.core.workflow.model.NodeData;
 import com.jing.admin.core.workflow.model.NodeDefinition;
 import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.node.BaseNode;
-import com.jing.admin.core.sdk.ISdkClient;
-import com.jing.admin.core.sdk.SdkManager;
+import com.jing.admin.core.workflow.sdk.ISdkClient;
+import com.jing.admin.core.workflow.sdk.SdkManager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * SDK节点处理器
@@ -135,7 +137,9 @@ public class SdkNode extends BaseNode {
             // 如果没有找到对应的SDK客户端，返回错误信息
             throw new RuntimeException("不支持的系统类型: " + system);
         }
-        
+        String apiKey = (String) params.get("apiKey");
+        GlobalParams globalParams = context.getGlobalParams().get(apiKey);
+        Optional.of(globalParams);
         // 准备调用参数
         Map<String, Object> methodParams = new HashMap<>();
         if (params.containsKey("params")) {
@@ -143,7 +147,7 @@ public class SdkNode extends BaseNode {
         }
         
         // 执行SDK调用
-        return sdkClient.execute(method, methodParams);
+        return sdkClient.execute(method, methodParams, globalParams);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.jing.admin.core.sdk.dingtalk.api;
+package com.jing.admin.core.workflow.sdk.dingtalk.api;
 
 /**
  * @author lxh

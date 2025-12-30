@@ -1,4 +1,4 @@
-package com.jing.admin.core.sdk.dingtalk.request;
+package com.jing.admin.core.workflow.sdk.dingtalk.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

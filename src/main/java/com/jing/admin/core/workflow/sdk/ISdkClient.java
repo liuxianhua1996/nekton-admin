@@ -1,4 +1,6 @@
-package com.jing.admin.core.sdk;
+package com.jing.admin.core.workflow.sdk;
+
+import com.jing.admin.core.workflow.model.GlobalParams;
 
 import java.util.Map;
 
@@ -15,7 +17,7 @@ public interface ISdkClient {
      * @param params 参数
      * @return 执行结果
      */
-    Object execute(String method, Map<String, Object> params);
+    Object execute(String method, Map<String, Object> params, GlobalParams globalParams);
     
     /**
      * 获取SDK系统标识

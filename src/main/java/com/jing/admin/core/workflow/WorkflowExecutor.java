@@ -5,6 +5,7 @@ import com.jing.admin.core.workflow.core.context.WorkflowContext;
 import com.jing.admin.core.workflow.core.conversion.WorkflowJsonConverter;
 import com.jing.admin.core.workflow.core.engine.WorkflowEngine;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
+import com.jing.admin.core.workflow.model.GlobalParams;
 import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.model.domain.Workflow;
 import com.jing.admin.model.domain.WorkflowGlobalParam;
@@ -38,11 +39,22 @@ public class WorkflowExecutor {
     
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    public Map<String, GlobalParams> handleGlobal(List<WorkflowGlobalParam> globalParams){
+        Map<String, GlobalParams> globalParamsMap = new HashMap<>();
+        globalParams.stream().forEach(workflowGlobalParam -> {
+            globalParamsMap.put(workflowGlobalParam.getId(), GlobalParams.builder()
+                            .apiKeyId(workflowGlobalParam.getId())
+                            .paramValue(workflowGlobalParam.getParamValue())
+                            .valueType(workflowGlobalParam.getValueType())
+                            .paramType(workflowGlobalParam.getParamType())
+                    .build());
+        });
+        return globalParamsMap;
+    }
     
     /**
      * 从JSON字符串执行工作流
-     * 
-     * @param workflowJson 工作流JSON字符串
+     *
      * @param workflowId 工作流ID，用于获取全局参数
      * @return 执行结果
      */
@@ -50,17 +62,17 @@ public class WorkflowExecutor {
         // 获取工作流的全局参数
         Workflow workflow = workflowRepository.getById(workflowId);
         List<WorkflowGlobalParam> globalParams = workflowGlobalParamService.getAll(workflowId, null, null, null);
-        return executeFromJson(workflow.getJsonData(), globalParams,startParams);
+        Map<String, GlobalParams> globalParamsMap = this.handleGlobal(globalParams);
+        return executeFromJson(workflow.getJsonData(), globalParamsMap,startParams);
     }
     /**
      * 从JSON字符串执行工作流
      *
      * @param workflowJson 工作流JSON字符串
-     * @param globalParams 全局参数列表
      * @return 执行结果
      */
     public WorkflowExecutionResult executeFromJson(@NonNull String workflowJson) {
-        return this.executeFromJson(workflowJson, new ArrayList<>(), new HashMap());
+        return this.executeFromJson(workflowJson, new HashMap<>(), new HashMap());
     }
     
     /**
@@ -70,7 +82,7 @@ public class WorkflowExecutor {
      * @param globalParams 全局参数列表
      * @return 执行结果
      */
-    public WorkflowExecutionResult executeFromJson(@NonNull String workflowJson, @NonNull List<WorkflowGlobalParam> globalParams, Map startParams) {
+    public WorkflowExecutionResult executeFromJson(@NonNull String workflowJson, @NonNull Map<String, GlobalParams> globalParams, Map startParams) {
         try {
             // 转换JSON为工作流定义
             WorkflowDefinition workflowDefinition = WorkflowJsonConverter.convertFromJson(workflowJson);
@@ -79,7 +91,7 @@ public class WorkflowExecutor {
             
             // 创建工作流执行上下文
             WorkflowContext context = new WorkflowContext();
-            
+            context.setGlobalParams(globalParams);
             // 执行工作流
             return workflowEngine.execute(workflowDefinition, context);
         } catch (IOException e) {
@@ -119,7 +131,7 @@ public class WorkflowExecutor {
             String workflowJson = objectMapper.readValue(inputStream, String.class);
             
             // 执行工作流
-            return executeFromJson(workflowJson, new ArrayList<>(), new HashMap());
+            return executeFromJson(workflowJson,new HashMap<>(), new HashMap());
         } catch (IOException e) {
             WorkflowContext context = new WorkflowContext();
             context.setStatus(WorkflowContext.WorkflowStatus.FAILED);

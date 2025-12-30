@@ -1,9 +1,12 @@
 package com.jing.admin.core.workflow.core.context;
 
+import com.jing.admin.core.workflow.model.GlobalParams;
 import com.jing.admin.core.workflow.model.NodeResult;
+import com.jing.admin.model.domain.WorkflowGlobalParam;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,7 +46,8 @@ public class WorkflowContext {
      * 节点执行结果存储
      */
     private Map<String, NodeResult> nodeResults;
-    
+
+    private Map<String, GlobalParams> globalParams;
     /**
      * 错误信息
      */

@@ -1,9 +1,7 @@
-package com.jing.admin.core.sdk.dingtalk.request;
+package com.jing.admin.core.workflow.sdk.dingtalk.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * @author lxh
@@ -11,12 +9,11 @@ import lombok.NoArgsConstructor;
  **/
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class YiDaGetInstancesByIdParams {
+public class YiDaInstancesParams {
     private String appType;
     private String systemToken;
     private String userId;
-    private String id;
+    private String language;
     private String formUuid;
+    private String formDataJson;
 }

@@ -1,4 +1,4 @@
-package com.jing.admin.core.sdk.dingtalk.dto;
+package com.jing.admin.core.workflow.sdk.dingtalk.dto;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.AllArgsConstructor;
