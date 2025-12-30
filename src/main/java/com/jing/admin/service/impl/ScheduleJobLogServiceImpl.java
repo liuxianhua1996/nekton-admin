@@ -1,6 +1,7 @@
 package com.jing.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -40,20 +41,42 @@ public class ScheduleJobLogServiceImpl extends ServiceImpl<ScheduleJobLogMapper,
 
     @Override
     public ScheduleJobLogDTO updateScheduleJobLog(String id, ScheduleJobLogRequest request) {
+        // 首先检查记录是否存在
         QueryWrapper<ScheduleJobLog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", id);
-        ScheduleJobLog scheduleJobLog = this.getOne(queryWrapper);
-        if (scheduleJobLog == null) {
+        ScheduleJobLog existingLog = this.getOne(queryWrapper);
+        if (existingLog == null) {
             throw new RuntimeException("调度任务执行记录不存在");
         }
         
-        scheduleJobLog = ScheduleJobLogMapping.INSTANCE.updateEntityFromRequest(request);
-        scheduleJobLog.setId(id);
-        scheduleJobLog.setUpdateTime(System.currentTimeMillis());
+        LambdaUpdateWrapper<ScheduleJobLog> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(ScheduleJobLog::getId, id)
+                .set(ScheduleJobLog::getJobId, request.getJobId())
+                .set(ScheduleJobLog::getWorkflowId, request.getWorkflowId())
+                .set(ScheduleJobLog::getTriggerType, request.getTriggerType())
+                .set(ScheduleJobLog::getStatus, request.getStatus())
+                .set(ScheduleJobLog::getResult, request.getResult())
+                .set(ScheduleJobLog::getStartTime, request.getStartTime())
+                .set(ScheduleJobLog::getEndTime, request.getEndTime())
+                .set(ScheduleJobLog::getExecutionTime, request.getExecutionTime())
+                .set(ScheduleJobLog::getErrorMessage, request.getErrorMessage())
+                .set(ScheduleJobLog::getUpdateTime, System.currentTimeMillis());
         
-        this.updateById(scheduleJobLog);
+        this.update(updateWrapper);
         
-        return ScheduleJobLogMapping.INSTANCE.toDTO(scheduleJobLog);
+        // 返回更新后的记录
+        existingLog.setJobId(request.getJobId());
+        existingLog.setWorkflowId(request.getWorkflowId());
+        existingLog.setTriggerType(request.getTriggerType());
+        existingLog.setStatus(request.getStatus());
+        existingLog.setResult(request.getResult());
+        existingLog.setStartTime(request.getStartTime());
+        existingLog.setEndTime(request.getEndTime());
+        existingLog.setExecutionTime(request.getExecutionTime());
+        existingLog.setErrorMessage(request.getErrorMessage());
+        existingLog.setUpdateTime(System.currentTimeMillis());
+        
+        return ScheduleJobLogMapping.INSTANCE.toDTO(existingLog);
     }
 
     @Override
