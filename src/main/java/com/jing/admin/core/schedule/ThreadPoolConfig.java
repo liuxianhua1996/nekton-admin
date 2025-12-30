@@ -1,4 +1,4 @@
-package com.ylys.datacenter.scheduling.common;
+package com.jing.admin.core.schedule;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;

@@ -1,6 +1,6 @@
-package com.ylys.datacenter.common.abs;
+package com.jing.admin.core.schedule;
 
-import com.ylys.datacenter.common.enums.ConstantEnum;
+import com.jing.admin.core.constant.ConstantEnum;
 import lombok.Data;
 
 import java.util.Map;

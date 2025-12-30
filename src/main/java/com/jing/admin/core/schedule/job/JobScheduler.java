@@ -1,9 +1,7 @@
-package com.ylys.datacenter.scheduling.job;
+package com.jing.admin.core.schedule.job;
 
 
 import com.alibaba.fastjson2.JSONObject;
-import com.ylys.datacenter.entity.scheduling.JobEntity;
-import com.ylys.datacenter.entity.workflow.WorkflowEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.DisallowConcurrentExecution;
@@ -26,14 +24,10 @@ public class JobScheduler extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
-        JobEntity job = (JobEntity) jobDataMap.get("job");
-        WorkflowEntity workflow = (WorkflowEntity) jobDataMap.get("workflow");
+        JSONObject job = (JSONObject) jobDataMap.get("job");
+        JSONObject workflow = (JSONObject) jobDataMap.get("workflow");
         //创建任务
-        if(job.getStartParams() != null || !StringUtils.equals("",job.getStartParams())){
-            new JobTask(job, workflow, JSONObject.parse(job.getStartParams())).run();
-        } else {
-            new JobTask(job, workflow).run();
-        }
+        //new JobTask(job, workflow).run();
 
     }
 }

@@ -1,4 +1,4 @@
-package com.ylys.datacenter.common.enums;
+package com.jing.admin.core.constant;
 
 /**
  * @author zhicheng

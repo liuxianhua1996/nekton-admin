@@ -1,7 +1,7 @@
-package com.ylys.datacenter.scheduling.engine;
+package com.jing.admin.core.schedule.engine;
 
-import com.ylys.datacenter.common.abs.AbstractJobTask;
-import com.ylys.datacenter.scheduling.common.ThreadPoolConfig;
+import com.jing.admin.core.schedule.AbstractJobTask;
+import com.jing.admin.core.schedule.ThreadPoolConfig;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;

@@ -1,6 +1,6 @@
-package com.ylys.datacenter.scheduling.engine;
+package com.jing.admin.core.schedule.engine;
 
-import com.ylys.datacenter.common.abs.AbstractJobTask;
+import com.jing.admin.core.schedule.AbstractJobTask;
 import lombok.Data;
 
 import java.util.concurrent.ExecutorService;

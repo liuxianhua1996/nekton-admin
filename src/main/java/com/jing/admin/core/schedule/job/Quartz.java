@@ -1,7 +1,6 @@
-package com.ylys.datacenter.scheduling.job;
+package com.jing.admin.core.schedule.job;
 
-import com.ylys.datacenter.entity.scheduling.JobEntity;
-import com.ylys.datacenter.entity.workflow.WorkflowEntity;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import org.quartz.*;
 
@@ -15,17 +14,17 @@ public class Quartz {
     private String cron;
     private JobDataMap jobData;
 
-    public Quartz(String jobId, String jobName, String cron, JobEntity job, WorkflowEntity workflow) {
+    public Quartz(String jobId, String jobName, String cron, JSONObject job) {
         this.jobId = jobId;
         this.cron = cron;
         this.jobData = new JobDataMap();
         jobData.put("jobName", jobName);
         jobData.put("job", job);
-        jobData.put("workflow", workflow);
+        jobData.put("workflow", job.getJSONObject("workflow"));
     }
 
-    public Quartz(JobEntity job, WorkflowEntity workflow) {
-        this(job.getId(), job.getJobName(), job.getJobCron(), job, workflow);
+    public Quartz(JSONObject job) {
+        this(job.getString("jobId"), job.getString("jobName"), job.getString("jobCron"), job);
     }
 
     public JobDetail restartJob() throws ClassNotFoundException {

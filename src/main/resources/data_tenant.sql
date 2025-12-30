@@ -19,10 +19,10 @@ VALUES
 ('WORKFLOW', '工作流', '/workflow', NULL, 3,1696032000000, 1696032000000, 'system', 'system'),
 ('LOW_CODE', '低代码', '/lowcode', NULL, 4, 1696032000000, 1696032000000, 'system', 'system'),
 ('PERMISSION', '权限管理', '/permission', NULL, 5, 1696032000000, 1696032000000, 'system', 'system'),
-
 -- 用户管理子菜单
 ('USER_LIST', '用户列表', '/user/list', 'USER_MANAGE', 1,1696032000000, 1696032000000, 'system',
  'system'),
+('SCHEDULE', '调度管理', '/schedule', NULL, 2, 1696032000000, 1696032000000, 'system', 'system'),
 
 -- 工作流子菜单
 ('WORKFLOW_LIST', '工作流列表', '/workflow/list', 'WORKFLOW', 1,1696032000000, 1696032000000,
@@ -36,6 +36,8 @@ VALUES
 ('PERMISSION_ASSIGN', '权限分配', '/permission/assign', 'PERMISSION', 2, 1696032000000,
  1696032000000, 'system', 'system'),
 ('ADMIN_MANAGE', '管理员管理', '/permission/admins','PERMISSION', 3, 1696032000000, 1696032000000,
+ 'system', 'system'),
+('SCHEDULE_LIST', '调度列表', '/schedule/list','SCHEDULE', 1, 1696032000000, 1696032000000,
  'system', 'system');
 
 -- 工作流全局参数示例数据
