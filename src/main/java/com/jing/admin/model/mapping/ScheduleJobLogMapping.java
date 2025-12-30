@@ -1,8 +1,8 @@
 package com.jing.admin.model.mapping;
 
 import com.jing.admin.model.domain.ScheduleJobLog;
-import com.jing.admin.core.dto.ScheduleJobLogRequest;
-import com.jing.admin.core.dto.ScheduleJobLogResponse;
+import com.jing.admin.model.dto.ScheduleJobLogDTO;
+import com.jing.admin.model.api.ScheduleJobLogRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -24,10 +24,11 @@ public interface ScheduleJobLogMapping {
     /**
      * 将实体转换为响应DTO
      */
-    ScheduleJobLogResponse toResponse(ScheduleJobLog entity);
+    ScheduleJobLogDTO toDTO(ScheduleJobLog entity);
 
     /**
      * 将请求DTO转换为实体（用于更新）
      */
     ScheduleJobLog updateEntityFromRequest(ScheduleJobLogRequest request);
+
 }

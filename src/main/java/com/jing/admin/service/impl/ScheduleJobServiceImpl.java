@@ -3,19 +3,22 @@ package com.jing.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jing.admin.core.PageResult;
-import com.jing.admin.core.dto.ScheduleJobRequest;
-import com.jing.admin.core.dto.ScheduleJobResponse;
+import com.jing.admin.model.api.ScheduleJobRequest;
 import com.jing.admin.model.domain.ScheduleJob;
 import com.jing.admin.mapper.ScheduleJobMapper;
 import com.jing.admin.model.api.ScheduleJobQueryRequest;
+import com.jing.admin.model.dto.ScheduleJobDTO;
 import com.jing.admin.model.mapping.ScheduleJobMapping;
+import com.jing.admin.repository.ScheduleJobRepository;
 import com.jing.admin.service.ScheduleJobService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -24,8 +27,11 @@ import java.util.stream.Collectors;
 @Service
 public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, ScheduleJob> implements ScheduleJobService {
 
+    @Autowired
+    private ScheduleJobRepository scheduleJobRepository;
+
     @Override
-    public ScheduleJobResponse createScheduleJob(ScheduleJobRequest request) {
+    public ScheduleJobDTO createScheduleJob(ScheduleJobRequest request) {
         if (request.getName() == null || request.getName().trim().isEmpty()) {
             throw new RuntimeException("调度名称不能为空");
         }
@@ -38,12 +44,14 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         
         this.save(scheduleJob);
         
-        return ScheduleJobMapping.INSTANCE.toResponse(scheduleJob);
+        return ScheduleJobMapping.INSTANCE.toDTO(scheduleJob);
     }
 
     @Override
-    public ScheduleJobResponse updateScheduleJob(String id, ScheduleJobRequest request) {
-        ScheduleJob scheduleJob = this.getById(id);
+    public ScheduleJobDTO updateScheduleJob(String id, ScheduleJobRequest request) {
+        QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", id);
+        ScheduleJob scheduleJob = this.getOne(queryWrapper);
         if (scheduleJob == null) {
             throw new RuntimeException("调度工作流不存在");
         }
@@ -58,7 +66,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         
         this.updateById(scheduleJob);
         
-        return ScheduleJobMapping.INSTANCE.toResponse(scheduleJob);
+        return ScheduleJobMapping.INSTANCE.toDTO(scheduleJob);
     }
 
     @Override
@@ -67,50 +75,35 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
     }
 
     @Override
-    public ScheduleJobResponse getScheduleJobById(String id) {
-        ScheduleJob scheduleJob = this.getById(id);
+    public ScheduleJobDTO getScheduleJobById(String id) {
+        QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", id);
+        ScheduleJob scheduleJob = this.getOne(queryWrapper);
         if (scheduleJob == null) {
             return null;
         }
         
-        return ScheduleJobMapping.INSTANCE.toResponse(scheduleJob);
+        return ScheduleJobMapping.INSTANCE.toDTO(scheduleJob);
     }
 
     @Override
-    public List<ScheduleJobResponse> getScheduleJobList() {
+    public List<ScheduleJobDTO> getScheduleJobList() {
         List<ScheduleJob> scheduleJobs = this.list();
         return scheduleJobs.stream()
-                .map(ScheduleJobMapping.INSTANCE::toResponse)
+                .map(ScheduleJobMapping.INSTANCE::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public PageResult<ScheduleJobResponse> getScheduleJobPage(ScheduleJobQueryRequest queryRequest) {
+    public PageResult<ScheduleJobDTO> getScheduleJobPage(ScheduleJobQueryRequest queryRequest) {
         // 创建分页对象
-        Page<ScheduleJob> page = new Page<>(queryRequest.getCurrent(), queryRequest.getSize());
+        Page<ScheduleJobDTO> page = new Page<>(queryRequest.getCurrent(), queryRequest.getSize());
 
-        // 构建查询条件
-        QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
-        if (queryRequest.getName() != null && !queryRequest.getName().isEmpty()) {
-            queryWrapper.like("name", queryRequest.getName());
-        }
-        if (queryRequest.getWorkflowId() != null && !queryRequest.getWorkflowId().isEmpty()) {
-            queryWrapper.eq("workflow_id", queryRequest.getWorkflowId());
-        }
-        if (queryRequest.getTriggerType() != null && !queryRequest.getTriggerType().isEmpty()) {
-            queryWrapper.eq("trigger_type", queryRequest.getTriggerType());
-        }
-        if (queryRequest.getStatus() != null && !queryRequest.getStatus().isEmpty()) {
-            queryWrapper.eq("status", queryRequest.getStatus());
-        }
+        // 使用Repository的自定义分页查询方法（关联用户表）
+        IPage<ScheduleJobDTO> scheduleJobPage = scheduleJobRepository.selectScheduleJobPageWithUser(page, queryRequest);
 
-        // 执行分页查询
-        IPage<ScheduleJob> scheduleJobPage = this.page(page, queryWrapper);
-
-        // 转换为响应对象列表
-        List<ScheduleJobResponse> records = scheduleJobPage.getRecords().stream()
-                .map(ScheduleJobMapping.INSTANCE::toResponse)
-                .collect(Collectors.toList());
+        // 直接使用DTO列表
+        List<ScheduleJobDTO> records = scheduleJobPage.getRecords();
 
         // 构建分页结果
         return PageResult.of(
@@ -123,7 +116,9 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
 
     @Override
     public Boolean disableJob(String id) {
-        ScheduleJob scheduleJob = this.getById(id);
+        QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", UUID.fromString(id));
+        ScheduleJob scheduleJob = this.getOne(queryWrapper);
         if (scheduleJob == null) {
             return false;
         }
@@ -135,7 +130,9 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
 
     @Override
     public Boolean enableJob(String id) {
-        ScheduleJob scheduleJob = this.getById(id);
+        QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", UUID.fromString(id));
+        ScheduleJob scheduleJob = this.getOne(queryWrapper);
         if (scheduleJob == null) {
             return false;
         }

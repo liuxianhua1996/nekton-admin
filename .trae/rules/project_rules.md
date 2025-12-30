@@ -90,6 +90,7 @@ Mapper.xml
         return this.getOne(queryWrapper);
     }
 ```
+- 请求响应统一用DTO即可，请求参数用Request类来接受前端传的参数
 ## 数据库规范
 
 - 数据库表名要使用下划线(\_)分隔单词，而不是驼峰命名法

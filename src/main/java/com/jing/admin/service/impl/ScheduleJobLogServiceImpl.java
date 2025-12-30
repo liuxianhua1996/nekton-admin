@@ -5,13 +5,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jing.admin.core.PageResult;
-import com.jing.admin.core.dto.ScheduleJobLogRequest;
-import com.jing.admin.core.dto.ScheduleJobLogResponse;
+import com.jing.admin.model.api.ScheduleJobLogRequest;
 import com.jing.admin.model.domain.ScheduleJobLog;
 import com.jing.admin.mapper.ScheduleJobLogMapper;
 import com.jing.admin.model.api.ScheduleJobQueryRequest;
+import com.jing.admin.model.dto.ScheduleJobLogDTO;
 import com.jing.admin.model.mapping.ScheduleJobLogMapping;
+import com.jing.admin.repository.ScheduleJobLogRepository;
 import com.jing.admin.service.ScheduleJobLogService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,19 +25,24 @@ import java.util.stream.Collectors;
 @Service
 public class ScheduleJobLogServiceImpl extends ServiceImpl<ScheduleJobLogMapper, ScheduleJobLog> implements ScheduleJobLogService {
 
+    @Autowired
+    private ScheduleJobLogRepository scheduleJobLogRepository;
+
 
     @Override
-    public ScheduleJobLogResponse createScheduleJobLog(ScheduleJobLogRequest request) {
+    public ScheduleJobLogDTO createScheduleJobLog(ScheduleJobLogRequest request) {
         ScheduleJobLog scheduleJobLog = ScheduleJobLogMapping.INSTANCE.toEntity(request);
         scheduleJobLog.setCreateTime(System.currentTimeMillis());
         scheduleJobLog.setUpdateTime(System.currentTimeMillis());
         this.save(scheduleJobLog);
-        return ScheduleJobLogMapping.INSTANCE.toResponse(scheduleJobLog);
+        return ScheduleJobLogMapping.INSTANCE.toDTO(scheduleJobLog);
     }
 
     @Override
-    public ScheduleJobLogResponse updateScheduleJobLog(String id, ScheduleJobLogRequest request) {
-        ScheduleJobLog scheduleJobLog = this.getById(id);
+    public ScheduleJobLogDTO updateScheduleJobLog(String id, ScheduleJobLogRequest request) {
+        QueryWrapper<ScheduleJobLog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", id);
+        ScheduleJobLog scheduleJobLog = this.getOne(queryWrapper);
         if (scheduleJobLog == null) {
             throw new RuntimeException("调度任务执行记录不存在");
         }
@@ -46,7 +53,7 @@ public class ScheduleJobLogServiceImpl extends ServiceImpl<ScheduleJobLogMapper,
         
         this.updateById(scheduleJobLog);
         
-        return ScheduleJobLogMapping.INSTANCE.toResponse(scheduleJobLog);
+        return ScheduleJobLogMapping.INSTANCE.toDTO(scheduleJobLog);
     }
 
     @Override
@@ -55,52 +62,46 @@ public class ScheduleJobLogServiceImpl extends ServiceImpl<ScheduleJobLogMapper,
     }
 
     @Override
-    public ScheduleJobLogResponse getScheduleJobLogById(String id) {
-        ScheduleJobLog scheduleJobLog = this.getById(id);
+    public ScheduleJobLogDTO getScheduleJobLogById(String id) {
+        QueryWrapper<ScheduleJobLog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", id);
+        ScheduleJobLog scheduleJobLog = this.getOne(queryWrapper);
         if (scheduleJobLog == null) {
             return null;
         }
         
-        return ScheduleJobLogMapping.INSTANCE.toResponse(scheduleJobLog);
+        return ScheduleJobLogMapping.INSTANCE.toDTO(scheduleJobLog);
     }
 
     @Override
-    public List<ScheduleJobLogResponse> getScheduleJobLogList() {
+    public List<ScheduleJobLogDTO> getScheduleJobLogList() {
         List<ScheduleJobLog> scheduleJobLogs = this.list();
         return scheduleJobLogs.stream()
-                .map(ScheduleJobLogMapping.INSTANCE::toResponse)
+                .map(ScheduleJobLogMapping.INSTANCE::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ScheduleJobLogResponse> getScheduleJobLogByJobId(String jobId) {
+    public List<ScheduleJobLogDTO> getScheduleJobLogByJobId(String jobId) {
         QueryWrapper<ScheduleJobLog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("job_id", jobId);
         
         List<ScheduleJobLog> scheduleJobLogs = this.list(queryWrapper);
         return scheduleJobLogs.stream()
-                .map(ScheduleJobLogMapping.INSTANCE::toResponse)
+                .map(ScheduleJobLogMapping.INSTANCE::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public PageResult<ScheduleJobLogResponse> getScheduleJobLogPage(ScheduleJobQueryRequest queryRequest) {
+    public PageResult<ScheduleJobLogDTO> getScheduleJobLogPage(ScheduleJobQueryRequest queryRequest) {
         // 创建分页对象
-        Page<ScheduleJobLog> page = new Page<>(queryRequest.getCurrent(), queryRequest.getSize());
+        Page<ScheduleJobLogDTO> page = new Page<>(queryRequest.getCurrent(), queryRequest.getSize());
 
-        // 构建查询条件
-        QueryWrapper<ScheduleJobLog> queryWrapper = new QueryWrapper<>();
-        if (queryRequest.getWorkflowId() != null && !queryRequest.getWorkflowId().isEmpty()) {
-            queryWrapper.eq("job_id", queryRequest.getWorkflowId()); // Using workflowId as jobId for logs
-        }
+        // 使用Repository的自定义分页查询方法（关联用户表）
+        IPage<ScheduleJobLogDTO> scheduleJobLogPage = scheduleJobLogRepository.selectScheduleJobLogPageWithUser(page, queryRequest);
 
-        // 执行分页查询
-        IPage<ScheduleJobLog> scheduleJobLogPage = this.page(page, queryWrapper);
-
-        // 转换为响应对象列表
-        List<ScheduleJobLogResponse> records = scheduleJobLogPage.getRecords().stream()
-                .map(ScheduleJobLogMapping.INSTANCE::toResponse)
-                .collect(Collectors.toList());
+        // 直接使用DTO列表
+        List<ScheduleJobLogDTO> records = scheduleJobLogPage.getRecords();
 
         // 构建分页结果
         return PageResult.of(
@@ -110,4 +111,6 @@ public class ScheduleJobLogServiceImpl extends ServiceImpl<ScheduleJobLogMapper,
                 scheduleJobLogPage.getSize()
         );
     }
+
+
 }

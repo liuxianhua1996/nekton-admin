@@ -1,8 +1,8 @@
 package com.jing.admin.service;
 
 import com.jing.admin.core.PageResult;
-import com.jing.admin.core.dto.ScheduleJobRequest;
-import com.jing.admin.core.dto.ScheduleJobResponse;
+import com.jing.admin.model.api.ScheduleJobRequest;
+import com.jing.admin.model.dto.ScheduleJobDTO;
 import com.jing.admin.model.domain.ScheduleJob;
 import com.jing.admin.model.api.ScheduleJobQueryRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -16,12 +16,12 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
     /**
      * 创建调度工作流
      */
-    ScheduleJobResponse createScheduleJob(ScheduleJobRequest request);
+    ScheduleJobDTO createScheduleJob(ScheduleJobRequest request);
 
     /**
      * 更新调度工作流
      */
-    ScheduleJobResponse updateScheduleJob(String id, ScheduleJobRequest request);
+    ScheduleJobDTO updateScheduleJob(String id, ScheduleJobRequest request);
 
     /**
      * 删除调度工作流
@@ -31,17 +31,17 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
     /**
      * 根据ID获取调度工作流
      */
-    ScheduleJobResponse getScheduleJobById(String id);
+    ScheduleJobDTO getScheduleJobById(String id);
 
     /**
      * 获取调度工作流列表
      */
-    List<ScheduleJobResponse> getScheduleJobList();
+    List<ScheduleJobDTO> getScheduleJobList();
 
     /**
      * 获取调度工作流分页列表
      */
-    PageResult<ScheduleJobResponse> getScheduleJobPage(ScheduleJobQueryRequest queryRequest);
+    PageResult<ScheduleJobDTO> getScheduleJobPage(ScheduleJobQueryRequest queryRequest);
 
     /**
      * 停用调度工作流

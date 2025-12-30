@@ -1,7 +1,7 @@
 package com.jing.admin.service;
 
-import com.jing.admin.core.dto.ScheduleJobLogRequest;
-import com.jing.admin.core.dto.ScheduleJobLogResponse;
+import com.jing.admin.model.api.ScheduleJobLogRequest;
+import com.jing.admin.model.dto.ScheduleJobLogDTO;
 import com.jing.admin.model.domain.ScheduleJobLog;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -14,12 +14,12 @@ public interface ScheduleJobLogService extends IService<ScheduleJobLog> {
     /**
      * 创建调度任务执行记录
      */
-    ScheduleJobLogResponse createScheduleJobLog(ScheduleJobLogRequest request);
+    ScheduleJobLogDTO createScheduleJobLog(ScheduleJobLogRequest request);
 
     /**
      * 更新调度任务执行记录
      */
-    ScheduleJobLogResponse updateScheduleJobLog(String id, ScheduleJobLogRequest request);
+    ScheduleJobLogDTO updateScheduleJobLog(String id, ScheduleJobLogRequest request);
 
     /**
      * 删除调度任务执行记录
@@ -29,20 +29,20 @@ public interface ScheduleJobLogService extends IService<ScheduleJobLog> {
     /**
      * 根据ID获取调度任务执行记录
      */
-    ScheduleJobLogResponse getScheduleJobLogById(String id);
+    ScheduleJobLogDTO getScheduleJobLogById(String id);
 
     /**
      * 获取调度任务执行记录列表
      */
-    List<ScheduleJobLogResponse> getScheduleJobLogList();
+    List<ScheduleJobLogDTO> getScheduleJobLogList();
 
     /**
      * 根据任务ID获取执行记录列表
      */
-    List<ScheduleJobLogResponse> getScheduleJobLogByJobId(String jobId);
+    List<ScheduleJobLogDTO> getScheduleJobLogByJobId(String jobId);
 
     /**
      * 获取调度任务执行记录分页列表
      */
-    com.jing.admin.core.PageResult<ScheduleJobLogResponse> getScheduleJobLogPage(com.jing.admin.model.api.ScheduleJobQueryRequest queryRequest);
+    com.jing.admin.core.PageResult<ScheduleJobLogDTO> getScheduleJobLogPage(com.jing.admin.model.api.ScheduleJobQueryRequest queryRequest);
 }

@@ -1,12 +1,12 @@
-package com.jing.admin.core.dto;
+package com.jing.admin.model.api;
 
 import lombok.Data;
 
 /**
- * 调度工作流响应DTO
+ * 调度工作流请求DTO
  */
 @Data
-public class ScheduleJobResponse {
+public class ScheduleJobRequest {
     private String id;
     private String name;
     private String workflowId;
@@ -15,8 +15,4 @@ public class ScheduleJobResponse {
     private String status;
     private String description;
     private String tenantId;
-    private Long createTime;
-    private Long updateTime;
-    private String createUserId;
-    private String updateUserId;
 }

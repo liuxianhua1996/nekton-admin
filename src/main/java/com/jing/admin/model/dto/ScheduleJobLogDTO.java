@@ -1,12 +1,12 @@
-package com.jing.admin.core.dto;
+package com.jing.admin.model.dto;
 
 import lombok.Data;
 
 /**
- * 调度工作流执行记录响应DTO
+ * 调度任务执行记录DTO，用于分页查询（关联用户信息）
  */
 @Data
-public class ScheduleJobLogResponse {
+public class ScheduleJobLogDTO {
     private String id;
     private String jobId;
     private String workflowId;
@@ -21,5 +21,7 @@ public class ScheduleJobLogResponse {
     private Long createTime;
     private Long updateTime;
     private String createUserId;
+    private String createUserName;  // 创建用户名称
     private String updateUserId;
+    private String updateUserName;  // 更新用户名称
 }
