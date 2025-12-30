@@ -1,0 +1,53 @@
+package com.jing.admin.service;
+
+import com.jing.admin.core.dto.ScheduleJobRequest;
+import com.jing.admin.core.dto.ScheduleJobResponse;
+import com.jing.admin.core.entity.ScheduleJob;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
+
+/**
+ * 调度工作流Service接口
+ */
+public interface ScheduleJobService extends IService<ScheduleJob> {
+    /**
+     * 创建调度工作流
+     */
+    ScheduleJobResponse createScheduleJob(ScheduleJobRequest request);
+
+    /**
+     * 更新调度工作流
+     */
+    ScheduleJobResponse updateScheduleJob(String id, ScheduleJobRequest request);
+
+    /**
+     * 删除调度工作流
+     */
+    Boolean deleteScheduleJob(String id);
+
+    /**
+     * 根据ID获取调度工作流
+     */
+    ScheduleJobResponse getScheduleJobById(String id);
+
+    /**
+     * 获取调度工作流列表
+     */
+    List<ScheduleJobResponse> getScheduleJobList();
+
+    /**
+     * 停用调度工作流
+     */
+    Boolean disableJob(String id);
+
+    /**
+     * 启用调度工作流
+     */
+    Boolean enableJob(String id);
+
+    /**
+     * 立即执行调度工作流
+     */
+    Boolean executeJob(String id);
+}
