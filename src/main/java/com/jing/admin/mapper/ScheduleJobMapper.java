@@ -1,7 +1,7 @@
 package com.jing.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jing.admin.core.entity.ScheduleJob;
+import com.jing.admin.model.domain.ScheduleJob;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

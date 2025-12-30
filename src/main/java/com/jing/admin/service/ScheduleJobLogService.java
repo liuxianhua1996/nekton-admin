@@ -2,7 +2,7 @@ package com.jing.admin.service;
 
 import com.jing.admin.core.dto.ScheduleJobLogRequest;
 import com.jing.admin.core.dto.ScheduleJobLogResponse;
-import com.jing.admin.core.entity.ScheduleJobLog;
+import com.jing.admin.model.domain.ScheduleJobLog;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -40,4 +40,9 @@ public interface ScheduleJobLogService extends IService<ScheduleJobLog> {
      * 根据任务ID获取执行记录列表
      */
     List<ScheduleJobLogResponse> getScheduleJobLogByJobId(String jobId);
+
+    /**
+     * 获取调度任务执行记录分页列表
+     */
+    com.jing.admin.core.PageResult<ScheduleJobLogResponse> getScheduleJobLogPage(com.jing.admin.model.api.ScheduleJobQueryRequest queryRequest);
 }

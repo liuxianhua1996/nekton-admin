@@ -1,8 +1,10 @@
 package com.jing.admin.service;
 
+import com.jing.admin.core.PageResult;
 import com.jing.admin.core.dto.ScheduleJobRequest;
 import com.jing.admin.core.dto.ScheduleJobResponse;
-import com.jing.admin.core.entity.ScheduleJob;
+import com.jing.admin.model.domain.ScheduleJob;
+import com.jing.admin.model.api.ScheduleJobQueryRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -35,6 +37,11 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
      * 获取调度工作流列表
      */
     List<ScheduleJobResponse> getScheduleJobList();
+
+    /**
+     * 获取调度工作流分页列表
+     */
+    PageResult<ScheduleJobResponse> getScheduleJobPage(ScheduleJobQueryRequest queryRequest);
 
     /**
      * 停用调度工作流
