@@ -12,6 +12,7 @@ import com.jing.admin.model.mapping.ScheduleJobMapping;
 import com.jing.admin.service.ScheduleJobService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +33,8 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         ScheduleJob scheduleJob = ScheduleJobMapping.INSTANCE.toEntity(request);
         scheduleJob.setCreateTime(System.currentTimeMillis());
         scheduleJob.setUpdateTime(System.currentTimeMillis());
+        scheduleJob.setCreateUserId(MDC.get("userId"));
+        scheduleJob.setUpdateUserId(MDC.get("userId"));
         
         this.save(scheduleJob);
         
@@ -136,7 +139,6 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         if (scheduleJob == null) {
             return false;
         }
-        
         scheduleJob.setStatus("ENABLED");
         scheduleJob.setUpdateTime(System.currentTimeMillis());
         return this.updateById(scheduleJob);

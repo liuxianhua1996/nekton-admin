@@ -16,7 +16,7 @@ import java.util.List;
  * 调度工作流Controller
  */
 @RestController
-@RequestMapping("/api/schedule/job")
+@RequestMapping("/schedule/job")
 public class ScheduleJobController {
 
     @Autowired

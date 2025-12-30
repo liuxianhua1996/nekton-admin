@@ -82,7 +82,14 @@ Mapper.xml
         ORDER BY w.create_time DESC
     </select>
 ```
-
+- 由于主键都是UUID，然后类里的id是String,不能使用直接getById方法，使用QueryWrapper来查询示例:
+```java
+    public Workflow getById(String id) {
+        QueryWrapper<Workflow> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", UUID.fromString(id));
+        return this.getOne(queryWrapper);
+    }
+```
 ## 数据库规范
 
 - 数据库表名要使用下划线(\_)分隔单词，而不是驼峰命名法
