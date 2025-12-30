@@ -1,19 +1,26 @@
 package com.jing.admin.core.workflow.sdk;
 
-
 import com.jing.admin.core.workflow.sdk.dingtalk.DingTalkSDK;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * SDK管理器
  * 负责注册和获取各种SDK客户端实例
  */
-public class SdkManager {
+@Component
+public class SdkManager implements InitializingBean {
     
     private static final Map<String, ISdkClient> sdkClients = new HashMap<>();
     
+    @Autowired
+    private List<ISdkClient> sdkClientList;
+
     /**
      * 注册SDK客户端
      * 
@@ -45,12 +52,18 @@ public class SdkManager {
     }
     
     /**
-     * 初始化默认SDK客户端
+     * 在Spring完成依赖注入后自动初始化SDK客户端
      */
-    public static void initializeDefaultClients() {
-        // 注册默认的SDK客户端
-        registerSdkClient("dingtalk_app",new DingTalkSDK());
-//      registerSdkClient("kingdee_sky", new KingdeeSkySDK());
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        // 清空静态map，防止重复注册
+        sdkClients.clear();
+        
+        // 将Spring管理的SDK客户端注册到静态map中
+        if (sdkClientList != null) {
+            for (ISdkClient sdkClient : sdkClientList) {
+                registerSdkClient(sdkClient.getSystemIdentifier(), sdkClient);
+            }
+        }
     }
-
 }

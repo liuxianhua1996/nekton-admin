@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.jing.admin.core.workflow.sdk.dingtalk.request.YiDaBatchInstancesParams;
 import com.jing.admin.core.workflow.sdk.dingtalk.request.YiDaGetInstancesByIdParams;
 import com.jing.admin.core.workflow.sdk.dingtalk.request.YiDaInstancesOrUpParams;
+import com.jing.admin.core.workflow.sdk.dingtalk.request.YiDaInstancesParams;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class DingTalkYiDaApi {
      * @param yiDaInstancesParams
      * @return
      */
-    public DingTalkResult instances(DingTalkApi dingTalkApi, YiDaBatchInstancesParams yiDaInstancesParams) {
+    public DingTalkResult instances(DingTalkApi dingTalkApi, YiDaInstancesParams yiDaInstancesParams) {
         RestTemplate restTemplate = new RestTemplate();
         String url = dingTalkConfig.getBaseUrl() + "/v2.0/yida/forms/instances";
         HttpEntity requestEntity = dingTalkApi.getHttpEntity(yiDaInstancesParams);

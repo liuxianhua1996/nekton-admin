@@ -23,7 +23,7 @@ public class DingTalkApi {
     private String appSecret = "";
     private final String headTokenName = "x-acs-dingtalk-access-token";
 
-    public void DingTalkApi(String appKey, String appSecret) {
+    public DingTalkApi(String appKey, String appSecret) {
         this.appKey = appKey;
         this.appSecret = appSecret;
         this.oauth();

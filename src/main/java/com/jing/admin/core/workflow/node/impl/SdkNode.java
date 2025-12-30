@@ -137,7 +137,7 @@ public class SdkNode extends BaseNode {
             // 如果没有找到对应的SDK客户端，返回错误信息
             throw new RuntimeException("不支持的系统类型: " + system);
         }
-        String apiKey = (String) params.get("apiKey");
+        String apiKey = (String) params.get("apiKeyId");
         GlobalParams globalParams = context.getGlobalParams().get(apiKey);
         Optional.of(globalParams);
         // 准备调用参数

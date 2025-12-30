@@ -2,6 +2,7 @@ package com.jing.admin.core.workflow.sdk.thirdparty;
 
 import com.jing.admin.core.workflow.model.GlobalParams;
 import com.jing.admin.core.workflow.sdk.ISdkClient;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
  * @version 1.0
  * @since 2025/12/26
  */
+@Component
 public class WechatSDK implements ISdkClient {
     
     private Map<String, Object> config;
