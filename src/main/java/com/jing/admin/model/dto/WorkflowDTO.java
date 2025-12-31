@@ -1,6 +1,8 @@
 package com.jing.admin.model.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 工作流数据传输对象
@@ -8,6 +10,8 @@ import lombok.Data;
  * @date 2025/9/19
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class WorkflowDTO {
     /**
      * 工作流ID

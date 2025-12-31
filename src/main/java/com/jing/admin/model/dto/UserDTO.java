@@ -1,7 +1,9 @@
 package com.jing.admin.model.dto;
 
 import com.jing.admin.core.constant.Role;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
  * @date 2025/9/18
  **/
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDTO {
     private String id;
 

@@ -1,7 +1,9 @@
 package com.jing.admin.model.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
@@ -10,6 +12,8 @@ import java.util.Map;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WorkflowExecution {
     private String jobId;
     
@@ -37,24 +41,4 @@ public class WorkflowExecution {
      * 额外的日志信息
      */
     private Map<String, Object> extraLogInfo;
-    
-    /**
-     * 构造函数
-     */
-    public WorkflowExecution(String workflowId, Map<String, Object> startParams,
-                             String workflowInstanceId, String triggerType, Map<String, Object> extraLogInfo) {
-        this.workflowId = workflowId;
-        this.startParams = startParams;
-        this.workflowInstanceId = workflowInstanceId;
-        this.triggerType = triggerType;
-        this.extraLogInfo = extraLogInfo;
-    }
-    
-    /**
-     * 默认构造函数
-     */
-    public WorkflowExecution() {
-    }
-    
-    // Getter和Setter方法由Lombok的@Data注解自动生成
 }

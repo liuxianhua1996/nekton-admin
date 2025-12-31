@@ -1,8 +1,10 @@
 package com.jing.admin.model.dto;
 
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,8 @@ import java.util.Map;
  * @date 2025/11/7
  **/
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class TestWorkflowDTO {
     private List<NodeTestResult> nodeTestResults;
     private String status;
