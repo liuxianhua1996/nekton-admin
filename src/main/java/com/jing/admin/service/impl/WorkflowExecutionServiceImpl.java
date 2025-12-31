@@ -1,6 +1,7 @@
 package com.jing.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jing.admin.core.tenant.TenantContextHolder;
 import com.jing.admin.core.workflow.WorkflowExecutor;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.core.workflow.model.GlobalParams;
@@ -14,6 +15,8 @@ import com.jing.admin.service.ScheduleJobLogService;
 import com.jing.admin.service.WorkflowExecutionService;
 import com.jing.admin.service.WorkflowGlobalParamService;
 import com.jing.admin.service.WorkflowNodeLogService;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +31,8 @@ import java.util.UUID;
  */
 @Service
 public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkflowExecutionServiceImpl.class);
 
     @Autowired
     private WorkflowExecutor workflowExecutor;
@@ -52,6 +57,12 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         String workflowInstanceId = workflowExecution.getWorkflowInstanceId();
         String triggerType = workflowExecution.getTriggerType();
         Map<String, Object> extraLogInfo = workflowExecution.getExtraLogInfo();
+        
+        // 获取当前租户ID
+        String currentTenantId = TenantContextHolder.getTenantId();
+        
+        // 记录租户信息用于调试
+        log.debug("执行工作流 {}，租户ID: {}", workflowId, currentTenantId);
         
         // 如果没有提供工作流实例ID，则生成一个新的
         if (workflowInstanceId == null || workflowInstanceId.trim().isEmpty()) {
@@ -139,6 +150,12 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         Map<String, Object> startParams = request.getStartParams();
         String workflowInstanceId = request.getWorkflowInstanceId();
         
+        // 获取当前租户ID
+        String currentTenantId = TenantContextHolder.getTenantId();
+        
+        // 记录租户信息用于调试
+        log.debug("执行工作流(无日志) {}，租户ID: {}", workflowId, currentTenantId);
+        
         try {
             // 获取工作流和全局参数
             Workflow workflow = workflowRepository.getById(workflowId);
@@ -161,6 +178,12 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
     }
     @Override
     public WorkflowExecutionResult executeWorkflowWithoutLogByData(String workflowJson, Map<String, Object> globalParams, Map<String, Object> startParams) {
+        // 获取当前租户ID
+        String currentTenantId = TenantContextHolder.getTenantId();
+        
+        // 记录租户信息用于调试
+        log.debug("执行工作流(无日志) by data，租户ID: {}", currentTenantId);
+        
         try {
             // 直接执行工作流，不记录日志
             return workflowExecutor.executeFromJsonByWorkflowData(
