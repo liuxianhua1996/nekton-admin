@@ -33,13 +33,13 @@ public class SdkNode extends BaseNode {
             // 获取节点数据
             NodeData nodeData = nodeDefinition.getData();
             if (nodeData == null || nodeData.getContent() == null) {
-                return NodeExecutionResult.failure("SDK节点数据为空");
+                throw new RuntimeException("SDK节点数据为空");
             }
 
             // 获取SDK参数
             Map<String, Object> sdkParams = nodeData.getContent().getSdkParams();
             if (sdkParams == null) {
-                return NodeExecutionResult.failure("SDK参数为空");
+                throw new RuntimeException("SDK参数为空");
             }
 
             // 处理参数中的引用
@@ -50,16 +50,15 @@ public class SdkNode extends BaseNode {
             String method = (String) processedParams.get("method");
 
             if (system == null || method == null) {
-                return NodeExecutionResult.failure("系统或方法参数为空");
+                throw new RuntimeException("系统或方法参数为空");
             }
-
-            // 这里应该根据不同的系统和方法调用相应的SDK
-            // 由于是示例，这里只做模拟处理
             Object result = executeSdkCall(system, method, processedParams, context);
-
             // 设置节点执行结果
             context.setNodeResult(nodeDefinition.getId(), NodeResult.builder()
-                    .nodeId(nodeDefinition.getId()).nodeName(nodeDefinition.getData().getLabel()).executeResult(result).build());
+                    .nodeId(nodeDefinition.getId())
+                    .nodeName(nodeDefinition.getData().getLabel())
+                    .success(true)
+                    .executeResult(result).build());
 
             // 将结果添加到上下文变量中
             if (nodeData.getContent().getOutParams() != null) {
@@ -75,9 +74,14 @@ public class SdkNode extends BaseNode {
             return executionResult;
         } catch (Exception e) {
             long executionTime = System.currentTimeMillis() - startTime;
-            NodeExecutionResult result = NodeExecutionResult.failure("SDK节点执行失败: " + e.getMessage());
+            NodeExecutionResult result = NodeExecutionResult.failure("执行失败: " + e.getMessage());
             result.setExecutionTime(executionTime);
-
+            context.setNodeResult(nodeDefinition.getId(), NodeResult.builder()
+                    .nodeId(nodeDefinition.getId())
+                    .nodeName(nodeDefinition.getData().getLabel())
+                    .success(false)
+                    .errorMessage(e.getMessage())
+                    .executeResult(result).build());
             return result;
         }
     }
@@ -145,7 +149,7 @@ public class SdkNode extends BaseNode {
         if (params.containsKey("params")) {
             methodParams = (Map<String, Object>) params.get("params");
         }
-        
+
         // 执行SDK调用
         return sdkClient.execute(method, methodParams, globalParams);
     }

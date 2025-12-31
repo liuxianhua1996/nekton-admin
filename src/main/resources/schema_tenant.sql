@@ -243,3 +243,48 @@ COMMENT ON COLUMN tb_schedule_job_log.start_time IS '开始执行时间';
 COMMENT ON COLUMN tb_schedule_job_log.end_time IS '结束执行时间';
 COMMENT ON COLUMN tb_schedule_job_log.execution_time IS '执行耗时(毫秒)';
 COMMENT ON COLUMN tb_schedule_job_log.error_message IS '错误信息';
+
+-- 工作流节点执行日志表
+CREATE TABLE IF NOT EXISTS tb_workflow_node_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    workflow_instance_id VARCHAR(255) NOT NULL,
+    workflow_id VARCHAR(255) NOT NULL,
+    node_id VARCHAR(255) NOT NULL,
+    node_name VARCHAR(255),
+    node_type VARCHAR(100),
+    status VARCHAR(20) NOT NULL,
+    input_data TEXT,
+    output_data TEXT,
+    error_message TEXT,
+    execution_time BIGINT,
+    start_time BIGINT,
+    end_time BIGINT,
+    sort_order INT DEFAULT 0,
+    tenant_id VARCHAR(255),
+    create_time BIGINT,
+    update_time BIGINT,
+    create_user_id VARCHAR(255),
+    update_user_id VARCHAR(255)
+);
+
+-- 工作流节点执行日志表字段注释
+COMMENT ON TABLE tb_workflow_node_log IS '工作流节点执行日志表';
+COMMENT ON COLUMN tb_workflow_node_log.id IS '日志ID';
+COMMENT ON COLUMN tb_workflow_node_log.workflow_instance_id IS '工作流实例ID';
+COMMENT ON COLUMN tb_workflow_node_log.workflow_id IS '工作流ID';
+COMMENT ON COLUMN tb_workflow_node_log.node_id IS '节点ID';
+COMMENT ON COLUMN tb_workflow_node_log.node_name IS '节点名称';
+COMMENT ON COLUMN tb_workflow_node_log.node_type IS '节点类型';
+COMMENT ON COLUMN tb_workflow_node_log.status IS '执行状态：SUCCESS-成功，FAILED-失败，RUNNING-执行中';
+COMMENT ON COLUMN tb_workflow_node_log.input_data IS '节点输入数据';
+COMMENT ON COLUMN tb_workflow_node_log.output_data IS '节点输出数据';
+COMMENT ON COLUMN tb_workflow_node_log.error_message IS '错误信息';
+COMMENT ON COLUMN tb_workflow_node_log.execution_time IS '执行耗时(毫秒)';
+COMMENT ON COLUMN tb_workflow_node_log.start_time IS '节点开始执行时间';
+COMMENT ON COLUMN tb_workflow_node_log.end_time IS '节点结束执行时间';
+COMMENT ON COLUMN tb_workflow_node_log.sort_order IS '执行顺序';
+COMMENT ON COLUMN tb_workflow_node_log.tenant_id IS '租户ID';
+COMMENT ON COLUMN tb_workflow_node_log.create_time IS '创建时间';
+COMMENT ON COLUMN tb_workflow_node_log.update_time IS '更新时间';
+COMMENT ON COLUMN tb_workflow_node_log.create_user_id IS '创建用户ID';
+COMMENT ON COLUMN tb_workflow_node_log.update_user_id IS '更新用户ID';

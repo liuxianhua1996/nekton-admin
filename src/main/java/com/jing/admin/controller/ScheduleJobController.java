@@ -110,7 +110,6 @@ public class ScheduleJobController {
     @PutMapping("/{id}/execute")
     @Operation(summary = "立即执行调度任务", description = "根据ID立即执行调度任务")
     public HttpResult<Boolean> executeJob(@PathVariable String id) {
-
         Boolean result = scheduleJobService.executeJob(id);
         return HttpResult.success(result);
 

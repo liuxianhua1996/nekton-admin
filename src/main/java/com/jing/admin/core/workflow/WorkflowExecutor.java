@@ -5,12 +5,16 @@ import com.jing.admin.core.workflow.core.context.WorkflowContext;
 import com.jing.admin.core.workflow.core.conversion.WorkflowJsonConverter;
 import com.jing.admin.core.workflow.core.engine.WorkflowEngine;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
+import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.core.workflow.model.GlobalParams;
 import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.model.domain.Workflow;
 import com.jing.admin.model.domain.WorkflowGlobalParam;
+import com.jing.admin.model.domain.WorkflowNodeLog;
+import com.jing.admin.service.WorkflowNodeLogService;
 import com.jing.admin.repository.WorkflowRepository;
 import com.jing.admin.service.WorkflowGlobalParamService;
+
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,6 +40,9 @@ public class WorkflowExecutor {
     private WorkflowGlobalParamService workflowGlobalParamService;
     @Autowired
     private WorkflowRepository workflowRepository;
+    @Autowired
+    private WorkflowNodeLogService workflowNodeLogService;
+
     
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -98,7 +105,6 @@ public class WorkflowExecutor {
             WorkflowContext context = new WorkflowContext();
             context.setStatus(WorkflowContext.WorkflowStatus.FAILED);
             context.setErrorMessage("工作流JSON解析失败: " + e.getMessage());
-            
             return new WorkflowExecutionResult(false, context, "工作流JSON解析失败: " + e.getMessage());
         }
     }
@@ -139,5 +145,34 @@ public class WorkflowExecutor {
             
             return new WorkflowExecutionResult(false, context, "读取工作流JSON文件失败: " + e.getMessage());
         }
+    }
+    
+    /**
+     * 获取指定工作流实例的节点执行日志
+     * 
+     * @param workflowInstanceId 工作流实例ID
+     * @return 节点执行日志列表
+     */
+    public List<WorkflowNodeLog> getNodeLogsByInstanceId(String workflowInstanceId) {
+        return workflowNodeLogService.getNodeLogsByInstanceId(workflowInstanceId);
+    }
+    
+    /**
+     * 获取指定工作流的节点执行日志
+     * 
+     * @param workflowId 工作流ID
+     * @return 节点执行日志列表
+     */
+    public List<WorkflowNodeLog> getNodeLogsByWorkflowId(String workflowId) {
+        return workflowNodeLogService.getNodeLogsByWorkflowId(workflowId);
+    }
+    
+    /**
+     * 清除指定工作流实例的节点日志
+     * 
+     * @param workflowInstanceId 工作流实例ID
+     */
+    public void clearLogsByInstanceId(String workflowInstanceId) {
+        workflowNodeLogService.clearLogsByInstanceId(workflowInstanceId);
     }
 }

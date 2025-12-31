@@ -12,7 +12,8 @@ import lombok.Data;
 public class NodeResult {
     private String nodeId;
     private String nodeName;
-
     private int sort;
     private Object executeResult;
+    private boolean success;
+    private String errorMessage;
 }

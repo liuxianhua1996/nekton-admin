@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jing.admin.core.PageResult;
+import com.jing.admin.core.workflow.WorkflowExecutor;
+import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.model.api.ScheduleJobRequest;
 import com.jing.admin.model.domain.ScheduleJob;
 import com.jing.admin.mapper.ScheduleJobMapper;
@@ -11,6 +13,7 @@ import com.jing.admin.model.api.ScheduleJobQueryRequest;
 import com.jing.admin.model.dto.ScheduleJobDTO;
 import com.jing.admin.model.mapping.ScheduleJobMapping;
 import com.jing.admin.repository.ScheduleJobRepository;
+import com.jing.admin.repository.WorkflowRepository;
 import com.jing.admin.service.ScheduleJobService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -18,6 +21,7 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,6 +34,10 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
 
     @Autowired
     private ScheduleJobRepository scheduleJobRepository;
+    @Autowired
+    private WorkflowRepository workflowRepository;
+    @Autowired
+    private WorkflowExecutor workflowExecutor;
 
     @Override
     public ScheduleJobDTO createScheduleJob(ScheduleJobRequest request) {
@@ -152,6 +160,9 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
     @Override
     public Boolean executeJob(String id) {
         // 这里可以实现立即执行调度工作流的逻辑
+        ScheduleJob scheduleJob = scheduleJobRepository.getById(id);
+        String workflowId =  scheduleJob.getWorkflowId();
+        WorkflowExecutionResult workflowExecutionResult = workflowExecutor.executeFromJsonByWorkflowId(workflowId,new HashMap());
         // 暂时返回true，实际实现需要根据具体工作流来执行
         return true;
     }
