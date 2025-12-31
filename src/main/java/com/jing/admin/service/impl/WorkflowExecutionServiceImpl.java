@@ -1,5 +1,7 @@
 package com.jing.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jing.admin.core.workflow.WorkflowExecutor;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.core.workflow.model.GlobalParams;
@@ -207,7 +209,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         }
         
         // 更新日志记录
-        scheduleJobLogService.updateById(log);
+        scheduleJobLogService.update(log, new QueryWrapper<ScheduleJobLog>().eq("id", UUID.fromString(log.getId())));
     }
     
     /**
@@ -222,6 +224,6 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         log.setResult("执行失败");
         
         // 更新日志记录
-        scheduleJobLogService.updateById(log);
+        scheduleJobLogService.update(log, new QueryWrapper<ScheduleJobLog>().eq("id", UUID.fromString(log.getId())));
     }
 }
