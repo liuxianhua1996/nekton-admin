@@ -1,5 +1,6 @@
 package com.jing.admin.model.domain;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -9,7 +10,9 @@ import lombok.Data;
  **/
 @Data
 @TableName("tb_tenants")
-public class Tenant  extends Base{
+public class Tenant{
+    @TableId
+    private String id;
     private String tenantCode;
     private String tenantName;
     private String description;
@@ -17,4 +20,8 @@ public class Tenant  extends Base{
      * -- ACTIVE, INACTIVE, SUSPENDED
      */
     private String status;
+    private long createTime;
+    private long updateTime;
+    private String createUserId;
+    private String updateUserId;
 }

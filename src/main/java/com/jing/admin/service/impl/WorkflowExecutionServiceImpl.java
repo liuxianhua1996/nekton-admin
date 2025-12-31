@@ -16,7 +16,6 @@ import com.jing.admin.service.WorkflowExecutionService;
 import com.jing.admin.service.WorkflowGlobalParamService;
 import com.jing.admin.service.WorkflowNodeLogService;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,25 +29,26 @@ import java.util.UUID;
  * 提供带日志和不带日志的工作流执行方法
  */
 @Service
+@Slf4j
 public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkflowExecutionServiceImpl.class);
 
     @Autowired
     private WorkflowExecutor workflowExecutor;
-    
+
     @Autowired
     private WorkflowRepository workflowRepository;
-    
+
     @Autowired
     private WorkflowGlobalParamService workflowGlobalParamService;
-    
+
     @Autowired
     private ScheduleJobLogService scheduleJobLogService;
-    
+
     @Autowired
     private WorkflowNodeLogService workflowNodeLogService;
-    
+
     @Override
     public WorkflowExecutionResult executeWorkflowWithLog(WorkflowExecution workflowExecution) {
         String workflowId = workflowExecution.getWorkflowId();
@@ -57,47 +57,47 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         String workflowInstanceId = workflowExecution.getWorkflowInstanceId();
         String triggerType = workflowExecution.getTriggerType();
         Map<String, Object> extraLogInfo = workflowExecution.getExtraLogInfo();
-        
+
         // 获取当前租户ID
         String currentTenantId = TenantContextHolder.getTenantId();
-        
+
         // 记录租户信息用于调试
-        log.debug("执行工作流 {}，租户ID: {}", workflowId, currentTenantId);
-        
+        log.info("执行工作流 {}，租户ID: {}", workflowId, currentTenantId);
+
         // 如果没有提供工作流实例ID，则生成一个新的
         if (workflowInstanceId == null || workflowInstanceId.trim().isEmpty()) {
             workflowInstanceId = UUID.randomUUID().toString();
         }
-        
+
         // 记录开始执行时间
         long startTime = System.currentTimeMillis();
-        
+
         // 创建执行日志记录
-        ScheduleJobLog log = new ScheduleJobLog();
-        log.setJobId(jobId); // 在调度场景下，jobId是调度任务ID；在其他场景下，可以是工作流ID
-        log.setWorkflowId(workflowId);
-        log.setWorkflowInstanceId(workflowInstanceId);
-        log.setTriggerType(triggerType != null ? triggerType : "MANUAL");
-        log.setStartTime(startTime);
-        log.setStatus("RUNNING");
-        
+        ScheduleJobLog scheduleJobLoglog = new ScheduleJobLog();
+        scheduleJobLoglog.setJobId(jobId); // 在调度场景下，jobId是调度任务ID；在其他场景下，可以是工作流ID
+        scheduleJobLoglog.setWorkflowId(workflowId);
+        scheduleJobLoglog.setWorkflowInstanceId(workflowInstanceId);
+        scheduleJobLoglog.setTriggerType(triggerType != null ? triggerType : "MANUAL");
+        scheduleJobLoglog.setStartTime(startTime);
+        scheduleJobLoglog.setStatus("RUNNING");
+
         // 设置额外的日志信息（如果有的话）
         if (extraLogInfo != null && !extraLogInfo.isEmpty()) {
             // 可以将额外信息序列化为JSON存储到result或errorMessage字段中，或者添加到扩展字段
-            log.setResult("Extra info: " + extraLogInfo.toString());
+            scheduleJobLoglog.setResult("Extra info: " + extraLogInfo.toString());
         }
-        
+
         // 保存初始日志记录
-        scheduleJobLogService.save(log);
-        
+        scheduleJobLogService.save(scheduleJobLoglog);
+
         try {
             // 获取工作流和全局参数
             Workflow workflow = workflowRepository.getById(workflowId);
             List<WorkflowGlobalParam> globalParams = workflowGlobalParamService.getAll(workflowId, null, null, null);
-            
+
             // 处理全局参数
             Map<String, GlobalParams> globalParamsMap = handleGlobal(globalParams);
-            
+
             // 使用回调方式执行工作流，实现解耦
             WorkflowExecutionResult workflowExecutionResult = workflowExecutor.executeFromJsonByWorkflowData(
                 workflow.getJsonData(),
@@ -108,37 +108,47 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
                     @Override
                     public void onExecutionComplete(WorkflowExecutionResult result) {
                         // 在执行完成后，更新日志记录
-                        updateScheduleJobLog(log, result, startTime);
+                        try{
+                            updateScheduleJobLog(scheduleJobLoglog, result, startTime);
+                        }catch(Exception e){
+                            log.error("保存执行日志失败： ",e.getMessage());
+                        }
+
                     }
 
                     @Override
                     public void onExecutionProgress(com.jing.admin.core.workflow.model.NodeResult nodeResult, com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus status) {
                         // 记录节点执行进度日志
-                        String nodeStatus = status.name();
-                        String nodeLogMessage = String.format(
-                            "节点[%s-%s]状态: %s, 执行结果: %s, 成功: %s",
-                            nodeResult.getNodeId(),
-                            nodeResult.getNodeName(),
-                            nodeStatus,
-                            nodeResult.getExecuteResult() != null ? nodeResult.getExecuteResult().toString() : "无结果",
-                            nodeResult.isSuccess()
-                        );
-                        
-                        if (status == com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus.ERROR && nodeResult.getErrorMessage() != null) {
-                            nodeLogMessage += ", 错误信息: " + nodeResult.getErrorMessage();
+                        try{
+                            String nodeStatus = status.name();
+                            String nodeLogMessage = String.format(
+                                    "节点[%s-%s]状态: %s, 执行结果: %s, 成功: %s",
+                                    nodeResult.getNodeId(),
+                                    nodeResult.getNodeName(),
+                                    nodeStatus,
+                                    nodeResult.getExecuteResult() != null ? nodeResult.getExecuteResult().toString() : "无结果",
+                                    nodeResult.isSuccess()
+                            );
+
+                            if (status == com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus.ERROR && nodeResult.getErrorMessage() != null) {
+                                nodeLogMessage += ", 错误信息: " + nodeResult.getErrorMessage();
+                            }
+
+                            // 更新日志记录中的节点执行信息
+                            updateNodeExecutionLog(scheduleJobLoglog, nodeLogMessage, nodeResult, status);
+                        }catch(Exception e){
+                            log.error("保存节点日志失败： ",e.getMessage());
                         }
-                        
-                        // 更新日志记录中的节点执行信息
-                        updateNodeExecutionLog(log, nodeLogMessage, nodeResult, status);
+
                     }
                 }
             );
-            
+
             return workflowExecutionResult;
         } catch (Exception e) {
             // 执行异常时更新日志记录
-            updateScheduleJobLogOnError(log, e, startTime);
-            
+            updateScheduleJobLogOnError(scheduleJobLoglog, e, startTime);
+
             // 重新抛出异常
             throw new RuntimeException("执行工作流失败: " + e.getMessage(), e);
         }
@@ -149,21 +159,21 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         String workflowId = request.getWorkflowId();
         Map<String, Object> startParams = request.getStartParams();
         String workflowInstanceId = request.getWorkflowInstanceId();
-        
+
         // 获取当前租户ID
         String currentTenantId = TenantContextHolder.getTenantId();
-        
+
         // 记录租户信息用于调试
         log.debug("执行工作流(无日志) {}，租户ID: {}", workflowId, currentTenantId);
-        
+
         try {
             // 获取工作流和全局参数
             Workflow workflow = workflowRepository.getById(workflowId);
             List<WorkflowGlobalParam> globalParams = workflowGlobalParamService.getAll(workflowId, null, null, null);
-            
+
             // 处理全局参数
             Map<String, GlobalParams> globalParamsMap = handleGlobal(globalParams);
-            
+
             // 直接执行工作流，不记录日志
             return workflowExecutor.executeFromJsonByWorkflowData(
                 workflow.getJsonData(),
@@ -180,10 +190,10 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
     public WorkflowExecutionResult executeWorkflowWithoutLogByData(String workflowJson, Map<String, Object> globalParams, Map<String, Object> startParams) {
         // 获取当前租户ID
         String currentTenantId = TenantContextHolder.getTenantId();
-        
+
         // 记录租户信息用于调试
         log.debug("执行工作流(无日志) by data，租户ID: {}", currentTenantId);
-        
+
         try {
             // 直接执行工作流，不记录日志
             return workflowExecutor.executeFromJsonByWorkflowData(
@@ -197,7 +207,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
             throw new RuntimeException("执行工作流失败: " + e.getMessage(), e);
         }
     }
-    
+
     /**
      * 处理全局参数
      */
@@ -215,7 +225,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         }
         return globalParamsMap;
     }
-    
+
     /**
      * 转换全局参数格式
      */
@@ -233,7 +243,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         }
         return globalParamsMap;
     }
-    
+
     /**
      * 更新调度任务日志
      */
@@ -241,7 +251,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         long endTime = System.currentTimeMillis();
         log.setEndTime(endTime);
         log.setExecutionTime(endTime - startTime);
-        
+
         // 根据执行结果设置状态
         if (result.isSuccess()) {
             log.setStatus("SUCCESS");
@@ -251,21 +261,21 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
             log.setResult("执行失败: " + result.getMessage());
             log.setErrorMessage(result.getMessage());
         }
-        
+
         // 更新日志记录
         scheduleJobLogService.update(log, new QueryWrapper<ScheduleJobLog>().eq("id", UUID.fromString(log.getId())));
     }
-    
+
     /**
      * 更新节点执行日志
      */
     private void updateNodeExecutionLog(ScheduleJobLog log, String nodeLogMessage, com.jing.admin.core.workflow.model.NodeResult nodeResult, com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus status) {
         // 首先尝试查找已存在的节点日志记录
         WorkflowNodeLog existingNodeLog = workflowNodeLogService.getNodeLogByInstanceIdAndNodeId(log.getWorkflowInstanceId(), nodeResult.getNodeId());
-        
+
         WorkflowNodeLog nodeLog;
         boolean isUpdate;
-        
+
         if (existingNodeLog != null) {
             // 如果已存在记录，则更新现有记录
             nodeLog = existingNodeLog;
@@ -281,46 +291,46 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
             nodeLog.setNodeType("DEFAULT"); // 可能需要从其他地方获取节点类型
             isUpdate = false;
         }
-        
+
         long currentTime = System.currentTimeMillis();
-        
+
         switch (status) {
             case BEFORE_EXECUTION:
                 // 节点执行前：记录开始执行
                 nodeLog.setStatus("RUNNING");
                 nodeLog.setStartTime(currentTime);
-                nodeLog.setInputData(nodeResult.getExecuteResult() != null ? 
+                nodeLog.setInputData(nodeResult.getExecuteResult() != null ?
                     nodeResult.getExecuteResult().toString() : null);
                 break;
-                
+
             case AFTER_EXECUTION:
                 // 节点执行后：记录执行结果
                 nodeLog.setStatus(nodeResult.isSuccess() ? "SUCCESS" : "FAILED");
                 nodeLog.setEndTime(currentTime);
-                nodeLog.setOutputData(nodeResult.getExecuteResult() != null ? 
+                nodeLog.setOutputData(nodeResult.getExecuteResult() != null ?
                     nodeResult.getExecuteResult().toString() : null);
-                
+
                 // 计算执行时间
                 if (nodeLog.getStartTime() != null) {
                     nodeLog.setExecutionTime(currentTime - nodeLog.getStartTime());
                 }
-                
+
                 // 如果执行失败，记录错误信息
                 if (!nodeResult.isSuccess() && nodeResult.getErrorMessage() != null) {
                     nodeLog.setErrorMessage(nodeResult.getErrorMessage());
                 }
                 break;
-                
+
             case ERROR:
                 // 节点执行错误：记录错误信息
                 nodeLog.setStatus("FAILED");
                 nodeLog.setEndTime(currentTime);
-                
+
                 // 计算执行时间（如果已记录开始时间）
                 if (nodeLog.getStartTime() != null) {
                     nodeLog.setExecutionTime(currentTime - nodeLog.getStartTime());
                 }
-                
+
                 // 设置错误信息
                 if (nodeResult.getErrorMessage() != null) {
                     nodeLog.setErrorMessage(nodeResult.getErrorMessage());
@@ -329,7 +339,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
                 }
                 break;
         }
-        
+
         // 保存或更新节点日志
         if (isUpdate) {
             workflowNodeLogService.updateNodeLog(nodeLog);
@@ -337,7 +347,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
             workflowNodeLogService.saveNodeLog(nodeLog);
         }
     }
-    
+
     /**
      * 执行异常时更新调度任务日志
      */
@@ -348,7 +358,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         log.setStatus("FAILED");
         log.setErrorMessage("执行异常: " + e.getMessage());
         log.setResult("执行失败");
-        
+
         // 更新日志记录
         scheduleJobLogService.update(log, new QueryWrapper<ScheduleJobLog>().eq("id", UUID.fromString(log.getId())));
     }

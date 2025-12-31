@@ -1,6 +1,7 @@
 package com.jing.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jing.admin.core.constant.ConstantEnum;
 import com.jing.admin.core.schedule.AbstractJobTask;
 import com.jing.admin.core.schedule.job.JobTaskManager;
 import com.jing.admin.core.tenant.TenantContextWrapper;
@@ -129,6 +130,9 @@ public class MultiTenantScheduleServiceImpl implements MultiTenantScheduleServic
                     wrappedRunnable.run();
                 }
             };
+            jobTask.setTaskId(jobId);
+            jobTask.setTaskData(scheduleJob);
+            jobTask.setStatus(ConstantEnum.WAIT);
             
             // 注册到JobTaskManager
             jobTaskManager.addCronJob(jobId, jobName, cronExpression, jobTask);

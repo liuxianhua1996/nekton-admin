@@ -47,30 +47,12 @@ public class JobTaskManager {
 
             // 创建 Quartz 任务
             Quartz quartz = new Quartz(jobTaskObj);
-            JobDetail jobDetail = JobBuilder.newJob(JobScheduler.class)
-                    .withIdentity(taskId)
-                    .storeDurably()
-                    .build();
-
-            // 设置 JobDataMap
-            JobDataMap jobDataMap = new JobDataMap();
-            jobDataMap.put("job", JSON.toJSON(jobTaskObj));
-            jobDetail.getJobDataMap().putAll(jobDataMap);
-
-            // 创建触发器
-            CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
-            CronTrigger cronTrigger = TriggerBuilder.newTrigger()
-                    .withIdentity(taskId)
-                    .withSchedule(scheduleBuilder)
-                    .build();
-
             // 检查是否已存在相同任务，如果存在则先删除
             if (scheduler.checkExists(JobKey.jobKey(taskId))) {
                 scheduler.deleteJob(JobKey.jobKey(taskId));
             }
-
             // 调度任务
-            scheduler.scheduleJob(jobDetail, cronTrigger);
+            scheduler.scheduleJob(quartz.restartJob(), quartz.restartTrigger());
             log.info("成功添加 cron 任务: {}, cron表达式: {}", taskId, cronExpression);
 
             // 保存到映射中

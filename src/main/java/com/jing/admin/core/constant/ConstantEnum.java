@@ -7,6 +7,8 @@ package com.jing.admin.core.constant;
 public enum ConstantEnum {
     SUCCESS("success","成功"),
     PROCESS("process","运行在"),
+    WAIT("process","等待"),
+
     FAIL("fail","成功");
     private String value;
     private String label;
