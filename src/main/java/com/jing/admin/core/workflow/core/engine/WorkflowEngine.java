@@ -39,6 +39,18 @@ public class WorkflowEngine {
      * @return 执行结果
      */
     public WorkflowExecutionResult execute(WorkflowDefinition workflowDefinition, WorkflowContext context) {
+        return execute(workflowDefinition, context, null);
+    }
+    
+    /**
+     * 执行工作流（支持回调）
+     * 
+     * @param workflowDefinition 工作流定义
+     * @param context 工作流执行上下文
+     * @param callback 执行回调接口
+     * @return 执行结果
+     */
+    public WorkflowExecutionResult execute(WorkflowDefinition workflowDefinition, WorkflowContext context, com.jing.admin.core.workflow.WorkflowExecutionCallback callback) {
         // 设置工作流实例ID
         if (context.getInstanceId() == null || context.getInstanceId().isEmpty()) {
             context.setInstanceId(UUID.randomUUID().toString());
@@ -63,7 +75,7 @@ public class WorkflowEngine {
             // 遍历执行节点
             while (currentNode != null) {
                 // 执行当前节点
-                NodeExecutionResult nodeResult = executeNode(currentNode, context);
+                NodeExecutionResult nodeResult = executeNode(currentNode, context, callback);
                 
                 // 如果节点执行失败，终止工作流
                 if (!nodeResult.isSuccess()) {
@@ -97,9 +109,34 @@ public class WorkflowEngine {
      * @return 节点执行结果
      */
     private NodeExecutionResult executeNode(NodeDefinition nodeDefinition, WorkflowContext context) {
+        return executeNode(nodeDefinition, context, null);
+    }
+    
+    /**
+     * 执行单个节点（支持回调）
+     * 
+     * @param nodeDefinition 节点定义
+     * @param context 工作流执行上下文
+     * @param callback 执行回调接口
+     * @return 节点执行结果
+     */
+    private NodeExecutionResult executeNode(NodeDefinition nodeDefinition, WorkflowContext context, com.jing.admin.core.workflow.WorkflowExecutionCallback callback) {
         long startTime = System.currentTimeMillis();
         String nodeType = nodeDefinition.getData() != null ? nodeDefinition.getData().getType() : null;
         String nodeName = nodeDefinition.getData() != null ? nodeDefinition.getData().getLabel() : "Unknown";
+        
+        // 如果有回调，在执行前调用
+        if (callback != null) {
+            com.jing.admin.core.workflow.model.NodeResult nodeResult = com.jing.admin.core.workflow.model.NodeResult.builder()
+                    .nodeId(nodeDefinition.getId())
+                    .nodeName(nodeName)
+                    .sort(0) // 可能需要从context获取当前执行顺序
+                    .success(true)
+                    .executeResult(null)
+                    .errorMessage(null)
+                    .build();
+            callback.onExecutionProgress(nodeResult, com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus.BEFORE_EXECUTION);
+        }
         
         // 记录节点开始执行日志
         WorkflowNodeLog nodeLog = new WorkflowNodeLog();
@@ -142,6 +179,19 @@ public class WorkflowEngine {
             }
         } catch (Exception e) {
             result = NodeExecutionResult.failure("节点执行异常: " + e.getMessage());
+            
+            // 如果有回调，在错误时调用
+            if (callback != null) {
+                com.jing.admin.core.workflow.model.NodeResult nodeResult = com.jing.admin.core.workflow.model.NodeResult.builder()
+                        .nodeId(nodeDefinition.getId())
+                        .nodeName(nodeName)
+                        .sort(0) // 可能需要从context获取当前执行顺序
+                        .success(false)
+                        .executeResult(null)
+                        .errorMessage(e.getMessage())
+                        .build();
+                callback.onExecutionProgress(nodeResult, com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus.ERROR);
+            }
         }
         
         // 记录节点执行结束日志
@@ -163,6 +213,19 @@ public class WorkflowEngine {
         
         // 异步更新日志 - 添加到队列
         workflowNodeLogQueueService.addLogTask(new WorkflowNodeLogTask(nodeLog, WorkflowNodeLogTask.LogOperationType.UPDATE));
+        
+        // 如果有回调，在执行后调用
+        if (callback != null) {
+            com.jing.admin.core.workflow.model.NodeResult nodeResult = com.jing.admin.core.workflow.model.NodeResult.builder()
+                    .nodeId(nodeDefinition.getId())
+                    .nodeName(nodeName)
+                    .sort(0) // 可能需要从context获取当前执行顺序
+                    .success(result.isSuccess())
+                    .executeResult(result.getData())
+                    .errorMessage(result.getErrorMessage())
+                    .build();
+            callback.onExecutionProgress(nodeResult, com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus.AFTER_EXECUTION);
+        }
         
         return result;
     }

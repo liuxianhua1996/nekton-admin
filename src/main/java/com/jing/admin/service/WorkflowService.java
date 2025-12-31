@@ -12,6 +12,7 @@ import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
 import com.jing.admin.model.api.WorkflowTestRequest;
 import com.jing.admin.model.domain.Workflow;
+import com.jing.admin.model.domain.WorkflowGlobalParam;
 import com.jing.admin.model.dto.TestWorkflowDTO;
 import com.jing.admin.model.dto.WorkflowDTO;
 import com.jing.admin.repository.WorkflowRepository;
@@ -35,6 +36,12 @@ public class WorkflowService {
     
     @Autowired
     private WorkflowExecutor workflowExecutor;
+    
+    @Autowired
+    private WorkflowExecutionService workflowExecutionService;
+    
+    @Autowired
+    private WorkflowGlobalParamService workflowGlobalParamService;
 
     /**
      * 保存或更新工作流
@@ -150,16 +157,34 @@ public class WorkflowService {
         if (workflow == null) {
             throw new BusinessException("工作流不存在");
         }
+        
+        // 获取全局参数
+        List<WorkflowGlobalParam> globalParamsList = workflowGlobalParamService.getAll(workflowTestRequest.getId(), null, null, null);
+        Map<String, Object> globalParams = new HashMap<>();
+        if (globalParamsList != null) {
+            globalParamsList.forEach(param -> {
+                globalParams.put(param.getId(), param.getParamValue());
+            });
+        }
+        
         // 获取测试参数
         Map<String, Object> params = new HashMap<>();
         if (workflowTestRequest.getParams() != null) {
             params = workflowTestRequest.getParams();
         }
+        
         TestWorkflowDTO testWorkflowDTO = new TestWorkflowDTO();
-        List<TestWorkflowDTO.NodeTestResult> nodeTestResults = new ArrayList();
-        WorkflowExecutionResult workflowExecutionResult = workflowExecutor.executeFromJsonByWorkflowId(workflowTestRequest.getId(), params);
+        List<TestWorkflowDTO.NodeTestResult> nodeTestResults = new ArrayList<>();
+        
+        // 使用工作流执行服务执行测试（不记录日志）
+        WorkflowExecutionResult workflowExecutionResult = workflowExecutionService.executeWorkflowWithoutLogByData(
+            workflow.getJsonData(),
+            globalParams,
+            params
+        );
+        
         Map<String, NodeResult> nodeResultMap = workflowExecutionResult.getContext().getNodeResults();
-        nodeResultMap.forEach((id,nodeTestResult)->{
+        nodeResultMap.forEach((id, nodeTestResult) -> {
             nodeTestResults.add(TestWorkflowDTO.NodeTestResult.builder()
                             .nodeId(nodeTestResult.getNodeId())
                             .nodeName(nodeTestResult.getNodeName())

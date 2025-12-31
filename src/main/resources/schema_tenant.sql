@@ -218,6 +218,7 @@ CREATE TABLE IF NOT EXISTS tb_schedule_job_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     job_id VARCHAR(255) NOT NULL,
     workflow_id VARCHAR(255) NOT NULL,
+    workflow_instance_id VARCHAR(255),
     trigger_type VARCHAR(20),
     status VARCHAR(20),
     result TEXT,

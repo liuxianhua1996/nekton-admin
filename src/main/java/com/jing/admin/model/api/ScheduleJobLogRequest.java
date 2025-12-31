@@ -10,6 +10,7 @@ public class ScheduleJobLogRequest {
     private String id;
     private String jobId;
     private String workflowId;
+    private String workflowInstanceId;
     private String triggerType;
     private String status;
     private String result;

@@ -6,15 +6,21 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jing.admin.core.PageResult;
 import com.jing.admin.core.workflow.WorkflowExecutor;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
+import com.jing.admin.core.workflow.model.GlobalParams;
 import com.jing.admin.model.api.ScheduleJobRequest;
 import com.jing.admin.model.domain.ScheduleJob;
 import com.jing.admin.mapper.ScheduleJobMapper;
 import com.jing.admin.model.api.ScheduleJobQueryRequest;
+import com.jing.admin.model.domain.ScheduleJobLog;
+import com.jing.admin.model.domain.WorkflowGlobalParam;
 import com.jing.admin.model.dto.ScheduleJobDTO;
 import com.jing.admin.model.mapping.ScheduleJobMapping;
 import com.jing.admin.repository.ScheduleJobRepository;
 import com.jing.admin.repository.WorkflowRepository;
+import com.jing.admin.service.ScheduleJobLogService;
 import com.jing.admin.service.ScheduleJobService;
+import com.jing.admin.service.WorkflowExecutionService;
+import com.jing.admin.service.WorkflowGlobalParamService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.slf4j.MDC;
@@ -23,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,6 +45,12 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
     private WorkflowRepository workflowRepository;
     @Autowired
     private WorkflowExecutor workflowExecutor;
+    @Autowired
+    private ScheduleJobLogService scheduleJobLogService;
+    @Autowired
+    private WorkflowGlobalParamService workflowGlobalParamService;
+    @Autowired
+    private com.jing.admin.service.WorkflowExecutionService workflowExecutionService;
 
     @Override
     public ScheduleJobDTO createScheduleJob(ScheduleJobRequest request) {
@@ -159,11 +172,25 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
 
     @Override
     public Boolean executeJob(String id) {
-        // 这里可以实现立即执行调度工作流的逻辑
+        // 获取调度任务信息
         ScheduleJob scheduleJob = scheduleJobRepository.getById(id);
-        String workflowId =  scheduleJob.getWorkflowId();
-        WorkflowExecutionResult workflowExecutionResult = workflowExecutor.executeFromJsonByWorkflowId(workflowId,new HashMap());
-        // 暂时返回true，实际实现需要根据具体工作流来执行
-        return true;
+        if (scheduleJob == null) {
+            throw new RuntimeException("调度任务不存在");
+        }
+        
+        String workflowId = scheduleJob.getWorkflowId();
+        
+        // 执行工作流（带日志记录）
+        WorkflowExecutionResult result = workflowExecutionService.executeWorkflowWithLog(
+            workflowId,
+            new HashMap<>(), // startParams
+            id, // jobId作为第一个参数
+            "SCHEDULED", // triggerType
+            null // extraLogInfo
+        );
+        
+        return result.isSuccess();
     }
+    
+
 }

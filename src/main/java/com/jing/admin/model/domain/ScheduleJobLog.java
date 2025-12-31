@@ -20,6 +20,8 @@ public class ScheduleJobLog extends Base implements Serializable {
 
     private String workflowId;
 
+    private String workflowInstanceId;
+
     private String triggerType;
 
     private String status;
