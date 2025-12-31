@@ -25,8 +25,14 @@ public interface WorkflowNodeLogService extends IService<WorkflowNodeLog> {
      */
     List<WorkflowNodeLog> getNodeLogsByWorkflowId(String workflowId);
 
+    
     /**
-     * 清除指定工作流实例的节点日志
+     * 根据工作流实例ID和节点ID获取节点日志
      */
-    void clearLogsByInstanceId(String workflowInstanceId);
+    WorkflowNodeLog getNodeLogByInstanceIdAndNodeId(String workflowInstanceId, String nodeId);
+    
+    /**
+     * 更新节点执行日志
+     */
+    void updateNodeLog(WorkflowNodeLog nodeLog);
 }

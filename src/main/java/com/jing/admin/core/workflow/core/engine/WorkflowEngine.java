@@ -3,8 +3,6 @@ package com.jing.admin.core.workflow.core.engine;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jing.admin.core.workflow.core.context.WorkflowContext;
-import com.jing.admin.core.workflow.log.WorkflowNodeLogQueueService;
-import com.jing.admin.core.workflow.log.WorkflowNodeLogTask;
 import com.jing.admin.core.workflow.model.NodeDefinition;
 import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
@@ -25,9 +23,6 @@ public class WorkflowEngine {
 
     @Autowired
     private List<NodeExecutor> nodeExecutors;
-    
-    @Autowired
-    private WorkflowNodeLogQueueService workflowNodeLogQueueService;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
     
@@ -155,9 +150,6 @@ public class WorkflowEngine {
             nodeLog.setInputData("无法序列化输入数据");
         }
         
-        // 异步记录日志 - 添加到队列
-        workflowNodeLogQueueService.addLogTask(new WorkflowNodeLogTask(nodeLog, WorkflowNodeLogTask.LogOperationType.INSERT));
-        
         NodeExecutionResult result;
         try {
             // 获取节点类型
@@ -210,9 +202,6 @@ public class WorkflowEngine {
         } catch (JsonProcessingException e) {
             nodeLog.setOutputData("无法序列化输出数据");
         }
-        
-        // 异步更新日志 - 添加到队列
-        workflowNodeLogQueueService.addLogTask(new WorkflowNodeLogTask(nodeLog, WorkflowNodeLogTask.LogOperationType.UPDATE));
         
         // 如果有回调，在执行后调用
         if (callback != null) {

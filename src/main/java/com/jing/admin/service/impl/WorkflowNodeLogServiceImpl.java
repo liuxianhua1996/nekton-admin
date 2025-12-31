@@ -1,5 +1,6 @@
 package com.jing.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jing.admin.model.domain.WorkflowNodeLog;
 import com.jing.admin.mapper.WorkflowNodeLogMapper;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 工作流节点执行日志服务实现类
@@ -48,9 +50,17 @@ public class WorkflowNodeLogServiceImpl extends ServiceImpl<WorkflowNodeLogMappe
                 .orderByAsc(WorkflowNodeLog::getSortOrder)
                 .list();
     }
-
+    
     @Override
-    public void clearLogsByInstanceId(String workflowInstanceId) {
-
+    public WorkflowNodeLog getNodeLogByInstanceIdAndNodeId(String workflowInstanceId, String nodeId) {
+        return workflowNodeLogRepository.lambdaQuery()
+                .eq(WorkflowNodeLog::getWorkflowInstanceId, workflowInstanceId)
+                .eq(WorkflowNodeLog::getNodeId, nodeId)
+                .one();
+    }
+    
+    @Override
+    public void updateNodeLog(WorkflowNodeLog nodeLog) {
+        workflowNodeLogRepository.update(nodeLog,new QueryWrapper<WorkflowNodeLog>().eq("id", UUID.fromString(nodeLog.getId())));
     }
 }

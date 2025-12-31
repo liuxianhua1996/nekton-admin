@@ -8,10 +8,12 @@ import com.jing.admin.model.dto.WorkflowExecution;
 import com.jing.admin.model.domain.ScheduleJobLog;
 import com.jing.admin.model.domain.Workflow;
 import com.jing.admin.model.domain.WorkflowGlobalParam;
+import com.jing.admin.model.domain.WorkflowNodeLog;
 import com.jing.admin.repository.WorkflowRepository;
 import com.jing.admin.service.ScheduleJobLogService;
 import com.jing.admin.service.WorkflowExecutionService;
 import com.jing.admin.service.WorkflowGlobalParamService;
+import com.jing.admin.service.WorkflowNodeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,9 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
     
     @Autowired
     private ScheduleJobLogService scheduleJobLogService;
+    
+    @Autowired
+    private WorkflowNodeLogService workflowNodeLogService;
     
     @Override
     public WorkflowExecutionResult executeWorkflowWithLog(WorkflowExecution workflowExecution) {
@@ -97,8 +102,23 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
 
                     @Override
                     public void onExecutionProgress(com.jing.admin.core.workflow.model.NodeResult nodeResult, com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus status) {
-                        // 在执行过程中可以处理节点状态变化
-                        // 目前暂时不处理，但可以扩展
+                        // 记录节点执行进度日志
+                        String nodeStatus = status.name();
+                        String nodeLogMessage = String.format(
+                            "节点[%s-%s]状态: %s, 执行结果: %s, 成功: %s",
+                            nodeResult.getNodeId(),
+                            nodeResult.getNodeName(),
+                            nodeStatus,
+                            nodeResult.getExecuteResult() != null ? nodeResult.getExecuteResult().toString() : "无结果",
+                            nodeResult.isSuccess()
+                        );
+                        
+                        if (status == com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus.ERROR && nodeResult.getErrorMessage() != null) {
+                            nodeLogMessage += ", 错误信息: " + nodeResult.getErrorMessage();
+                        }
+                        
+                        // 更新日志记录中的节点执行信息
+                        updateNodeExecutionLog(log, nodeLogMessage, nodeResult, status);
                     }
                 }
             );
@@ -211,6 +231,88 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         
         // 更新日志记录
         scheduleJobLogService.update(log, new QueryWrapper<ScheduleJobLog>().eq("id", UUID.fromString(log.getId())));
+    }
+    
+    /**
+     * 更新节点执行日志
+     */
+    private void updateNodeExecutionLog(ScheduleJobLog log, String nodeLogMessage, com.jing.admin.core.workflow.model.NodeResult nodeResult, com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus status) {
+        // 首先尝试查找已存在的节点日志记录
+        WorkflowNodeLog existingNodeLog = workflowNodeLogService.getNodeLogByInstanceIdAndNodeId(log.getWorkflowInstanceId(), nodeResult.getNodeId());
+        
+        WorkflowNodeLog nodeLog;
+        boolean isUpdate;
+        
+        if (existingNodeLog != null) {
+            // 如果已存在记录，则更新现有记录
+            nodeLog = existingNodeLog;
+            isUpdate = true;
+        } else {
+            // 如果不存在记录，则创建新记录
+            nodeLog = new WorkflowNodeLog();
+            nodeLog.setWorkflowInstanceId(log.getWorkflowInstanceId());
+            nodeLog.setWorkflowId(log.getWorkflowId());
+            nodeLog.setNodeId(nodeResult.getNodeId());
+            nodeLog.setNodeName(nodeResult.getNodeName());
+            nodeLog.setSortOrder(nodeResult.getSort());
+            nodeLog.setNodeType("DEFAULT"); // 可能需要从其他地方获取节点类型
+            isUpdate = false;
+        }
+        
+        long currentTime = System.currentTimeMillis();
+        
+        switch (status) {
+            case BEFORE_EXECUTION:
+                // 节点执行前：记录开始执行
+                nodeLog.setStatus("RUNNING");
+                nodeLog.setStartTime(currentTime);
+                nodeLog.setInputData(nodeResult.getExecuteResult() != null ? 
+                    nodeResult.getExecuteResult().toString() : null);
+                break;
+                
+            case AFTER_EXECUTION:
+                // 节点执行后：记录执行结果
+                nodeLog.setStatus(nodeResult.isSuccess() ? "SUCCESS" : "FAILED");
+                nodeLog.setEndTime(currentTime);
+                nodeLog.setOutputData(nodeResult.getExecuteResult() != null ? 
+                    nodeResult.getExecuteResult().toString() : null);
+                
+                // 计算执行时间
+                if (nodeLog.getStartTime() != null) {
+                    nodeLog.setExecutionTime(currentTime - nodeLog.getStartTime());
+                }
+                
+                // 如果执行失败，记录错误信息
+                if (!nodeResult.isSuccess() && nodeResult.getErrorMessage() != null) {
+                    nodeLog.setErrorMessage(nodeResult.getErrorMessage());
+                }
+                break;
+                
+            case ERROR:
+                // 节点执行错误：记录错误信息
+                nodeLog.setStatus("FAILED");
+                nodeLog.setEndTime(currentTime);
+                
+                // 计算执行时间（如果已记录开始时间）
+                if (nodeLog.getStartTime() != null) {
+                    nodeLog.setExecutionTime(currentTime - nodeLog.getStartTime());
+                }
+                
+                // 设置错误信息
+                if (nodeResult.getErrorMessage() != null) {
+                    nodeLog.setErrorMessage(nodeResult.getErrorMessage());
+                } else {
+                    nodeLog.setErrorMessage(nodeLogMessage);
+                }
+                break;
+        }
+        
+        // 保存或更新节点日志
+        if (isUpdate) {
+            workflowNodeLogService.updateNodeLog(nodeLog);
+        } else {
+            workflowNodeLogService.saveNodeLog(nodeLog);
+        }
     }
     
     /**
