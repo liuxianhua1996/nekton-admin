@@ -3,32 +3,33 @@ package com.jing.admin.core.schedule;
 import com.jing.admin.service.MultiTenantScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
  * 多租户定时任务调度器
- * 定期执行所有租户的定时任务
+ * 负责初始化基于Quartz的cron任务，并处理其他类型的即时任务
  */
 @Slf4j
 @Component
-public class MultiTenantJobScheduler {
+public class MultiTenantJobScheduler implements CommandLineRunner {
 
     @Autowired
     private MultiTenantScheduleService multiTenantScheduleService;
 
     /**
-     * 每分钟执行一次所有租户的定时任务检查
-     * 这个方法会检查所有租户的定时任务配置，并执行需要执行的任务
+     * 应用启动时初始化所有cron类型的调度任务
      */
-    @Scheduled(cron = "0 * * * * ?") // 每分钟执行一次
-    public void executeAllTenantScheduledJobs() {
-        log.info("开始执行多租户定时任务检查");
+    @Override
+    public void run(String... args) throws Exception {
+        log.info("开始初始化多租户Quartz调度任务");
         try {
-            multiTenantScheduleService.executeAllTenantScheduledJobs();
+            // 初始化所有租户的cron调度任务
+            multiTenantScheduleService.initializeAllTenantScheduledJobs();
         } catch (Exception e) {
-            log.error("执行多租户定时任务时发生错误", e);
+            log.error("初始化多租户Quartz调度任务时发生错误", e);
         }
-        log.info("完成执行多租户定时任务检查");
+        log.info("完成初始化多租户Quartz调度任务");
     }
 }

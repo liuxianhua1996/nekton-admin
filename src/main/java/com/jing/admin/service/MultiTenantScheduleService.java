@@ -6,7 +6,7 @@ package com.jing.admin.service;
 public interface MultiTenantScheduleService {
     
     /**
-     * 获取所有租户的定时任务并执行
+     * 初始化所有租户的定时任务（注册cron任务到调度器）
      */
-    void executeAllTenantScheduledJobs();
+    void initializeAllTenantScheduledJobs();
 }
