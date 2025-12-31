@@ -1,6 +1,7 @@
 package com.jing.admin.service;
 
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
+import com.jing.admin.model.dto.WorkflowExecution;
 
 import java.util.Map;
 
@@ -13,44 +14,18 @@ public interface WorkflowExecutionService {
     /**
      * 执行工作流（带日志记录）
      * 
-     * @param workflowId 工作流ID
-     * @param startParams 启动参数
-     * @param triggerType 触发类型（如：SCHEDULED, MANUAL, TEST等）
-     * @param extraLogInfo 额外的日志信息
+     * @param request 工作流执行请求对象
      * @return 执行结果
      */
-    WorkflowExecutionResult executeWorkflowWithLog(String workflowId, Map<String, Object> startParams, String triggerType, Map<String, Object> extraLogInfo);
+    WorkflowExecutionResult executeWorkflowWithLog(WorkflowExecution request);
     
     /**
      * 执行工作流（不记录日志，用于测试等场景）
      * 
-     * @param workflowId 工作流ID
-     * @param startParams 启动参数
+     * @param request 工作流执行请求对象
      * @return 执行结果
      */
-    WorkflowExecutionResult executeWorkflowWithoutLog(String workflowId, Map<String, Object> startParams);
-    
-    /**
-     * 执行工作流（带日志记录，支持指定工作流实例ID）
-     * 
-     * @param workflowId 工作流ID
-     * @param startParams 启动参数
-     * @param workflowInstanceId 工作流实例ID
-     * @param triggerType 触发类型
-     * @param extraLogInfo 额外的日志信息
-     * @return 执行结果
-     */
-    WorkflowExecutionResult executeWorkflowWithLog(String workflowId, Map<String, Object> startParams, String workflowInstanceId, String triggerType, Map<String, Object> extraLogInfo);
-    
-    /**
-     * 执行工作流（不记录日志，支持指定工作流实例ID，用于测试等场景）
-     * 
-     * @param workflowId 工作流ID
-     * @param startParams 启动参数
-     * @param workflowInstanceId 工作流实例ID
-     * @return 执行结果
-     */
-    WorkflowExecutionResult executeWorkflowWithoutLog(String workflowId, Map<String, Object> startParams, String workflowInstanceId);
+    WorkflowExecutionResult executeWorkflowWithoutLog(WorkflowExecution request);
     
     /**
      * 执行工作流（不记录日志，用于测试等场景，直接使用工作流数据）

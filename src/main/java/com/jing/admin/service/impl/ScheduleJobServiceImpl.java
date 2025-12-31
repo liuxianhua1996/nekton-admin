@@ -6,20 +6,17 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jing.admin.core.PageResult;
 import com.jing.admin.core.workflow.WorkflowExecutor;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
-import com.jing.admin.core.workflow.model.GlobalParams;
 import com.jing.admin.model.api.ScheduleJobRequest;
 import com.jing.admin.model.domain.ScheduleJob;
 import com.jing.admin.mapper.ScheduleJobMapper;
 import com.jing.admin.model.api.ScheduleJobQueryRequest;
-import com.jing.admin.model.domain.ScheduleJobLog;
-import com.jing.admin.model.domain.WorkflowGlobalParam;
 import com.jing.admin.model.dto.ScheduleJobDTO;
+import com.jing.admin.model.dto.WorkflowExecution;
 import com.jing.admin.model.mapping.ScheduleJobMapping;
 import com.jing.admin.repository.ScheduleJobRepository;
 import com.jing.admin.repository.WorkflowRepository;
 import com.jing.admin.service.ScheduleJobLogService;
 import com.jing.admin.service.ScheduleJobService;
-import com.jing.admin.service.WorkflowExecutionService;
 import com.jing.admin.service.WorkflowGlobalParamService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -29,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -57,15 +53,15 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         if (request.getName() == null || request.getName().trim().isEmpty()) {
             throw new RuntimeException("调度名称不能为空");
         }
-        
+
         ScheduleJob scheduleJob = ScheduleJobMapping.INSTANCE.toEntity(request);
         scheduleJob.setCreateTime(System.currentTimeMillis());
         scheduleJob.setUpdateTime(System.currentTimeMillis());
         scheduleJob.setCreateUserId(MDC.get("userId"));
         scheduleJob.setUpdateUserId(MDC.get("userId"));
-        
+
         this.save(scheduleJob);
-        
+
         return ScheduleJobMapping.INSTANCE.toDTO(scheduleJob);
     }
 
@@ -78,11 +74,11 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         if (existingJob == null) {
             throw new RuntimeException("调度工作流不存在");
         }
-        
+
         if (request.getName() == null || request.getName().trim().isEmpty()) {
             throw new RuntimeException("调度名称不能为空");
         }
-        
+
         LambdaUpdateWrapper<ScheduleJob> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(ScheduleJob::getId, UUID.fromString(id))
                 .set(ScheduleJob::getName, request.getName())
@@ -92,9 +88,9 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
                 .set(ScheduleJob::getWorkflowId, request.getWorkflowId())
                 .set(ScheduleJob::getUpdateTime, System.currentTimeMillis())
                 .set(ScheduleJob::getUpdateUserId, MDC.get("userId"));
-        
+
         this.update(updateWrapper);
-        
+
         // 返回更新后的记录
         existingJob.setName(request.getName());
         existingJob.setDescription(request.getDescription());
@@ -103,7 +99,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         existingJob.setWorkflowId(request.getWorkflowId());
         existingJob.setUpdateTime(System.currentTimeMillis());
         existingJob.setUpdateUserId(MDC.get("userId"));
-        
+
         return ScheduleJobMapping.INSTANCE.toDTO(existingJob);
     }
 
@@ -120,7 +116,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         if (scheduleJob == null) {
             return null;
         }
-        
+
         return ScheduleJobMapping.INSTANCE.toDTO(scheduleJob);
     }
 
@@ -177,20 +173,23 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         if (scheduleJob == null) {
             throw new RuntimeException("调度任务不存在");
         }
-        
+
         String workflowId = scheduleJob.getWorkflowId();
-        
+
         // 执行工作流（带日志记录）
         WorkflowExecutionResult result = workflowExecutionService.executeWorkflowWithLog(
-            workflowId,
-            new HashMap<>(), // startParams
-            id, // jobId作为第一个参数
-            "SCHEDULED", // triggerType
-            null // extraLogInfo
+                WorkflowExecution.builder()
+                        .jobId(id)
+                        .workflowId(workflowId)
+                        .startParams(new HashMap<>())
+                        .workflowInstanceId(id)
+                        .triggerType("SCHEDULED")
+                        .extraLogInfo(null)
+                        .build()
         );
-        
+
         return result.isSuccess();
     }
-    
+
 
 }

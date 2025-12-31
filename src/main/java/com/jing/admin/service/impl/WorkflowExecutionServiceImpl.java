@@ -1,10 +1,10 @@
 package com.jing.admin.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jing.admin.core.workflow.WorkflowExecutor;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.core.workflow.model.GlobalParams;
+import com.jing.admin.model.dto.WorkflowExecution;
 import com.jing.admin.model.domain.ScheduleJobLog;
 import com.jing.admin.model.domain.Workflow;
 import com.jing.admin.model.domain.WorkflowGlobalParam;
@@ -40,40 +40,14 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
     private ScheduleJobLogService scheduleJobLogService;
     
     @Override
-    public WorkflowExecutionResult executeWorkflowWithLog(String workflowId, Map<String, Object> startParams, String triggerType, Map<String, Object> extraLogInfo) {
-        return executeWorkflowWithLog(workflowId, startParams, null, triggerType, extraLogInfo);
-    }
-
-    @Override
-    public WorkflowExecutionResult executeWorkflowWithoutLog(String workflowId, Map<String, Object> startParams) {
-        return executeWorkflowWithoutLog(workflowId, startParams, null);
-    }
-
-    @Override
-    public WorkflowExecutionResult executeWorkflowWithoutLog(String workflowId, Map<String, Object> startParams, String workflowInstanceId) {
-        try {
-            // 获取工作流和全局参数
-            Workflow workflow = workflowRepository.getById(workflowId);
-            List<WorkflowGlobalParam> globalParams = workflowGlobalParamService.getAll(workflowId, null, null, null);
-            
-            // 处理全局参数
-            Map<String, GlobalParams> globalParamsMap = handleGlobal(globalParams);
-            
-            // 直接执行工作流，不记录日志
-            return workflowExecutor.executeFromJsonByWorkflowData(
-                workflow.getJsonData(),
-                globalParamsMap,
-                startParams != null ? startParams : new HashMap<>(),
-                workflowInstanceId,
-                null // 不使用回调，因为不需要记录日志
-            );
-        } catch (Exception e) {
-            throw new RuntimeException("执行工作流失败: " + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public WorkflowExecutionResult executeWorkflowWithLog(String workflowId, Map<String, Object> startParams, String workflowInstanceId, String triggerType, Map<String, Object> extraLogInfo) {
+    public WorkflowExecutionResult executeWorkflowWithLog(WorkflowExecution workflowExecution) {
+        String workflowId = workflowExecution.getWorkflowId();
+        String jobId = workflowExecution.getJobId();
+        Map<String, Object> startParams = workflowExecution.getStartParams();
+        String workflowInstanceId = workflowExecution.getWorkflowInstanceId();
+        String triggerType = workflowExecution.getTriggerType();
+        Map<String, Object> extraLogInfo = workflowExecution.getExtraLogInfo();
+        
         // 如果没有提供工作流实例ID，则生成一个新的
         if (workflowInstanceId == null || workflowInstanceId.trim().isEmpty()) {
             workflowInstanceId = UUID.randomUUID().toString();
@@ -84,7 +58,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         
         // 创建执行日志记录
         ScheduleJobLog log = new ScheduleJobLog();
-        log.setJobId(workflowId); // 在调度场景下，jobId是调度任务ID；在其他场景下，可以是工作流ID
+        log.setJobId(jobId); // 在调度场景下，jobId是调度任务ID；在其他场景下，可以是工作流ID
         log.setWorkflowId(workflowId);
         log.setWorkflowInstanceId(workflowInstanceId);
         log.setTriggerType(triggerType != null ? triggerType : "MANUAL");
@@ -135,6 +109,33 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
             updateScheduleJobLogOnError(log, e, startTime);
             
             // 重新抛出异常
+            throw new RuntimeException("执行工作流失败: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public WorkflowExecutionResult executeWorkflowWithoutLog(WorkflowExecution request) {
+        String workflowId = request.getWorkflowId();
+        Map<String, Object> startParams = request.getStartParams();
+        String workflowInstanceId = request.getWorkflowInstanceId();
+        
+        try {
+            // 获取工作流和全局参数
+            Workflow workflow = workflowRepository.getById(workflowId);
+            List<WorkflowGlobalParam> globalParams = workflowGlobalParamService.getAll(workflowId, null, null, null);
+            
+            // 处理全局参数
+            Map<String, GlobalParams> globalParamsMap = handleGlobal(globalParams);
+            
+            // 直接执行工作流，不记录日志
+            return workflowExecutor.executeFromJsonByWorkflowData(
+                workflow.getJsonData(),
+                globalParamsMap,
+                startParams != null ? startParams : new HashMap<>(),
+                workflowInstanceId,
+                null // 不使用回调，因为不需要记录日志
+            );
+        } catch (Exception e) {
             throw new RuntimeException("执行工作流失败: " + e.getMessage(), e);
         }
     }
