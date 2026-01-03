@@ -34,13 +34,10 @@ public class StartNode extends BaseNode {
             NodeData nodeData = nodeDefinition.getData();
             Map<String, Object> outputData = new HashMap<>();
             Map outputParams = nodeData.getContent().getOutParams();
-            // 设置节点执行结果
-            context.setNodeResult(nodeDefinition.getId(), NodeResult.builder()
-                    .nodeId(nodeDefinition.getId()).nodeName(nodeDefinition.getData().getLabel()).executeResult(outputData).build());
-
             long executionTime = System.currentTimeMillis() - startTime;
             NodeExecutionResult result = NodeExecutionResult.success(outputData);
             result.setExecutionTime(executionTime);
+            result.setData(outputParams);
 
             return result;
         } catch (Exception e) {

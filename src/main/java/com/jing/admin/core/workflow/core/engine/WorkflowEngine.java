@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jing.admin.core.workflow.core.context.WorkflowContext;
 import com.jing.admin.core.workflow.model.NodeDefinition;
+import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.exception.NodeExecutor;
@@ -122,35 +123,19 @@ public class WorkflowEngine {
         
         // 如果有回调，在执行前调用
         if (callback != null) {
-            com.jing.admin.core.workflow.model.NodeResult nodeResult = com.jing.admin.core.workflow.model.NodeResult.builder()
+            NodeResult nodeResult = com.jing.admin.core.workflow.model.NodeResult.builder()
                     .nodeId(nodeDefinition.getId())
                     .nodeName(nodeName)
-                    .sort(0) // 可能需要从context获取当前执行顺序
+                    .startTime(startTime)
+                    .nodeType(nodeType)
                     .success(true)
                     .executeResult(null)
                     .errorMessage(null)
                     .build();
             callback.onExecutionProgress(nodeResult, com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus.BEFORE_EXECUTION);
         }
-        
-        // 记录节点开始执行日志
-        WorkflowNodeLog nodeLog = new WorkflowNodeLog();
-        nodeLog.setWorkflowInstanceId(context.getInstanceId());
-        nodeLog.setWorkflowId(context.getDefinitionId());
-        nodeLog.setNodeId(nodeDefinition.getId());
-        nodeLog.setNodeName(nodeName);
-        nodeLog.setNodeType(nodeType);
-        nodeLog.setStatus("RUNNING");
-        nodeLog.setStartTime(startTime);
-        
-        // 记录输入数据
-        try {
-            nodeLog.setInputData(objectMapper.writeValueAsString(context.getVariables()));
-        } catch (JsonProcessingException e) {
-            nodeLog.setInputData("无法序列化输入数据");
-        }
-        
         NodeExecutionResult result;
+
         try {
             // 获取节点类型
             if (nodeType == null) {
@@ -171,12 +156,12 @@ public class WorkflowEngine {
             }
         } catch (Exception e) {
             result = NodeExecutionResult.failure("节点执行异常: " + e.getMessage());
-            
             // 如果有回调，在错误时调用
             if (callback != null) {
-                com.jing.admin.core.workflow.model.NodeResult nodeResult = com.jing.admin.core.workflow.model.NodeResult.builder()
+                NodeResult nodeResult = com.jing.admin.core.workflow.model.NodeResult.builder()
                         .nodeId(nodeDefinition.getId())
                         .nodeName(nodeName)
+                        .nodeType(nodeType)
                         .sort(0) // 可能需要从context获取当前执行顺序
                         .success(false)
                         .executeResult(null)
@@ -188,27 +173,15 @@ public class WorkflowEngine {
         
         // 记录节点执行结束日志
         long endTime = System.currentTimeMillis();
-        nodeLog.setEndTime(endTime);
-        nodeLog.setExecutionTime(endTime - startTime);
-        nodeLog.setStatus(result.isSuccess() ? "SUCCESS" : "FAILED");
-        
-        if (!result.isSuccess()) {
-            nodeLog.setErrorMessage(result.getErrorMessage());
-        }
-        
-        // 记录输出数据
-        try {
-            nodeLog.setOutputData(objectMapper.writeValueAsString(result.getData()));
-        } catch (JsonProcessingException e) {
-            nodeLog.setOutputData("无法序列化输出数据");
-        }
         
         // 如果有回调，在执行后调用
         if (callback != null) {
             com.jing.admin.core.workflow.model.NodeResult nodeResult = com.jing.admin.core.workflow.model.NodeResult.builder()
                     .nodeId(nodeDefinition.getId())
                     .nodeName(nodeName)
-                    .sort(0) // 可能需要从context获取当前执行顺序
+                    .nodeType(nodeType)
+                    .endTime(endTime)
+                    .inputData(result.getInputData())
                     .success(result.isSuccess())
                     .executeResult(result.getData())
                     .errorMessage(result.getErrorMessage())

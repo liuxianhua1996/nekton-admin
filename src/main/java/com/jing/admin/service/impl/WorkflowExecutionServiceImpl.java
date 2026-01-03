@@ -1,5 +1,6 @@
 package com.jing.admin.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jing.admin.core.tenant.TenantContextHolder;
 import com.jing.admin.core.workflow.WorkflowExecutionCallback;
@@ -293,7 +294,9 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
             nodeLog.setNodeId(nodeResult.getNodeId());
             nodeLog.setNodeName(nodeResult.getNodeName());
             nodeLog.setSortOrder(nodeResult.getSort());
-            nodeLog.setNodeType("DEFAULT"); // 可能需要从其他地方获取节点类型
+            nodeLog.setNodeType(nodeResult.getNodeType());
+            nodeLog.setInputData(JSON.toJSONString(nodeResult.getExecuteResult()));
+            nodeLog.setStartTime(nodeResult.getStartTime());
             isUpdate = false;
         }
 
@@ -347,6 +350,9 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
 
         // 保存或更新节点日志
         if (isUpdate) {
+            nodeLog.setEndTime(nodeResult.getEndTime());
+            nodeLog.setInputData(JSON.toJSONString(nodeResult.getInputData()));
+            nodeLog.setOutputData(JSON.toJSONString(nodeResult.getExecuteResult()));
             workflowNodeLogService.updateNodeLog(nodeLog);
         } else {
             workflowNodeLogService.saveNodeLog(nodeLog);

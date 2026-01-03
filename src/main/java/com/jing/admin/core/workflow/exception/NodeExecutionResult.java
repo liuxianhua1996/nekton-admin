@@ -2,6 +2,8 @@ package com.jing.admin.core.workflow.exception;
 
 import lombok.Data;
 
+import java.util.Map;
+
 /**
  * 节点执行结果类
  * 用于存储节点执行的结果和状态
@@ -18,6 +20,8 @@ public class NodeExecutionResult {
      * 执行结果数据
      */
     private Object data;
+
+    private Map<String, Object> inputData;
     
     /**
      * 错误信息

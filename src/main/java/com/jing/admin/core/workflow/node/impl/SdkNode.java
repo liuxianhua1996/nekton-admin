@@ -28,7 +28,7 @@ public class SdkNode extends BaseNode {
     @Override
     public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context) {
         long startTime = System.currentTimeMillis();
-
+        Map<String, Object> processedParams = new HashMap<>(1);
         try {
             // 获取节点数据
             NodeData nodeData = nodeDefinition.getData();
@@ -43,7 +43,7 @@ public class SdkNode extends BaseNode {
             }
 
             // 处理参数中的引用
-            Map<String, Object> processedParams = processSdkParams(sdkParams, context);
+            processedParams = processSdkParams(sdkParams, context);
 
             // 获取系统和方法信息
             String system = (String) processedParams.get("system");
@@ -70,18 +70,13 @@ public class SdkNode extends BaseNode {
             long executionTime = System.currentTimeMillis() - startTime;
             NodeExecutionResult executionResult = NodeExecutionResult.success(result);
             executionResult.setExecutionTime(executionTime);
-
+            executionResult.setInputData(processedParams);
             return executionResult;
         } catch (Exception e) {
             long executionTime = System.currentTimeMillis() - startTime;
             NodeExecutionResult result = NodeExecutionResult.failure("执行失败: " + e.getMessage());
             result.setExecutionTime(executionTime);
-            context.setNodeResult(nodeDefinition.getId(), NodeResult.builder()
-                    .nodeId(nodeDefinition.getId())
-                    .nodeName(nodeDefinition.getData().getLabel())
-                    .success(false)
-                    .errorMessage(e.getMessage())
-                    .executeResult(result).build());
+            result.setInputData(processedParams);
             return result;
         }
     }
@@ -126,7 +121,6 @@ public class SdkNode extends BaseNode {
 
             processedParams.put("params", processedParamsMap);
         }
-
         return processedParams;
     }
 
