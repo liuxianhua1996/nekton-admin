@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jing.admin.mapper.ScheduleJobLogMapper;
+import com.jing.admin.model.api.ScheduleJobLogQueryRequest;
 import com.jing.admin.model.domain.ScheduleJobLog;
 import com.jing.admin.model.dto.ScheduleJobLogDTO;
 import com.jing.admin.model.api.ScheduleJobQueryRequest;
@@ -22,7 +23,7 @@ public class ScheduleJobLogRepository extends ServiceImpl<ScheduleJobLogMapper, 
      * @param queryRequest 查询请求参数
      * @return 分页结果
      */
-    public IPage<ScheduleJobLogDTO> selectScheduleJobLogPageWithUser(Page<ScheduleJobLogDTO> page, ScheduleJobQueryRequest queryRequest) {
+    public IPage<ScheduleJobLogDTO> selectScheduleJobLogPageWithUser(Page<ScheduleJobLogDTO> page, ScheduleJobLogQueryRequest queryRequest) {
         return this.baseMapper.selectScheduleJobLogPageWithUser(page, queryRequest);
     }
 }

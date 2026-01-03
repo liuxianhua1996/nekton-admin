@@ -2,9 +2,9 @@ package com.jing.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.jing.admin.model.api.ScheduleJobLogQueryRequest;
 import com.jing.admin.model.domain.ScheduleJobLog;
 import com.jing.admin.model.dto.ScheduleJobLogDTO;
-import com.jing.admin.model.api.ScheduleJobQueryRequest;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -23,5 +23,5 @@ public interface ScheduleJobLogMapper extends BaseMapper<ScheduleJobLog> {
      * @param queryRequest 查询请求参数
      * @return 分页结果
      */
-    IPage<ScheduleJobLogDTO> selectScheduleJobLogPageWithUser(Page<ScheduleJobLogDTO> page, @Param("query") ScheduleJobQueryRequest queryRequest);
+    IPage<ScheduleJobLogDTO> selectScheduleJobLogPageWithUser(Page<ScheduleJobLogDTO> page, @Param("query") ScheduleJobLogQueryRequest queryRequest);
 }

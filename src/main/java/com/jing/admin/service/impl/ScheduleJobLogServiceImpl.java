@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jing.admin.core.PageResult;
+import com.jing.admin.model.api.ScheduleJobLogQueryRequest;
 import com.jing.admin.model.api.ScheduleJobLogRequest;
 import com.jing.admin.model.domain.ScheduleJobLog;
 import com.jing.admin.mapper.ScheduleJobLogMapper;
@@ -116,7 +117,7 @@ public class ScheduleJobLogServiceImpl extends ServiceImpl<ScheduleJobLogMapper,
     }
 
     @Override
-    public PageResult<ScheduleJobLogDTO> getScheduleJobLogPage(ScheduleJobQueryRequest queryRequest) {
+    public PageResult<ScheduleJobLogDTO> getScheduleJobLogPage(ScheduleJobLogQueryRequest queryRequest) {
         // 创建分页对象
         Page<ScheduleJobLogDTO> page = new Page<>(queryRequest.getCurrent(), queryRequest.getSize());
 

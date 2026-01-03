@@ -2,6 +2,7 @@ package com.jing.admin.controller;
 
 import com.jing.admin.core.HttpResult;
 import com.jing.admin.core.PageResult;
+import com.jing.admin.model.api.ScheduleJobLogQueryRequest;
 import com.jing.admin.model.api.ScheduleJobLogRequest;
 import com.jing.admin.model.api.ScheduleJobQueryRequest;
 import com.jing.admin.model.dto.ScheduleJobLogDTO;
@@ -93,26 +94,14 @@ public class ScheduleJobLogController {
     }
 
     /**
-     * 根据任务ID获取执行记录列表
+     * 根据任务ID获取执行记录分页列表
      */
-    @GetMapping("/job/{jobId}")
-    @Operation(summary = "根据任务ID获取执行记录列表", description = "根据任务ID获取对应的执行记录列表")
-    public HttpResult<List<ScheduleJobLogDTO>> getScheduleJobLogByJobId(@PathVariable String jobId) {
+    @GetMapping("/job/{jobId}/page")
+    @Operation(summary = "根据任务ID获取执行记录分页列表", description = "根据任务ID获取对应的执行记录分页列表，支持按条件查询")
+    public HttpResult<PageResult<ScheduleJobLogDTO>> getScheduleJobLogByJobId(@PathVariable String jobId, ScheduleJobLogQueryRequest queryRequest) {
         try {
-            List<ScheduleJobLogDTO> list = scheduleJobLogService.getScheduleJobLogByJobId(jobId);
-            return HttpResult.success(list);
-        } catch (Exception e) {
-            return HttpResult.fail(null, "500", e.getMessage());
-        }
-    }
-    
-    /**
-     * 获取调度任务执行记录分页列表
-     */
-    @GetMapping("/page")
-    @Operation(summary = "获取调度任务执行记录分页列表", description = "获取调度任务执行记录分页列表，支持按条件查询")
-    public HttpResult<PageResult<ScheduleJobLogDTO>> getScheduleJobLogPage(ScheduleJobQueryRequest queryRequest) {
-        try {
+            // 设置jobId到查询请求中
+            queryRequest.setJobId(jobId);
             PageResult<ScheduleJobLogDTO> pageResult = scheduleJobLogService.getScheduleJobLogPage(queryRequest);
             return HttpResult.success(pageResult);
         } catch (Exception e) {

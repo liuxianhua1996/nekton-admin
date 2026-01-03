@@ -44,5 +44,5 @@ public interface ScheduleJobLogService extends IService<ScheduleJobLog> {
     /**
      * 获取调度任务执行记录分页列表
      */
-    com.jing.admin.core.PageResult<ScheduleJobLogDTO> getScheduleJobLogPage(com.jing.admin.model.api.ScheduleJobQueryRequest queryRequest);
+    com.jing.admin.core.PageResult<ScheduleJobLogDTO> getScheduleJobLogPage(com.jing.admin.model.api.ScheduleJobLogQueryRequest queryRequest);
 }

@@ -4,6 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jing.admin.core.PageResult;
+import com.jing.admin.core.constant.ConstantEnum;
+import com.jing.admin.core.schedule.AbstractJobTask;
+import com.jing.admin.core.schedule.job.JobTaskManager;
+import com.jing.admin.core.tenant.TenantContextHolder;
 import com.jing.admin.core.workflow.WorkflowExecutor;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.model.api.ScheduleJobRequest;
@@ -29,10 +33,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 调度工作流Service实现类
  */
 @Service
+@Slf4j
 public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, ScheduleJob> implements ScheduleJobService {
 
     @Autowired
@@ -47,6 +54,8 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
     private WorkflowGlobalParamService workflowGlobalParamService;
     @Autowired
     private com.jing.admin.service.WorkflowExecutionService workflowExecutionService;
+    @Autowired
+    private JobTaskManager jobTaskManager;
 
     @Override
     public ScheduleJobDTO createScheduleJob(ScheduleJobRequest request) {
@@ -61,6 +70,11 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         scheduleJob.setUpdateUserId(MDC.get("userId"));
 
         this.save(scheduleJob);
+
+        // 如果新创建的任务状态是启用的，需要注册定时任务
+        if ("ENABLED".equals(request.getStatus())) {
+            registerCronJob(scheduleJob);
+        }
 
         return ScheduleJobMapping.INSTANCE.toDTO(scheduleJob);
     }
@@ -78,6 +92,10 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         if (request.getName() == null || request.getName().trim().isEmpty()) {
             throw new RuntimeException("调度名称不能为空");
         }
+
+        // 记录原始状态，用于判断是否需要处理定时任务
+        String originalStatus = existingJob.getStatus();
+        String newStatus = request.getStatus();
 
         LambdaUpdateWrapper<ScheduleJob> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(ScheduleJob::getId, UUID.fromString(id))
@@ -100,11 +118,24 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         existingJob.setUpdateTime(System.currentTimeMillis());
         existingJob.setUpdateUserId(MDC.get("userId"));
 
+        // 如果状态发生了变化，需要处理定时任务
+        if (!originalStatus.equals(newStatus)) {
+            if ("ENABLED".equals(newStatus) && "DISABLED".equals(originalStatus)) {
+                // 从禁用变为启用，注册定时任务
+                registerCronJob(existingJob);
+            } else if ("DISABLED".equals(newStatus) && "ENABLED".equals(originalStatus)) {
+                // 从启用变为禁用，暂停定时任务
+                jobTaskManager.pauseJob(id);
+            }
+        }
+
         return ScheduleJobMapping.INSTANCE.toDTO(existingJob);
     }
 
     @Override
     public Boolean deleteScheduleJob(String id) {
+        // 在删除前，先暂停并删除对应的定时任务
+        jobTaskManager.deleteJob(id);
         return this.removeById(id);
     }
 
@@ -150,20 +181,64 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
 
     @Override
     public Boolean disableJob(String id) {
+        // 首先检查调度任务是否存在
+        QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", UUID.fromString(id));
+        ScheduleJob existingJob = this.getOne(queryWrapper);
+        if (existingJob == null) {
+            throw new RuntimeException("调度任务不存在");
+        }
+
+        // 更新数据库状态
         LambdaUpdateWrapper<ScheduleJob> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(ScheduleJob::getId, UUID.fromString(id))
                 .set(ScheduleJob::getStatus, "DISABLED")
                 .set(ScheduleJob::getUpdateTime, System.currentTimeMillis());
-        return this.update(updateWrapper);
+        boolean updateResult = this.update(updateWrapper);
+
+        // 如果更新成功，暂停对应的定时任务
+        if (updateResult) {
+            jobTaskManager.pauseJob(id);
+        }
+
+        return updateResult;
     }
 
     @Override
     public Boolean enableJob(String id) {
+        // 首先检查调度任务是否存在
+        QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", UUID.fromString(id));
+        ScheduleJob existingJob = this.getOne(queryWrapper);
+        if (existingJob == null) {
+            throw new RuntimeException("调度任务不存在");
+        }
+
+        // 检查任务当前状态，如果是已启用则直接返回
+        if ("ENABLED".equals(existingJob.getStatus())) {
+            return true; // 已经是启用状态，无需操作
+        }
+
+        // 更新数据库状态
         LambdaUpdateWrapper<ScheduleJob> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(ScheduleJob::getId, UUID.fromString(id))
                 .set(ScheduleJob::getStatus, "ENABLED")
                 .set(ScheduleJob::getUpdateTime, System.currentTimeMillis());
-        return this.update(updateWrapper);
+        boolean updateResult = this.update(updateWrapper);
+
+        // 如果更新成功，处理对应的定时任务
+        if (updateResult) {
+            // 检查任务是否已存在于JobTaskManager中
+            if (jobTaskManager.getJobTask(id) != null) {
+                // 如果任务存在，直接恢复
+                jobTaskManager.resumeJob(id);
+            } else {
+                // 如果任务不存在，需要创建并注册定时任务
+                registerCronJob(existingJob);
+            }
+        }
+
+        return updateResult;
     }
 
     @Override
@@ -191,5 +266,43 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         return result.isSuccess();
     }
 
+    /**
+     * 注册cron调度任务
+     */
+    private void registerCronJob(ScheduleJob scheduleJob) {
+        try {
+            String cronExpression = scheduleJob.getTriggerConfig();
+            String jobId = scheduleJob.getId();
+            String jobName = scheduleJob.getName();
+            
+            // 创建一个实现AbstractJobTask的作业任务，用于执行工作流
+            AbstractJobTask jobTask = new AbstractJobTask() {
+                @Override
+                public void run() {
+                    // 直接执行工作流，租户上下文将在JobScheduler中处理
+                    workflowExecutionService.executeWorkflowWithLog(
+                        com.jing.admin.model.dto.WorkflowExecution.builder()
+                            .jobId(scheduleJob.getId())
+                            .workflowId(scheduleJob.getWorkflowId())
+                            .startParams(new HashMap<>())
+                            .workflowInstanceId(scheduleJob.getId())
+                            .triggerType("CRON")
+                            .build()
+                    );
+                }
+            };
+            jobTask.setTaskId(jobId);
+            jobTask.setTaskData(scheduleJob);
+            jobTask.setStatus(ConstantEnum.WAIT);
+            
+            // 注册到JobTaskManager，租户ID暂时为null（ScheduleJob实体中没有tenantId字段）
+            jobTaskManager.addCronJob(jobId, jobName, cronExpression, jobTask, null);
+            
+            log.info("成功注册cron任务: {}, 租户: null, cron表达式: {}", jobId, cronExpression);
+        } catch (Exception e) {
+            log.error("注册cron任务 {} 失败: {}", scheduleJob.getId(), e.getMessage(), e);
+            throw new RuntimeException("注册cron任务失败", e);
+        }
+    }
 
 }
