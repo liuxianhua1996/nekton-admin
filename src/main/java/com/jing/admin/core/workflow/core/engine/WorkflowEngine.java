@@ -9,6 +9,7 @@ import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.exception.NodeExecutor;
 import com.jing.admin.model.domain.WorkflowNodeLog;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,7 @@ import java.util.UUID;
  * 负责工作流的执行流程控制
  */
 @Component
+@Slf4j
 public class WorkflowEngine {
 
     @Autowired
@@ -71,14 +73,15 @@ public class WorkflowEngine {
             // 遍历执行节点
             while (currentNode != null) {
                 // 执行当前节点
+                log.debug("[工作流执行][{}]: {}",context.getDefinitionId(),currentNode.getData().getLabel());
                 NodeExecutionResult nodeResult = executeNode(currentNode, context, callback);
-                
                 // 如果节点执行失败，终止工作流
                 if (!nodeResult.isSuccess()) {
                     context.setStatus(WorkflowContext.WorkflowStatus.FAILED);
                     context.setErrorMessage("节点 " + currentNode.getId() + " 执行失败: " + nodeResult.getErrorMessage());
                     return new WorkflowExecutionResult(false, context, nodeResult.getErrorMessage());
                 }
+                context.setVariable(currentNode.getId(),nodeResult);
                 
                 // 获取下一个节点
                 currentNode = workflowDefinition.getNextNode(currentNode.getId());

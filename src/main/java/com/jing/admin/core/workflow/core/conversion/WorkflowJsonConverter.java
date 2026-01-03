@@ -8,6 +8,7 @@ import com.jing.admin.core.workflow.model.WorkflowDefinition;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -101,10 +102,11 @@ public class WorkflowJsonConverter {
     private  static NodeData.NodeContent convertNodeContent(Map<String, Object> contentJson) {
         NodeData.NodeContent content = new NodeData.NodeContent();
         
-        content.setInParams((Map<String, Object>) contentJson.get("inParams"));
-        content.setOutParams((Map<String, Object>) contentJson.get("outParams"));
+        content.setInParams((Map<String, Object>) contentJson.getOrDefault("inParams", new HashMap<>()));
+        content.setOutParams((Map<String, Object>) contentJson.getOrDefault("outParams",new HashMap<>()));
         content.setConditions((List<Object>) contentJson.get("conditions"));
-        content.setSdkParams((Map<String, Object>) contentJson.get("sdkParams"));
+        content.setSdkParams((Map<String, Object>) contentJson.getOrDefault("sdkParams",new HashMap<>()));
+        content.setCode((String) contentJson.getOrDefault("code",""));
         
         return content;
     }

@@ -53,20 +53,6 @@ public class SdkNode extends BaseNode {
                 throw new RuntimeException("系统或方法参数为空");
             }
             Object result = executeSdkCall(system, method, processedParams, context);
-            // 设置节点执行结果
-            context.setNodeResult(nodeDefinition.getId(), NodeResult.builder()
-                    .nodeId(nodeDefinition.getId())
-                    .nodeName(nodeDefinition.getData().getLabel())
-                    .success(true)
-                    .executeResult(result).build());
-
-            // 将结果添加到上下文变量中
-            if (nodeData.getContent().getOutParams() != null) {
-                nodeData.getContent().getOutParams().forEach((key, param) -> {
-                    context.setVariable(key, result);
-                });
-            }
-
             long executionTime = System.currentTimeMillis() - startTime;
             NodeExecutionResult executionResult = NodeExecutionResult.success(result);
             executionResult.setExecutionTime(executionTime);
@@ -95,31 +81,25 @@ public class SdkNode extends BaseNode {
         processedParams.put("system", sdkParams.get("system"));
         processedParams.put("method", sdkParams.get("method"));
         processedParams.put("apiKeyId", sdkParams.get("apiKeyId"));
-
+        Map newParams = new HashMap();
         // 处理params参数
         Map<String, Object> params = (Map<String, Object>) sdkParams.get("params");
+        processedParams.put("params", newParams);
         if (params != null) {
-            Map<String, Object> processedParamsMap = new HashMap<>();
 
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 String paramName = entry.getKey();
                 Map<String, Object> paramDetails = (Map<String, Object>) entry.getValue();
-
                 // 获取参数值和类型
                 Object value = paramDetails.get("value");
                 String valueType = (String) paramDetails.get("valueType");
-
                 // 使用参数转换器处理参数值
                 Object convertedValue = parameterConverter.convertParameter(value, valueType, context);
-
                 // 创建新的参数详情
                 Map<String, Object> newParamDetails = new HashMap<>(paramDetails);
                 newParamDetails.put("value", convertedValue);
-
-                processedParamsMap.put(paramName, newParamDetails);
+                newParams.put(paramName, convertedValue);
             }
-
-            processedParams.put("params", processedParamsMap);
         }
         return processedParams;
     }

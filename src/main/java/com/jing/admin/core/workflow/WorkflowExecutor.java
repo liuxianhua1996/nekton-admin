@@ -169,7 +169,7 @@ public class WorkflowExecutor {
      */
     public WorkflowExecutionResult executeFromJson(@NonNull String workflowJson, @NonNull Map<String, GlobalParams> globalParams, Map startParams, String workflowInstanceId) {
         try {
-            // 转换JSON为工作流定义
+            /** (重要) 转换JSON为工作流定义 **/
             WorkflowDefinition workflowDefinition = WorkflowJsonConverter.convertFromJson(workflowJson);
             workflowDefinition.setGlobalParams(globalParams);
             workflowDefinition.setStartParams(startParams);

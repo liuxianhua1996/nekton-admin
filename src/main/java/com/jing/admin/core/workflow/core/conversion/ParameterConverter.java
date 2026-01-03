@@ -2,6 +2,7 @@ package com.jing.admin.core.workflow.core.conversion;
 
 import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.core.workflow.core.context.WorkflowContext;
+import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.model.NodeResult;
 
 import java.util.Map;
@@ -46,10 +47,10 @@ public class ParameterConverter {
             String variableName = matcher.group(2);
 
             // 从上下文中获取节点执行结果
-            NodeResult nodeResult = context.getNodeResult(nodeId);
+            NodeExecutionResult nodeResult = context.getVariable(nodeId);
             if (nodeResult != null) {
                 // 获取节点的执行结果
-                Object executeResult = nodeResult.getExecuteResult();
+                Object executeResult = nodeResult.getData();
                 if (executeResult instanceof Map) {
                     Map<?, ?> resultMap = (Map<?, ?>) executeResult;
                     return resultMap.get(variableName);

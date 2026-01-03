@@ -1,5 +1,9 @@
 package com.jing.admin.core.workflow.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 import java.util.Map;
 
@@ -119,6 +123,9 @@ public class NodeData {
     /**
      * 节点内容类
      */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class NodeContent {
         /**
          * 输入参数
@@ -139,40 +146,8 @@ public class NodeData {
          * SDK参数（当节点类型为sdk时使用）
          */
         private Map<String, Object> sdkParams;
-        
-        public NodeContent() {
-        }
-        
-        public Map<String, Object> getInParams() {
-            return inParams;
-        }
-        
-        public void setInParams(Map<String, Object> inParams) {
-            this.inParams = inParams;
-        }
-        
-        public Map<String, Object> getOutParams() {
-            return outParams;
-        }
-        
-        public void setOutParams(Map<String, Object> outParams) {
-            this.outParams = outParams;
-        }
-        
-        public List<Object> getConditions() {
-            return conditions;
-        }
-        
-        public void setConditions(List<Object> conditions) {
-            this.conditions = conditions;
-        }
-        
-        public Map<String, Object> getSdkParams() {
-            return sdkParams;
-        }
-        
-        public void setSdkParams(Map<String, Object> sdkParams) {
-            this.sdkParams = sdkParams;
-        }
+
+
+        private String code;
     }
 }

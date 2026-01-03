@@ -1,5 +1,6 @@
 package com.jing.admin.core.workflow.core.context;
 
+import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.model.GlobalParams;
 import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.model.domain.WorkflowGlobalParam;
@@ -40,7 +41,7 @@ public class WorkflowContext {
     /**
      * 工作流变量存储
      */
-    private Map<String, Object> variables;
+    private Map<String, NodeExecutionResult> variables;
     
     /**
      * 节点执行结果存储
@@ -72,7 +73,7 @@ public class WorkflowContext {
     /**
      * 设置变量值
      */
-    public void setVariable(String key, Object value) {
+    public void setVariable(String key, NodeExecutionResult value) {
         if (variables == null) {
             variables = new HashMap<>();
         }
@@ -82,7 +83,7 @@ public class WorkflowContext {
     /**
      * 获取变量值
      */
-    public Object getVariable(String key) {
+    public NodeExecutionResult getVariable(String key) {
         if (variables == null) {
             return null;
         }
