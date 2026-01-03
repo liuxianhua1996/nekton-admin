@@ -71,11 +71,13 @@ public class WorkflowNodeLogServiceImpl extends ServiceImpl<WorkflowNodeLogMappe
     }
     
     @Override
-    public WorkflowNodeLogDTO getNodeLogById(String id) {
+    public List<WorkflowNodeLogDTO> getNodeLogById(String id) {
         QueryWrapper<WorkflowNodeLog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", UUID.fromString(id));
-        WorkflowNodeLog nodeLog = this.getOne(queryWrapper);
-        return WorkflowNodeLogMapping.INSTANCE.toDTO(nodeLog);
+        queryWrapper.eq("workflow_instance_id", id);
+        List<WorkflowNodeLog> nodeLogs = this.list(queryWrapper);
+        return nodeLogs.stream()
+                .map(WorkflowNodeLogMapping.INSTANCE::toDTO)
+                .collect(java.util.stream.Collectors.toList());
     }
 
 }

@@ -9,11 +9,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 工作流节点执行日志控制器
  */
 @RestController
-@RequestMapping("/api/workflow/node/log")
+@RequestMapping("/workflow/node/log")
 @Tag(name = "工作流节点执行日志", description = "工作流节点执行日志管理")
 public class WorkflowNodeLogController {
 
@@ -25,9 +27,9 @@ public class WorkflowNodeLogController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "根据日志ID获取节点执行日志")
-    public HttpResult<WorkflowNodeLogDTO> getNodeLogById(@PathVariable String id) {
-        WorkflowNodeLogDTO nodeLog = workflowNodeLogService.getNodeLogById(id);
-        return HttpResult.success(nodeLog);
+    public HttpResult<List<WorkflowNodeLogDTO>> getNodeLogById(@PathVariable String id) {
+        List<WorkflowNodeLogDTO> nodeLogs = workflowNodeLogService.getNodeLogById(id);
+        return HttpResult.success(nodeLogs);
     }
-    
+
 }

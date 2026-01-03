@@ -274,9 +274,9 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
     /**
      * 更新节点执行日志
      */
-    private void updateNodeExecutionLog(ScheduleJobLog log, String nodeLogMessage, com.jing.admin.core.workflow.model.NodeResult nodeResult, com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus status) {
+    private void updateNodeExecutionLog(ScheduleJobLog log, String nodeLogMessage, NodeResult nodeResult, WorkflowExecutionCallback.ExecutionStatus status) {
         // 首先尝试查找已存在的节点日志记录
-        WorkflowNodeLog existingNodeLog = workflowNodeLogService.getNodeLogByInstanceIdAndNodeId(log.getWorkflowInstanceId(), nodeResult.getNodeId());
+        WorkflowNodeLog existingNodeLog = workflowNodeLogService.getNodeLogByInstanceIdAndNodeId(log.getId(), nodeResult.getNodeId());
 
         WorkflowNodeLog nodeLog;
         boolean isUpdate;
@@ -288,7 +288,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         } else {
             // 如果不存在记录，则创建新记录
             nodeLog = new WorkflowNodeLog();
-            nodeLog.setWorkflowInstanceId(log.getWorkflowInstanceId());
+            nodeLog.setWorkflowInstanceId(log.getId());
             nodeLog.setWorkflowId(log.getWorkflowId());
             nodeLog.setNodeId(nodeResult.getNodeId());
             nodeLog.setNodeName(nodeResult.getNodeName());

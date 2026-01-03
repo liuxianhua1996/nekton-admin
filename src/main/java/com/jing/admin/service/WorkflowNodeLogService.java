@@ -39,7 +39,7 @@ public interface WorkflowNodeLogService extends IService<WorkflowNodeLog> {
     void updateNodeLog(WorkflowNodeLog nodeLog);
     
     /**
-     * 根据日志ID获取节点执行日志
+     * 根据日志ID获取节点执行日志列表
      */
-    WorkflowNodeLogDTO getNodeLogById(String id);
+    List<WorkflowNodeLogDTO> getNodeLogById(String id);
 }

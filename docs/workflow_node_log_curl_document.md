@@ -32,7 +32,7 @@ curl -X GET "http://localhost:8080/api/workflow/node/log/log123" \
 {
   "code": 200,
   "message": "success",
-  "data": {
+  "data": [{
     "id": "log123",
     "workflowInstanceId": "instance123",
     "workflowId": "workflow123",
@@ -54,7 +54,7 @@ curl -X GET "http://localhost:8080/api/workflow/node/log/log123" \
     "updateUserId": "user123",
     "createUserName": "张三",
     "updateUserName": "李四"
-  }
+  }]
 }
 ```
 
