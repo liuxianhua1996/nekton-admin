@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jing.admin.mapper.WorkflowNodeLogMapper">
+    <!-- 工作流节点日志DTO结果映射 -->
+    <resultMap id="WorkflowNodeLogDTOMap" type="com.jing.admin.model.dto.WorkflowNodeLogDTO">
+        <id column="id" property="id"/>
+        <result column="workflow_instance_id" property="workflowInstanceId"/>
+        <result column="workflow_id" property="workflowId"/>
+        <result column="node_id" property="nodeId"/>
+        <result column="node_name" property="nodeName"/>
+        <result column="node_type" property="nodeType"/>
+        <result column="status" property="status"/>
+        <result column="input_data" property="inputData"/>
+        <result column="output_data" property="outputData"/>
+        <result column="error_message" property="errorMessage"/>
+        <result column="execution_time" property="executionTime"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="tenant_id" property="tenantId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="create_user_name" property="createUserName"/>
+        <result column="update_user_name" property="updateUserName"/>
+    </resultMap>
+
+    <!-- 分页查询节点执行日志（关联用户表） -->
+    <select id="selectNodeLogPageWithUser" resultMap="WorkflowNodeLogDTOMap">
+        SELECT
+            wnl.id,
+            wnl.workflow_instance_id,
+            wnl.workflow_id,
+            wnl.node_id,
+            wnl.node_name,
+            wnl.node_type,
+            wnl.status,
+            wnl.input_data,
+            wnl.output_data,
+            wnl.error_message,
+            wnl.execution_time,
+            wnl.start_time,
+            wnl.end_time,
+            wnl.sort_order,
+            wnl.tenant_id,
+            wnl.create_time,
+            wnl.update_time,
+            wnl.create_user_id,
+            cu.username AS create_user_name,
+            wnl.update_user_id,
+            uu.username AS update_user_name
+        FROM
+            tb_workflow_node_log wnl
+        LEFT JOIN
+            tb_users cu ON wnl.create_user_id = cu.uuid
+        LEFT JOIN
+            tb_users uu ON wnl.update_user_id = uu.uuid
+        <where>
+            <if test="query.workflowInstanceId != null and query.workflowInstanceId != ''">
+                AND wnl.workflow_instance_id = #{query.workflowInstanceId}
+            </if>
+            <if test="query.workflowId != null and query.workflowId != ''">
+                AND wnl.workflow_id = #{query.workflowId}
+            </if>
+            <if test="query.nodeId != null and query.nodeId != ''">
+                AND wnl.node_id = #{query.nodeId}
+            </if>
+            <if test="query.nodeName != null and query.nodeName != ''">
+                AND wnl.node_name LIKE CONCAT('%', #{query.nodeName}, '%')
+            </if>
+            <if test="query.status != null and query.status != ''">
+                AND wnl.status = #{query.status}
+            </if>
+        </where>
+        ORDER BY wnl.create_time DESC
+    </select>
+</mapper>

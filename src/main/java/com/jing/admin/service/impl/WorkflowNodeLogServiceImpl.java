@@ -1,8 +1,14 @@
 package com.jing.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jing.admin.core.PageResult;
+import com.jing.admin.model.api.WorkflowNodeLogQueryRequest;
 import com.jing.admin.model.domain.WorkflowNodeLog;
+import com.jing.admin.model.dto.WorkflowNodeLogDTO;
+import com.jing.admin.model.mapping.WorkflowNodeLogMapping;
 import com.jing.admin.mapper.WorkflowNodeLogMapper;
 import com.jing.admin.repository.WorkflowNodeLogRepository;
 import com.jing.admin.service.WorkflowNodeLogService;
@@ -50,7 +56,7 @@ public class WorkflowNodeLogServiceImpl extends ServiceImpl<WorkflowNodeLogMappe
                 .orderByAsc(WorkflowNodeLog::getSortOrder)
                 .list();
     }
-    
+
     @Override
     public WorkflowNodeLog getNodeLogByInstanceIdAndNodeId(String workflowInstanceId, String nodeId) {
         return workflowNodeLogRepository.lambdaQuery()
@@ -58,9 +64,18 @@ public class WorkflowNodeLogServiceImpl extends ServiceImpl<WorkflowNodeLogMappe
                 .eq(WorkflowNodeLog::getNodeId, nodeId)
                 .one();
     }
-    
+
     @Override
     public void updateNodeLog(WorkflowNodeLog nodeLog) {
         workflowNodeLogRepository.update(nodeLog,new QueryWrapper<WorkflowNodeLog>().eq("id", UUID.fromString(nodeLog.getId())));
     }
+    
+    @Override
+    public WorkflowNodeLogDTO getNodeLogById(String id) {
+        QueryWrapper<WorkflowNodeLog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", UUID.fromString(id));
+        WorkflowNodeLog nodeLog = this.getOne(queryWrapper);
+        return WorkflowNodeLogMapping.INSTANCE.toDTO(nodeLog);
+    }
+
 }
