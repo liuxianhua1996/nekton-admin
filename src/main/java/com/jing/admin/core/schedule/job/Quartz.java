@@ -15,7 +15,13 @@ public class Quartz {
     public Quartz(JobTask jobTask) {
         this.jobTask = jobTask;
         JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put("taskData",jobTask);
+        jobDataMap.put("taskData", jobTask);
+        
+        // Add tenant ID to job data if available
+        if (jobTask.getTenantId() != null) {
+            jobDataMap.put("tenantId", jobTask.getTenantId());
+        }
+        
         jobData = jobDataMap;
     }
     public JobDetail restartJob() throws ClassNotFoundException {

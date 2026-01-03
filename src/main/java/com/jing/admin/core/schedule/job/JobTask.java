@@ -1,14 +1,10 @@
 package com.jing.admin.core.schedule.job;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.jing.admin.core.constant.ConstantEnum;
 import com.jing.admin.core.schedule.AbstractJobTask;
 import com.jing.admin.core.schedule.engine.TaskEngine;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 /**
  * @author zhicheng
@@ -25,6 +21,12 @@ public class JobTask  {
     private String coron;
 
     private AbstractJobTask task;
+    
+    /**
+     * 租户ID，用于多租户环境下的任务执行
+     */
+    private String tenantId;
+    
     /**
      * 执行超时时间
      */
@@ -41,7 +43,7 @@ public class JobTask  {
     }
 
     public void run() {
-        log.info("[调度任务] 任务名称: {}", name);
+        log.info("[调度任务] 任务名称: {}, 租户ID: {}", name, tenantId);
         try {
             //创建任务
             //创建执行引擎

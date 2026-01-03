@@ -110,32 +110,24 @@ public class MultiTenantScheduleServiceImpl implements MultiTenantScheduleServic
             AbstractJobTask jobTask = new AbstractJobTask() {
                 @Override
                 public void run() {
-                    // 获取当前租户ID，用于传递给执行线程
-                    String currentTenantId = TenantContextHolder.getTenantId();
-                    
-                    // 使用租户上下文包装器来确保在执行过程中保持租户上下文
-                    Runnable wrappedRunnable = TenantContextWrapper.wrap(() -> {
-                        // 执行工作流
-                        workflowExecutionService.executeWorkflowWithLog(
-                            com.jing.admin.model.dto.WorkflowExecution.builder()
-                                .jobId(scheduleJob.getId())
-                                .workflowId(scheduleJob.getWorkflowId())
-                                .startParams(new HashMap<>())
-                                .workflowInstanceId(scheduleJob.getId())
-                                .triggerType("CRON")
-                                .build()
-                        );
-                    }, currentTenantId);
-                    
-                    wrappedRunnable.run();
+                    // 直接执行工作流，租户上下文将在JobScheduler中处理
+                    workflowExecutionService.executeWorkflowWithLog(
+                        com.jing.admin.model.dto.WorkflowExecution.builder()
+                            .jobId(scheduleJob.getId())
+                            .workflowId(scheduleJob.getWorkflowId())
+                            .startParams(new HashMap<>())
+                            .workflowInstanceId(scheduleJob.getId())
+                            .triggerType("CRON")
+                            .build()
+                    );
                 }
             };
             jobTask.setTaskId(jobId);
             jobTask.setTaskData(scheduleJob);
             jobTask.setStatus(ConstantEnum.WAIT);
             
-            // 注册到JobTaskManager
-            jobTaskManager.addCronJob(jobId, jobName, cronExpression, jobTask);
+            // 注册到JobTaskManager with tenant ID
+            jobTaskManager.addCronJob(jobId, jobName, cronExpression, jobTask, tenantId);
             
             log.info("成功注册cron任务: {}, 租户: {}, cron表达式: {}", jobId, tenantId, cronExpression);
         } catch (Exception e) {

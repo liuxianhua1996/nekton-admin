@@ -2,9 +2,11 @@ package com.jing.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jing.admin.core.tenant.TenantContextHolder;
+import com.jing.admin.core.workflow.WorkflowExecutionCallback;
 import com.jing.admin.core.workflow.WorkflowExecutor;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.core.workflow.model.GlobalParams;
+import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.model.dto.WorkflowExecution;
 import com.jing.admin.model.domain.ScheduleJobLog;
 import com.jing.admin.model.domain.Workflow;
@@ -63,6 +65,9 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
 
         // 记录租户信息用于调试
         log.info("执行工作流 {}，租户ID: {}", workflowId, currentTenantId);
+        if (currentTenantId == null) {
+            log.warn("在WorkflowExecutionServiceImpl.executeWorkflowWithLog中租户ID为null，线程: {}", Thread.currentThread().getName());
+        }
 
         // 如果没有提供工作流实例ID，则生成一个新的
         if (workflowInstanceId == null || workflowInstanceId.trim().isEmpty()) {
@@ -104,7 +109,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
                 globalParamsMap,
                 startParams != null ? startParams : new HashMap<>(),
                 workflowInstanceId,
-                new com.jing.admin.core.workflow.WorkflowExecutionCallback() {
+                new WorkflowExecutionCallback() {
                     @Override
                     public void onExecutionComplete(WorkflowExecutionResult result) {
                         // 在执行完成后，更新日志记录
@@ -117,7 +122,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
                     }
 
                     @Override
-                    public void onExecutionProgress(com.jing.admin.core.workflow.model.NodeResult nodeResult, com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus status) {
+                    public void onExecutionProgress(NodeResult nodeResult, ExecutionStatus status) {
                         // 记录节点执行进度日志
                         try{
                             String nodeStatus = status.name();

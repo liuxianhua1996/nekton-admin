@@ -15,6 +15,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkflowExecution {
+    private String tenantId;
     private String jobId;
     
     /**

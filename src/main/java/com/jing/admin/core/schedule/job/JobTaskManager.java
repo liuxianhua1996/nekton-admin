@@ -37,6 +37,18 @@ public class JobTaskManager {
      * @param jobTask 具体的作业任务
      */
     public void addCronJob(String taskId, String taskName, String cronExpression, AbstractJobTask jobTask) {
+        addCronJob(taskId, taskName, cronExpression, jobTask, null);
+    }
+
+    /**
+     * 添加并启动一个 cron 类型的定时任务（支持租户）
+     * @param taskId 任务ID
+     * @param taskName 任务名称
+     * @param cronExpression cron表达式
+     * @param jobTask 具体的作业任务
+     * @param tenantId 租户ID
+     */
+    public void addCronJob(String taskId, String taskName, String cronExpression, AbstractJobTask jobTask, String tenantId) {
         try {
             // 创建 JobTask
             JobTask jobTaskObj = new JobTask();
@@ -44,6 +56,7 @@ public class JobTaskManager {
             jobTaskObj.setName(taskName);
             jobTaskObj.setCoron(cronExpression);
             jobTaskObj.setTask(jobTask);
+            jobTaskObj.setTenantId(tenantId);
 
             // 创建 Quartz 任务
             Quartz quartz = new Quartz(jobTaskObj);
@@ -53,7 +66,7 @@ public class JobTaskManager {
             }
             // 调度任务
             scheduler.scheduleJob(quartz.restartJob(), quartz.restartTrigger());
-            log.info("成功添加 cron 任务: {}, cron表达式: {}", taskId, cronExpression);
+            log.info("成功添加 cron 任务: {}, 租户ID: {}, cron表达式: {}", taskId, tenantId, cronExpression);
 
             // 保存到映射中
             jobTaskMap.put(taskId, jobTaskObj);

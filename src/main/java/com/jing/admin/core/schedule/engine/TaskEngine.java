@@ -2,6 +2,8 @@ package com.jing.admin.core.schedule.engine;
 
 import com.jing.admin.core.schedule.AbstractJobTask;
 import com.jing.admin.core.schedule.ThreadPoolConfig;
+import com.jing.admin.core.tenant.TenantContextWrapper;
+import com.jing.admin.core.tenant.TenantContextHolder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
@@ -33,7 +35,20 @@ public class TaskEngine {
 
     public void run() {
         String result = "fail";
-        Future<String> future = ThreadPoolConfig.JOB_THREAD_POOL.submit(abstractTask, "success");
+        // 获取当前线程的租户ID，用于传递给执行线程
+        String currentTenantId = TenantContextHolder.getTenantId();
+        
+        // 包装任务以确保在执行线程中保持租户上下文
+        Runnable wrappedTask = TenantContextWrapper.wrap(() -> {
+            try {
+                abstractTask.run();
+            } catch (Exception e) {
+                log.error("执行任务时发生异常: ", e);
+                throw e;
+            }
+        }, currentTenantId);
+        
+        Future<String> future = ThreadPoolConfig.JOB_THREAD_POOL.submit(wrappedTask, "success");
         try {
             result = future.get(timeOut, TimeUnit.SECONDS);
         } catch (TimeoutException timeoutException) {

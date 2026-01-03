@@ -1,6 +1,7 @@
 package com.jing.admin.core.workflow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jing.admin.core.tenant.TenantContextHolder;
 import com.jing.admin.core.workflow.core.context.WorkflowContext;
 import com.jing.admin.core.workflow.core.conversion.WorkflowJsonConverter;
 import com.jing.admin.core.workflow.core.engine.WorkflowEngine;
@@ -31,6 +32,8 @@ public class WorkflowExecutor {
 
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    
+
 
     /**
      * 从JSON字符串执行工作流
@@ -41,7 +44,17 @@ public class WorkflowExecutor {
      * @return 执行结果
      */
     public WorkflowExecutionResult executeFromJsonByWorkflowData(@NonNull String workflowJson, Map<String, GlobalParams> globalParams, Map startParams) {
-        return executeFromJson(workflowJson, globalParams, startParams, null);
+        try {
+            // 直接执行工作流（租户上下文已由TaskEngine传播）
+            return executeFromJson(workflowJson, globalParams, startParams, null);
+        } catch (Exception e) {
+            // 如果在Callable包装中发生异常，重新抛出
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**
@@ -135,13 +148,13 @@ public class WorkflowExecutor {
             WorkflowContext context = new WorkflowContext();
             context.setGlobalParams(globalParams);
 
-            // 执行工作流
+            // 直接执行工作流（租户上下文已由TaskEngine传播）
             return workflowEngine.execute(workflowDefinition, context);
-        } catch (IOException e) {
+        } catch (Exception e) {
             WorkflowContext context = new WorkflowContext();
             context.setStatus(WorkflowContext.WorkflowStatus.FAILED);
-            context.setErrorMessage("工作流JSON解析失败: " + e.getMessage());
-            return new WorkflowExecutionResult(false, context, "工作流JSON解析失败: " + e.getMessage());
+            context.setErrorMessage("工作流执行失败: " + e.getMessage());
+            return new WorkflowExecutionResult(false, context, "工作流执行失败: " + e.getMessage());
         }
     }
 
@@ -170,9 +183,9 @@ public class WorkflowExecutor {
                 context.setInstanceId(workflowInstanceId);
             }
 
-            // 执行工作流
+            // 直接执行工作流（租户上下文已由TaskEngine传播）
             return workflowEngine.execute(workflowDefinition, context);
-        } catch (IOException e) {
+        } catch (Exception e) {
             WorkflowContext context = new WorkflowContext();
             if (workflowInstanceId != null) {
                 context.setInstanceId(workflowInstanceId);
@@ -209,7 +222,7 @@ public class WorkflowExecutor {
                 context.setInstanceId(workflowInstanceId);
             }
 
-            // 执行工作流（带回调）
+            // 直接执行工作流（租户上下文已由TaskEngine传播）
             WorkflowExecutionResult result = workflowEngine.execute(workflowDefinition, context, callback);
 
             // 调用回调方法
@@ -218,7 +231,7 @@ public class WorkflowExecutor {
             }
 
             return result;
-        } catch (IOException e) {
+        } catch (Exception e) {
             WorkflowContext context = new WorkflowContext();
             if (workflowInstanceId != null) {
                 context.setInstanceId(workflowInstanceId);
@@ -233,48 +246,6 @@ public class WorkflowExecutor {
             }
 
             return result;
-        }
-    }
-
-
-    /**
-     * 从JSON文件执行工作流
-     *
-     * @param jsonFilePath JSON文件路径
-     * @return 执行结果
-     */
-    public WorkflowExecutionResult executeFromJsonFile(String jsonFilePath) {
-        return executeFromJsonFile(jsonFilePath, null);
-    }
-
-    /**
-     * 从JSON文件执行工作流
-     *
-     * @param jsonFilePath JSON文件路径
-     * @param workflowJson 工作流JSON数据
-     * @return 执行结果
-     */
-    public WorkflowExecutionResult executeFromJsonFile(String jsonFilePath, String workflowJson) {
-        try {
-            // 读取JSON文件
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(jsonFilePath);
-            if (inputStream == null) {
-                throw new IOException("无法找到工作流JSON文件: " + jsonFilePath);
-            }
-
-            String actualWorkflowJson = objectMapper.readValue(inputStream, String.class);
-            if (workflowJson != null) {
-                actualWorkflowJson = workflowJson;
-            }
-
-            // 执行工作流
-            return executeFromJson(actualWorkflowJson, new HashMap<>(), new HashMap());
-        } catch (IOException e) {
-            WorkflowContext context = new WorkflowContext();
-            context.setStatus(WorkflowContext.WorkflowStatus.FAILED);
-            context.setErrorMessage("读取工作流JSON文件失败: " + e.getMessage());
-
-            return new WorkflowExecutionResult(false, context, "读取工作流JSON文件失败: " + e.getMessage());
         }
     }
 }
