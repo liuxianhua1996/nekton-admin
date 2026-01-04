@@ -1,10 +1,14 @@
 package com.jing.admin.core.workflow.core.conversion;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.core.workflow.core.context.WorkflowContext;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
+import com.jing.admin.core.workflow.model.GlobalParams;
 import com.jing.admin.core.workflow.model.NodeResult;
 
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,11 +45,14 @@ public class ParameterConverter {
         // 处理column类型的参数引用
         String stringValue = value.toString();
         Matcher matcher = PARAMETER_PATTERN.matcher(stringValue);
-
+        Map<String, GlobalParams> globalParamsMap = context.getGlobalParams();
         if (matcher.matches()) {
             String nodeId = matcher.group(1);
             String variableName = matcher.group(2);
-
+            if (globalParamsMap.containsKey(nodeId)) {
+                GlobalParams globalParams = globalParamsMap.get(nodeId);
+                return convertByDataType(globalParams.getParamValue(),globalParams.getValueType());
+            }
             // 从上下文中获取节点执行结果
             NodeExecutionResult nodeResult = context.getVariable(nodeId);
             if (nodeResult != null) {
@@ -63,5 +70,58 @@ public class ParameterConverter {
         }
         // 如果没有匹配的模式或找不到节点结果，返回原值
         throw new BusinessException("未找到相关节点值");
+    }
+
+    /**
+     * 根据数据类型进行转换
+     */
+    private Object convertByDataType(Object value, String dataType) {
+        if (value == null) {
+            return null;
+        }
+
+        if (dataType == null) {
+            return value; // 如果没有指定数据类型，返回原值
+        }
+
+        switch (dataType.toLowerCase()) {
+            case "string":
+                return value.toString();
+            case "number":
+                if (value instanceof Number) {
+                    return value;
+                }
+                try {
+                    String strValue = value.toString().trim();
+                    if (strValue.contains(".")) {
+                        return Double.parseDouble(strValue);
+                    } else {
+                        return Long.parseLong(strValue);
+                    }
+                } catch (NumberFormatException e) {
+                    throw new BusinessException("无法将值转换为数字类型: " + value);
+                }
+            case "boolean":
+                if (value instanceof Boolean) {
+                    return value;
+                }
+                String boolStr = value.toString().trim().toLowerCase();
+                return "true".equals(boolStr) || "1".equals(boolStr) || "yes".equals(boolStr) || "on".equals(boolStr);
+            case "array":
+                // 如果已经是数组或列表，直接返回
+                if (value instanceof List || value.getClass().isArray()) {
+                    return value;
+                }
+                // 否则将其作为字符串处理，可能需要进一步解析
+                return JSONObject.parseObject((String) value,List.class);
+            case "object":
+                // 对象类型通常不需要转换，直接返回
+                return JSONObject.parseObject((String) value,Map.class);
+            case "file":
+                // 文件类型，可能需要特殊处理，暂时返回原值
+                return value;
+            default:
+                return value; // 默认返回原值
+        }
     }
 }

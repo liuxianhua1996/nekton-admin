@@ -3,6 +3,7 @@ package com.jing.admin.core.workflow.config;
 import com.jing.admin.core.workflow.core.conversion.ParameterConverter;
 import com.jing.admin.core.workflow.exception.NodeExecutor;
 import com.jing.admin.core.workflow.node.impl.EndNode;
+import com.jing.admin.core.workflow.node.impl.IfNode;
 import com.jing.admin.core.workflow.node.impl.JsNode;
 import com.jing.admin.core.workflow.node.impl.SdkNode;
 import com.jing.admin.core.workflow.node.impl.StartNode;
@@ -30,6 +31,7 @@ public class WorkflowConfig {
         executors.add(new EndNode(parameterConverter));
         executors.add(new SdkNode(parameterConverter));
         executors.add(new JsNode(parameterConverter));
+        executors.add(new IfNode(parameterConverter));
         return executors;
     }
 }

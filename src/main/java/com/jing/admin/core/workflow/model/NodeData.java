@@ -140,7 +140,7 @@ public class NodeData {
         /**
          * 条件列表
          */
-        private List<Object> conditions;
+        private List<Map<String,Object>> conditions;
         
         /**
          * SDK参数（当节点类型为sdk时使用）

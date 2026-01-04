@@ -1,0 +1,383 @@
+{
+    "isValid": true,
+    "nodes": [
+        {
+            "id": "f2c45473072742e6a981eb968a8c99b1",
+            "type": "custom",
+            "position": {
+                "x": 300,
+                "y": 50
+            },
+            "width": 200,
+            "height": 52,
+            "data": {
+                "icon": "https://ylys.shop/icon/qidong.png",
+                "label": "开始",
+                "description": "",
+                "type": "start",
+                "content": {
+                    "conditions": [
+
+                    ],
+                    "inParams": {
+
+                    },
+                    "outParams": {
+
+                    }
+                },
+                "selected": false,
+                "error": false
+            },
+            "positionAbsolute": {
+                "x": 300,
+                "y": 50
+            }
+        },
+        {
+            "id": "45004afdcf1e4bed933b246c6cebb878",
+            "type": "custom",
+            "position": {
+                "x": 1623,
+                "y": 182
+            },
+            "width": 200,
+            "height": 52,
+            "data": {
+                "icon": "https://ylys.shop/icon/qidong.png",
+                "label": "结束",
+                "description": "",
+                "type": "end",
+                "content": {
+                    "outParams": {
+                        "result": {
+                            "id": "7dbeb7a2c0704e029835daf7b698e18e",
+                            "name": "result",
+                            "valueType": "column",
+                            "dataType": "string",
+                            "value": "{e8bcbe6ae2b64295b2fa2baaf4fc654f.变量}",
+                            "description": "",
+                            "required": "false",
+                            "sort": 0
+                        }
+                    }
+                },
+                "selected": false,
+                "error": false
+            },
+            "positionAbsolute": {
+                "x": 1623,
+                "y": 182
+            },
+            "selected": false
+        },
+        {
+            "id": "837d28577696478385539ae7e614767b",
+            "type": "custom",
+            "data": {
+                "label": "钉钉",
+                "code": "sdk",
+                "type": "sdk",
+                "content": {
+                    "inParams": {
+
+                    },
+                    "outParams": {
+                        "result": {
+                            "name": "result",
+                            "dataType": "object",
+                            "description": "插入结果",
+                            "required": "false"
+                        }
+                    },
+                    "conditions": [
+
+                    ],
+                    "sdkParams": {
+                        "system": "dingtalk_app",
+                        "method": "yida_insert",
+                        "params": {
+                            "userId": {
+                                "label": "用户ID",
+                                "name": "userId",
+                                "dataType": "string",
+                                "desc": "用户的userid",
+                                "required": true,
+                                "value": "012602501247751593",
+                                "valueType": "input",
+                                "sort": 2
+                            },
+                            "formUuid": {
+                                "label": "表单ID",
+                                "name": "formUuid",
+                                "dataType": "string",
+                                "desc": "表单ID",
+                                "required": true,
+                                "value": "FORM-751205D7CB0242C59997DBAEAF7CAD9ANEEQ",
+                                "valueType": "input",
+                                "sort": 4
+                            },
+                            "systemToken": {
+                                "label": "应用密钥",
+                                "name": "systemToken",
+                                "dataType": "string",
+                                "desc": "应用密钥",
+                                "required": true,
+                                "value": "QUA66M815XR11GPDNVM6Z4HCKVAP2AHSYSPJMPOG",
+                                "valueType": "input",
+                                "sort": 1
+                            },
+                            "formDataJson": {
+                                "label": "表单数据",
+                                "name": "formDataJson",
+                                "dataType": "string",
+                                "desc": "表单数据，示例：\"{\\\"textField_jcpm6agt\\\": \\\"单行\\\",\\\"employeeField_jcos0sar\\\": [\\\"workno\\\"]}\"，key为流程组件标识，value为组件内的值",
+                                "required": true,
+                                "value": "{{f9fe16cf8dc14c1f8f50aa857eb47986.formDataJson}}",
+                                "valueType": "column",
+                                "sort": 5
+                            },
+                            "appType": {
+                                "label": "应用编码",
+                                "name": "appType",
+                                "dataType": "string",
+                                "desc": "应用编码",
+                                "required": true,
+                                "value": "{{f9fe16cf8dc14c1f8f50aa857eb47986.appType}}",
+                                "valueType": "column",
+                                "sort": 0
+                            }
+                        },
+                        "apiKeyId": "22e10ea8b94b4080baaea73eb91e6283"
+                    }
+                },
+                "selected": false,
+                "error": false
+            },
+            "position": {
+                "x": 1322,
+                "y": 267
+            },
+            "targetPosition": "left",
+            "sourcePosition": "right",
+            "width": 200,
+            "height": 52,
+            "positionAbsolute": {
+                "x": 1322,
+                "y": 267
+            },
+            "selected": false
+        },
+        {
+            "id": "f9fe16cf8dc14c1f8f50aa857eb47986",
+            "type": "custom",
+            "data": {
+                "label": "JS脚本",
+                "code": "javascript",
+                "type": "javascript",
+                "content": {
+                    "inParams": {
+
+                    },
+                    "outParams": {
+                        "formDataJson": {
+                            "name": "formDataJson",
+                            "dataType": "string"
+                        },
+                        "appType": {
+                            "name": "appType",
+                            "dataType": "string"
+                        }
+                    },
+                    "conditions": [
+
+                    ],
+                    "code": "// 在这里编写JavaScript代码\n// 输入参数可以通过 context.inputs 获取\n// 输出结果请赋值给 context.outputs\nfunction main(context) {\n\t// 示例：简单的数据处理\n\tconst input = context.inputs.input1 || \"Hello World\";\n\t// 处理逻辑\n\tconst result = input.toUpperCase();\n\t// 设置输出\n\tcontext.outputs = {\n      appType:\"APP_XFIBVR4Y9BUOL1J0VRT6\",\n      formDataJson: JSON.stringify({\n          \"textField_mjy1c0tv\":\"连接器测试写入：\"+Date.now()\n        })\n    };\n    return context;\n}"
+                },
+                "selected": false,
+                "error": false
+            },
+            "position": {
+                "x": 595,
+                "y": 119
+            },
+            "targetPosition": "left",
+            "sourcePosition": "right",
+            "width": 200,
+            "height": 52,
+            "positionAbsolute": {
+                "x": 595,
+                "y": 119
+            },
+            "selected": false
+        },
+        {
+            "id": "d32ab9453ab04f16a72d89aff98e986d",
+            "type": "custom",
+            "data": {
+                "label": "IF判断",
+                "code": "verify",
+                "type": "verify",
+                "content": {
+                    "inParams": {
+
+                    },
+                    "outParams": {
+
+                    },
+                    "conditions": [
+                        {
+                            "id": "3c444a12c81a4cd6bc731bf93efe940d",
+                            "name": "通过钉钉",
+                            "subConditions": [
+                                {
+                                    "id": "ba658394903440e5adccc56c86cb9c24",
+                                    "field": "{{f9fe16cf8dc14c1f8f50aa857eb47986.appType}}",
+                                    "operator": "==",
+                                    "value": "APP",
+                                    "valueType": "value"
+                                },
+                                {
+                                    "id": "1767509142358",
+                                    "field": "{{f9fe16cf8dc14c1f8f50aa857eb47986.formDataJson}}",
+                                    "operator": "==",
+                                    "value": "222",
+                                    "valueType": "value"
+                                }
+                            ],
+                            "logicOperator": "AND"
+                        },
+                        {
+                            "id": "cd3c94315bb44b8a885c111869b3ae1b",
+                            "name": "条件2",
+                            "subConditions": [
+                                {
+                                    "id": "fbfdf7339c9448cea53062b19f8a5100",
+                                    "field": "{{global.newParam2}}",
+                                    "operator": "contains",
+                                    "value": "123",
+                                    "valueType": "value"
+                                }
+                            ],
+                            "logicOperator": "AND"
+                        }
+                    ]
+                },
+                "selected": false,
+                "error": false
+            },
+            "position": {
+                "x": 924,
+                "y": 244
+            },
+            "targetPosition": "left",
+            "sourcePosition": "right",
+            "width": 200,
+            "height": 138,
+            "positionAbsolute": {
+                "x": 924,
+                "y": 244
+            },
+            "selected": true
+        }
+    ],
+    "edges": [
+        {
+            "id": "source-837d28577696478385539ae7e614767b-45004afdcf1e4bed933b246c6cebb878",
+            "source": "837d28577696478385539ae7e614767b",
+            "target": "45004afdcf1e4bed933b246c6cebb878",
+            "sourceHandle": "source-837d28577696478385539ae7e614767b",
+            "type": "custom",
+            "style": {
+
+            }
+        },
+        {
+            "id": "source-f2c45473072742e6a981eb968a8c99b1-f9fe16cf8dc14c1f8f50aa857eb47986",
+            "type": "custom",
+            "source": "f2c45473072742e6a981eb968a8c99b1",
+            "sourceHandle": "source-f2c45473072742e6a981eb968a8c99b1",
+            "target": "f9fe16cf8dc14c1f8f50aa857eb47986",
+            "targetHandle": "target-f9fe16cf8dc14c1f8f50aa857eb47986",
+            "style": {
+
+            },
+            "selected": false
+        },
+        {
+            "id": "source-f9fe16cf8dc14c1f8f50aa857eb47986-d32ab9453ab04f16a72d89aff98e986d",
+            "type": "custom",
+            "source": "f9fe16cf8dc14c1f8f50aa857eb47986",
+            "sourceHandle": "source-f9fe16cf8dc14c1f8f50aa857eb47986",
+            "target": "d32ab9453ab04f16a72d89aff98e986d",
+            "targetHandle": "target-d32ab9453ab04f16a72d89aff98e986d",
+            "style": {
+
+            }
+        },
+        {
+            "id": "source-3c444a12c81a4cd6bc731bf93efe940d-837d28577696478385539ae7e614767b",
+            "source": "d32ab9453ab04f16a72d89aff98e986d",
+            "target": "837d28577696478385539ae7e614767b",
+            "sourceHandle": "source-3c444a12c81a4cd6bc731bf93efe940d",
+            "type": "custom",
+            "style": {
+
+            }
+        },
+        {
+            "id": "source-cd3c94315bb44b8a885c111869b3ae1b-837d28577696478385539ae7e614767b",
+            "source": "d32ab9453ab04f16a72d89aff98e986d",
+            "target": "837d28577696478385539ae7e614767b",
+            "sourceHandle": "source-cd3c94315bb44b8a885c111869b3ae1b",
+            "type": "custom"
+        }
+    ],
+    "globalSettings": {
+        "globalParams": {
+            "variables": {
+                "newParam2": {
+                    "key": "newParam2",
+                    "value": "",
+                    "type": "string",
+                    "id": "f29d5140611548aa87b467dd3ebf9e81"
+                },
+                "newParam1": {
+                    "key": "newParam1",
+                    "value": "1111",
+                    "type": "string",
+                    "id": "f247174cd7f442c9b0651cd04f6b37bb"
+                }
+            }
+        },
+        "databaseConfig": {
+            "connections": [
+                {
+                    "type": "mysql",
+                    "host": "111",
+                    "port": "3306",
+                    "database": "123",
+                    "username": "123",
+                    "password": "123",
+                    "url": "jdbc:mysql://111:3306/123",
+                    "id": "234f281402cc4611aeba1fc0fb3931ba"
+                }
+            ]
+        },
+        "logSettings": {
+            "level": "info",
+            "enabled": true
+        },
+        "apiKeyConfig": {
+            "apiKeys": [
+                {
+                    "serviceProvider": "dingtalk",
+                    "serviceName": "晋享",
+                    "apiKey": "dingcei2rwv5r1mmf99z",
+                    "apiSecret": "aBRmurPpOx6HP3NjqZwelzzFmBW402zJ96Fhp9LVQBsi-j9tJlynkIyxERLPnRpv",
+                    "id": "22e10ea8b94b4080baaea73eb91e6283"
+                }
+            ]
+        }
+    }
+}

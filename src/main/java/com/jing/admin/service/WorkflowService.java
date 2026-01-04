@@ -7,6 +7,7 @@ import com.jing.admin.core.PageResult;
 import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.core.workflow.WorkflowExecutor;
+import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;

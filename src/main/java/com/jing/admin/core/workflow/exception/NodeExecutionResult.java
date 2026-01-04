@@ -22,6 +22,8 @@ public class NodeExecutionResult {
     private Object data;
 
     private Map<String, Object> inputData;
+
+    private int sort;
     
     /**
      * 错误信息

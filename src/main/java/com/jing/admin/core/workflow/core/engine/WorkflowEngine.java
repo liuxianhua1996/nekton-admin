@@ -82,9 +82,16 @@ public class WorkflowEngine {
                     return new WorkflowExecutionResult(false, context, nodeResult.getErrorMessage());
                 }
                 context.setVariable(currentNode.getId(),nodeResult);
+                context.setNodeResult(currentNode.getId(),NodeResult.builder()
+                                .nodeType(currentNode.getType())
+                                .nodeName(currentNode.getData().getLabel())
+                                .nodeId(currentNode.getId())
+                                .inputData(nodeResult.getInputData())
+                                .executeResult(nodeResult.getData())
+                        .build());
                 
-                // 获取下一个节点
-                currentNode = workflowDefinition.getNextNode(currentNode.getId());
+                // 获取下一个节点（支持条件分支）
+                currentNode = workflowDefinition.getNextNodeConditional(currentNode.getId(), context);
                 if (currentNode != null) {
                     context.setCurrentNodeId(currentNode.getId());
                 }

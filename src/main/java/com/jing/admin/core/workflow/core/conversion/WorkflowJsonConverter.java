@@ -104,7 +104,7 @@ public class WorkflowJsonConverter {
         
         content.setInParams((Map<String, Object>) contentJson.getOrDefault("inParams", new HashMap<>()));
         content.setOutParams((Map<String, Object>) contentJson.getOrDefault("outParams",new HashMap<>()));
-        content.setConditions((List<Object>) contentJson.get("conditions"));
+        content.setConditions((List<Map<String,Object>>) contentJson.get("conditions"));
         content.setSdkParams((Map<String, Object>) contentJson.getOrDefault("sdkParams",new HashMap<>()));
         content.setCode((String) contentJson.getOrDefault("code",""));
         

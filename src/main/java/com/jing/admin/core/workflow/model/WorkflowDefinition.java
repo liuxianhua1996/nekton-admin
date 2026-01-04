@@ -1,10 +1,12 @@
 package com.jing.admin.core.workflow.model;
 
 import com.jing.admin.model.domain.WorkflowGlobalParam;
+import com.jing.admin.core.workflow.core.context.WorkflowContext;
 import lombok.Data;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 工作流定义类
@@ -86,5 +88,55 @@ public class WorkflowDefinition {
                 .findFirst()
                 .map(edge -> getNodeById(edge.getTarget()))
                 .orElse(null);
+    }
+    
+    /**
+     * 根据当前节点ID和工作流上下文获取下一个节点（支持条件分支）
+     * 
+     * @param currentNodeId 当前节点ID
+     * @param context 工作流执行上下文
+     * @return 下一个节点定义
+     */
+    public NodeDefinition getNextNodeConditional(String currentNodeId, WorkflowContext context) {
+        if (edges == null) {
+            return null;
+        }
+        
+        // 获取当前节点
+        NodeDefinition currentNode = getNodeById(currentNodeId);
+        if (currentNode == null) {
+            return null;
+        }
+        
+        // 如果当前节点是IF节点，需要根据条件判断结果选择分支
+        if ("verify".equals(currentNode.getData().getType())) {
+            // 从上下文中获取匹配的条件ID
+            Object matchedConditionsObj = ((Map<String,Object>)context.getVariable(currentNode.getId()).getData()).get("matchedConditions");
+            
+            if (matchedConditionsObj instanceof List) {
+                @SuppressWarnings("unchecked")
+                List<Map<String,String>> matchedConditionIds = (List<Map<String,String>>) matchedConditionsObj;
+                
+                // 查找与匹配条件ID对应的边
+                for (Map<String,String> condition : matchedConditionIds) {
+                    String sourceHandle = "source-" + condition.get("conditionId");
+                    
+                    // 查找sourceHandle匹配的边
+                    EdgeDefinition matchingEdge = edges.stream()
+                            .filter(edge -> currentNodeId.equals(edge.getSource()) && 
+                                          sourceHandle.equals(edge.getSourceHandle()))
+                            .findFirst()
+                            .orElse(null);
+                    
+                    if (matchingEdge != null) {
+                        return getNodeById(matchingEdge.getTarget());
+                    }
+                }
+            }
+            return getEndNode();
+        }
+        
+        // 对于非IF节点，使用普通逻辑
+        return getNextNode(currentNodeId);
     }
 }
