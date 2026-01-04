@@ -106,48 +106,48 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
 
             // 使用回调方式执行工作流，实现解耦
             WorkflowExecutionResult workflowExecutionResult = workflowExecutor.executeFromJsonByWorkflowData(
-                workflow.getJsonData(),
-                globalParamsMap,
-                startParams != null ? startParams : new HashMap<>(),
-                workflowInstanceId,
-                new WorkflowExecutionCallback() {
-                    @Override
-                    public void onExecutionComplete(WorkflowExecutionResult result) {
-                        // 在执行完成后，更新日志记录
-                        try{
-                            updateScheduleJobLog(scheduleJobLoglog, result, startTime);
-                        }catch(Exception e){
-                            log.error("保存执行日志失败： ",e.getMessage());
-                        }
-
-                    }
-
-                    @Override
-                    public void onExecutionProgress(NodeResult nodeResult, ExecutionStatus status) {
-                        // 记录节点执行进度日志
-                        try{
-                            String nodeStatus = status.name();
-                            String nodeLogMessage = String.format(
-                                    "节点[%s-%s]状态: %s, 执行结果: %s, 成功: %s",
-                                    nodeResult.getNodeId(),
-                                    nodeResult.getNodeName(),
-                                    nodeStatus,
-                                    nodeResult.getExecuteResult() != null ? nodeResult.getExecuteResult().toString() : "无结果",
-                                    nodeResult.isSuccess()
-                            );
-
-                            if (status == com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus.ERROR && nodeResult.getErrorMessage() != null) {
-                                nodeLogMessage += ", 错误信息: " + nodeResult.getErrorMessage();
+                    workflow.getJsonData(),
+                    globalParamsMap,
+                    startParams != null ? startParams : new HashMap<>(),
+                    workflowInstanceId,
+                    new WorkflowExecutionCallback() {
+                        @Override
+                        public void onExecutionComplete(WorkflowExecutionResult result) {
+                            // 在执行完成后，更新日志记录
+                            try {
+                                updateScheduleJobLog(scheduleJobLoglog, result, startTime);
+                            } catch (Exception e) {
+                                log.error("保存执行日志失败： ", e.getMessage());
                             }
 
-                            // 更新日志记录中的节点执行信息
-                            updateNodeExecutionLog(scheduleJobLoglog, nodeLogMessage, nodeResult, status);
-                        }catch(Exception e){
-                            log.error("保存节点日志失败： ",e.getMessage());
                         }
 
+                        @Override
+                        public void onExecutionProgress(NodeResult nodeResult, ExecutionStatus status) {
+                            // 记录节点执行进度日志
+                            try {
+                                String nodeStatus = status.name();
+                                String nodeLogMessage = String.format(
+                                        "节点[%s-%s]状态: %s, 执行结果: %s, 成功: %s",
+                                        nodeResult.getNodeId(),
+                                        nodeResult.getNodeName(),
+                                        nodeStatus,
+                                        nodeResult.getExecuteResult() != null ? nodeResult.getExecuteResult().toString() : "无结果",
+                                        nodeResult.isSuccess()
+                                );
+
+                                if (status == com.jing.admin.core.workflow.WorkflowExecutionCallback.ExecutionStatus.ERROR && nodeResult.getErrorMessage() != null) {
+                                    nodeLogMessage += ", 错误信息: " + nodeResult.getErrorMessage();
+                                }
+
+                                // 更新日志记录中的节点执行信息
+                                updateNodeExecutionLog(scheduleJobLoglog, nodeLogMessage, nodeResult, status);
+                            } catch (Exception e) {
+                                log.error("保存节点日志失败： ", e.getMessage());
+                            }
+
+                        }
                     }
-                }
             );
 
             return workflowExecutionResult;
@@ -182,18 +182,19 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
 
             // 直接执行工作流，不记录日志
             return workflowExecutor.executeFromJsonByWorkflowData(
-                workflow.getJsonData(),
-                globalParamsMap,
-                startParams != null ? startParams : new HashMap<>(),
-                workflowInstanceId,
-                null // 不使用回调，因为不需要记录日志
+                    workflow.getJsonData(),
+                    globalParamsMap,
+                    startParams != null ? startParams : new HashMap<>(),
+                    workflowInstanceId,
+                    null // 不使用回调，因为不需要记录日志
             );
         } catch (Exception e) {
             throw new RuntimeException("执行工作流失败: " + e.getMessage(), e);
         }
     }
+
     @Override
-    public WorkflowExecutionResult executeWorkflowWithoutLogByData(String workflowJson, Map<String, Object> globalParams, Map<String, Object> startParams) {
+    public WorkflowExecutionResult executeWorkflowWithoutLogByData(String workflowJson, Map<String, GlobalParams> globalParams, Map<String, Object> startParams) {
         // 获取当前租户ID
         String currentTenantId = TenantContextHolder.getTenantId();
 
@@ -203,11 +204,11 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         try {
             // 直接执行工作流，不记录日志
             return workflowExecutor.executeFromJsonByWorkflowData(
-                workflowJson,
-                convertGlobalParams(globalParams),
-                startParams != null ? startParams : new HashMap<>(),
-                null, // 不指定工作流实例ID
-                null // 不使用回调，因为不需要记录日志
+                    workflowJson,
+                    globalParams,
+                    startParams != null ? startParams : new HashMap<>(),
+                    null, // 不指定工作流实例ID
+                    null // 不使用回调，因为不需要记录日志
             );
         } catch (Exception e) {
             throw new RuntimeException("执行工作流失败: " + e.getMessage(), e);
@@ -222,28 +223,10 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         if (globalParams != null) {
             globalParams.stream().forEach(workflowGlobalParam -> {
                 globalParamsMap.put(workflowGlobalParam.getId(), GlobalParams.builder()
-                                .apiKeyId(workflowGlobalParam.getId())
-                                .paramValue(workflowGlobalParam.getParamValue())
-                                .valueType(workflowGlobalParam.getValueType())
-                                .paramType(workflowGlobalParam.getParamType())
-                        .build());
-            });
-        }
-        return globalParamsMap;
-    }
-
-    /**
-     * 转换全局参数格式
-     */
-    private Map<String, GlobalParams> convertGlobalParams(Map<String, Object> globalParams) {
-        Map<String, GlobalParams> globalParamsMap = new HashMap<>();
-        if (globalParams != null) {
-            globalParams.forEach((key, value) -> {
-                globalParamsMap.put(key, GlobalParams.builder()
-                                .apiKeyId(key)
-                                .paramValue(String.valueOf(value))
-                                .valueType(value != null ? value.getClass().getSimpleName() : "String")
-                                .paramType("DYNAMIC")
+                        .apiKeyId(workflowGlobalParam.getId())
+                        .paramValue(workflowGlobalParam.getParamValue())
+                        .valueType(workflowGlobalParam.getValueType())
+                        .paramType(workflowGlobalParam.getParamType())
                         .build());
             });
         }
@@ -308,7 +291,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
                 nodeLog.setStatus("RUNNING");
                 nodeLog.setStartTime(currentTime);
                 nodeLog.setInputData(nodeResult.getExecuteResult() != null ?
-                    nodeResult.getExecuteResult().toString() : null);
+                        nodeResult.getExecuteResult().toString() : null);
                 break;
 
             case AFTER_EXECUTION:
@@ -316,7 +299,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
                 nodeLog.setStatus(nodeResult.isSuccess() ? "SUCCESS" : "FAILED");
                 nodeLog.setEndTime(currentTime);
                 nodeLog.setOutputData(nodeResult.getExecuteResult() != null ?
-                    nodeResult.getExecuteResult().toString() : null);
+                        nodeResult.getExecuteResult().toString() : null);
 
                 // 计算执行时间
                 if (nodeLog.getStartTime() != null) {

@@ -32,7 +32,7 @@ public class WorkflowGlobalParam extends Base {
     private String paramType;
     
     /**
-     * 值的数据类型 (string, number, boolean, json等)
+     * 值的数据类型 (string, number, boolean, object, json等)
      */
     private String valueType;
     

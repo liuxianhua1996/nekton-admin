@@ -8,6 +8,7 @@ import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.core.workflow.WorkflowExecutor;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
+import com.jing.admin.core.workflow.model.GlobalParams;
 import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
@@ -34,13 +35,13 @@ public class WorkflowService {
 
     @Autowired
     private WorkflowRepository workflowRepository;
-    
+
     @Autowired
     private WorkflowExecutor workflowExecutor;
-    
+
     @Autowired
     private WorkflowExecutionService workflowExecutionService;
-    
+
     @Autowired
     private WorkflowGlobalParamService workflowGlobalParamService;
 
@@ -81,12 +82,12 @@ public class WorkflowService {
         workflow.setJsonData(jsonData.toJSONString());
         workflow.setCreateTime(System.currentTimeMillis());
         workflow.setUpdateTime(workflow.getCreateTime());
-        workflow.setVersion(workflowRequest.getVersion()+1);
+        workflow.setVersion(workflowRequest.getVersion() + 1);
         workflow.setUpdateUserId(MDC.get("userId"));
-        int success = workflowRepository.updateWorkflow(workflow,workflowRequest.getVersion());
-        if(success == 0){
+        int success = workflowRepository.updateWorkflow(workflow, workflowRequest.getVersion());
+        if (success == 0) {
             Workflow lastWorkflow = workflowRepository.getById(workflow.getId());
-            if(lastWorkflow == null){
+            if (lastWorkflow == null) {
                 throw new BusinessException("工作流不存在");
             } else {
                 throw new BusinessException("版本不一致更新失败");
@@ -124,7 +125,7 @@ public class WorkflowService {
     public PageResult<WorkflowDTO> getWorkflowPage(WorkflowQueryRequest queryRequest) {
         // 创建分页对象
         Page<WorkflowDTO> page = new Page<>(queryRequest.getCurrent(), queryRequest.getSize());
-        
+
         // 执行分页查询（关联用户表）
         IPage<WorkflowDTO> workflowPage = workflowRepository.selectWorkflowPageWithUser(
                 page,
@@ -142,7 +143,7 @@ public class WorkflowService {
         return pageResult;
     }
 
-    public Workflow getWorkflowInfo(WorkflowQueryRequest workflowQueryRequest){
+    public Workflow getWorkflowInfo(WorkflowQueryRequest workflowQueryRequest) {
         return workflowRepository.getById(workflowQueryRequest.getId());
     }
 
@@ -158,40 +159,45 @@ public class WorkflowService {
         if (workflow == null) {
             throw new BusinessException("工作流不存在");
         }
-        
+
         // 获取全局参数
         List<WorkflowGlobalParam> globalParamsList = workflowGlobalParamService.getAll(workflowTestRequest.getId(), null, null, null);
-        Map<String, Object> globalParams = new HashMap<>();
+        Map<String, GlobalParams> globalParams = new HashMap<>();
         if (globalParamsList != null) {
             globalParamsList.forEach(param -> {
-                globalParams.put(param.getId(), param.getParamValue());
+                globalParams.put(param.getId(), GlobalParams.builder()
+                        .paramType(param.getParamType())
+                        .paramValue(param.getParamValue())
+                        .paramKey(param.getParamKey())
+                        .valueType(param.getValueType())
+                        .build());
             });
         }
-        
+
         // 获取测试参数
         Map<String, Object> params = new HashMap<>();
         if (workflowTestRequest.getParams() != null) {
             params = workflowTestRequest.getParams();
         }
-        
+
         TestWorkflowDTO testWorkflowDTO = new TestWorkflowDTO();
         List<TestWorkflowDTO.NodeTestResult> nodeTestResults = new ArrayList<>();
-        
+
         // 使用工作流执行服务执行测试（不记录日志）
         WorkflowExecutionResult workflowExecutionResult = workflowExecutionService.executeWorkflowWithoutLogByData(
-            workflow.getJsonData(),
-            globalParams,
-            params
+                workflow.getJsonData(),
+                globalParams,
+                params
         );
-        
+
         Map<String, NodeResult> nodeResultMap = workflowExecutionResult.getContext().getNodeResults();
         nodeResultMap.forEach((id, nodeTestResult) -> {
             nodeTestResults.add(TestWorkflowDTO.NodeTestResult.builder()
-                            .nodeId(nodeTestResult.getNodeId())
-                            .nodeName(nodeTestResult.getNodeName())
-                            .status("COMPLETED")
-                            .sort(nodeTestResult.getSort())
-                            .executeResult(nodeTestResult.getExecuteResult())
+                    .nodeId(nodeTestResult.getNodeId())
+                    .nodeName(nodeTestResult.getNodeName())
+                    .status("COMPLETED")
+                    .sort(nodeTestResult.getSort())
+                    .executeResult(nodeTestResult.getExecuteResult())
                     .build());
         });
         testWorkflowDTO.setNodeTestResults(nodeTestResults);

@@ -1,6 +1,7 @@
 package com.jing.admin.service;
 
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
+import com.jing.admin.core.workflow.model.GlobalParams;
 import com.jing.admin.model.dto.WorkflowExecution;
 
 import java.util.Map;
@@ -35,5 +36,5 @@ public interface WorkflowExecutionService {
      * @param startParams 启动参数
      * @return 执行结果
      */
-    WorkflowExecutionResult executeWorkflowWithoutLogByData(String workflowJson, Map<String, Object> globalParams, Map<String, Object> startParams);
+    WorkflowExecutionResult executeWorkflowWithoutLogByData(String workflowJson, Map<String, GlobalParams> globalParams, Map<String, Object> startParams);
 }
