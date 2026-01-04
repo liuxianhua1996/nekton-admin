@@ -39,9 +39,8 @@ public abstract class BaseNode implements NodeExecutor {
                 newParamDetails.put("value", convertedValue);
 
                 processedParamsMap.put(paramName, newParamDetails);
+                processedParams.put(paramName, convertedValue);
             }
-
-            processedParams.put("params", processedParamsMap);
         }
         return processedParams;
     }

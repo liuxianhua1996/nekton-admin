@@ -61,6 +61,16 @@ public class ParameterConverter {
                 if (executeResult instanceof Map) {
                     Map<?, ?> resultMap = (Map<?, ?>) executeResult;
                     return resultMap.get(variableName);
+                } else if (executeResult instanceof Object){
+                    // 使用反射获取DTO对象的属性值
+                    try {
+                        java.lang.reflect.Field field = executeResult.getClass().getDeclaredField(variableName);
+                        field.setAccessible(true); // 允许访问私有字段
+                        return field.get(executeResult);
+                    } catch (NoSuchFieldException | IllegalAccessException e) {
+                        // 如果反射获取失败，尝试使用其他方式获取属性
+                         throw new BusinessException("未找到相关节点值");
+                    }
                 }
                 // 如果executeResult不是Map，但变量名为""或为null，则返回整个executeResult
                 if ("".equals(variableName) || variableName == null) {
