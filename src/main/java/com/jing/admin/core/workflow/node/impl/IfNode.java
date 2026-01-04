@@ -131,17 +131,17 @@ public class IfNode extends BaseNode {
         }
 
         switch (operator) {
-            case "==":
+            case "eq":
                 return Objects.equals(String.valueOf(actualValue), String.valueOf(expectedValue));
-            case "!=":
+            case "neq":
                 return !Objects.equals(String.valueOf(actualValue), String.valueOf(expectedValue));
-            case ">":
+            case "gt":
                 return compareNumbers(actualValue, expectedValue) > 0;
-            case ">=":
+            case "gte":
                 return compareNumbers(actualValue, expectedValue) >= 0;
-            case "<":
+            case "lt":
                 return compareNumbers(actualValue, expectedValue) < 0;
-            case "<=":
+            case "lte":
                 return compareNumbers(actualValue, expectedValue) <= 0;
             case "contains":
                 return String.valueOf(actualValue).contains(String.valueOf(expectedValue));
@@ -149,6 +149,10 @@ public class IfNode extends BaseNode {
                 return String.valueOf(actualValue).startsWith(String.valueOf(expectedValue));
             case "ends_with":
                 return String.valueOf(actualValue).endsWith(String.valueOf(expectedValue));
+            case "is_null":
+                return actualValue == null || (actualValue instanceof String && ((String) actualValue).trim().isEmpty());
+            case "is_not_null":
+                return actualValue != null && !(actualValue instanceof String && ((String) actualValue).trim().isEmpty());
             default:
                 return Objects.equals(String.valueOf(actualValue), String.valueOf(expectedValue));
         }
