@@ -108,9 +108,10 @@ public class JsNode extends BaseNode {
             jsContext.put("inputs", new HashMap<>());
         }
         try (Context context = Context.newBuilder("js")
-                .allowHostAccess(HostAccess.ALL) // 允许访问 Java Map 的方法
+                    .allowHostAccess(HostAccess.ALL)
                 .allowValueSharing(true)
-                .option("js.ecmascript-version", "2022") // 建议指定较新的 ES 版本
+                .option("engine.WarnInterpreterOnly", "false")
+                .option("js.foreign-object-prototype", "true")  // 启用外部对象支持
                 .build()) {
 
             // 2. 加载脚本 (只定义函数，不立即执行 main)
@@ -120,6 +121,7 @@ public class JsNode extends BaseNode {
 
             // 3. 获取 main 函数
             Value bindings = context.getBindings("js");
+            bindings.putMember("inputs", jsContext.get("inputs"));
             Value mainFunction = bindings.getMember("main");
 
             if (mainFunction == null || !mainFunction.canExecute()) {
