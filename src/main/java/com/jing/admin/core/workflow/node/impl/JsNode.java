@@ -7,6 +7,7 @@ import com.jing.admin.core.workflow.model.NodeDefinition;
 import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.node.BaseNode;
+import lombok.extern.slf4j.Slf4j;
 import org.graalvm.polyglot.*;
 
 import java.util.ArrayList;
@@ -18,10 +19,31 @@ import java.util.Map;
  * JavaScript节点处理器
  * 执行JavaScript代码的节点
  */
+@Slf4j
 public class JsNode extends BaseNode {
 
     public JsNode(ParameterConverter parameterConverter) {
         super(parameterConverter);
+    }
+    // 1. 定义静态 Engine
+    private static final Engine ENGINE;
+
+    // 2. 静态初始化块 (类加载时执行)
+    static {
+        Engine tempEngine = null;
+        try {
+            log.info("开始初始化 GraalVM Polyglot Engine...");
+
+            tempEngine = Engine.newBuilder("js")
+                    // 这里不需要 hostClassLoader，Engine 是全局通用的
+                    .option("engine.WarnInterpreterOnly", "false")
+                    .build();
+
+            log.info("GraalVM Engine 初始化成功！");
+        } catch (Throwable t) {
+            log.error("GraalVM Engine 静态初始化 严重失败！", t);
+        }
+        ENGINE = tempEngine;
     }
 
     @Override
@@ -63,6 +85,7 @@ public class JsNode extends BaseNode {
             executionResult.setInputData(inputData);
             return executionResult;
         } catch (Exception e) {
+            log.error("脚本执行异常: {}", e.getMessage());
             long executionTime = System.currentTimeMillis() - startTime;
             NodeExecutionResult result = NodeExecutionResult.failure("执行失败: " + e.getMessage());
             result.setExecutionTime(executionTime);
@@ -108,10 +131,11 @@ public class JsNode extends BaseNode {
             jsContext.put("inputs", new HashMap<>());
         }
         try (Context context = Context.newBuilder("js")
+                .engine(ENGINE) // 使用上面初始化的 Engine
                     .allowHostAccess(HostAccess.ALL)
+                //Spring Boot 环境下必须加的，不管是不是 GraalVM JDK
+                .hostClassLoader(Thread.currentThread().getContextClassLoader())
                 .allowValueSharing(true)
-                .option("engine.WarnInterpreterOnly", "false")
-                .option("js.foreign-object-prototype", "true")  // 启用外部对象支持
                 .build()) {
 
             // 2. 加载脚本 (只定义函数，不立即执行 main)
@@ -145,6 +169,9 @@ public class JsNode extends BaseNode {
             throw new RuntimeException("JS执行运行时错误: " + e.getMessage(), e);
         } catch (Exception e) {
             throw new RuntimeException("脚本加载或系统错误: " + e.getMessage(), e);
+        } catch (Throwable e) { // 👈 重点：这里改成 Throwable
+            e.printStackTrace();
+            throw new RuntimeException("脚本加载或系统错误: " + e.getMessage());
         }
     }
 

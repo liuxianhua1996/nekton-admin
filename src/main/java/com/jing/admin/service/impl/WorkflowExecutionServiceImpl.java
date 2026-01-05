@@ -154,7 +154,6 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
         } catch (Exception e) {
             // 执行异常时更新日志记录
             updateScheduleJobLogOnError(scheduleJobLoglog, e, startTime);
-
             // 重新抛出异常
             throw new RuntimeException("执行工作流失败: " + e.getMessage(), e);
         }

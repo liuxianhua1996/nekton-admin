@@ -1,5 +1,6 @@
 package com.jing.admin.core.workflow.core.engine;
 
+import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jing.admin.core.workflow.core.context.WorkflowContext;
@@ -73,10 +74,11 @@ public class WorkflowEngine {
             // 遍历执行节点
             while (currentNode != null) {
                 // 执行当前节点
-                log.debug("[工作流执行][{}]: {}", context.getDefinitionId(), currentNode.getData().getLabel());
+                log.info("[工作流执行][{}]: {}", context.getDefinitionId(), currentNode.getData().getLabel());
                 NodeExecutionResult nodeResult = executeNode(currentNode, context, callback);
                 // 如果节点执行失败，终止工作流
                 if (!nodeResult.isSuccess()) {
+                    log.info("[工作流执行][{}] 执行失败: {}",context.getDefinitionId(),currentNode.getData().getLabel(), nodeResult.getErrorMessage());
                     context.setStatus(WorkflowContext.WorkflowStatus.FAILED);
                     context.setErrorMessage("节点 " + currentNode.getId() + " 执行失败: " + nodeResult.getErrorMessage());
                     context.setNodeResult(currentNode.getId(), NodeResult.builder()
@@ -89,6 +91,7 @@ public class WorkflowEngine {
                             .build());
                     return new WorkflowExecutionResult(false, context, nodeResult.getErrorMessage());
                 }
+                log.info("[工作流执行][{}] 执行成功: {}",context.getDefinitionId(),currentNode.getData().getLabel(), JSON.toJSONString(nodeResult.getData()));
                 context.setVariable(currentNode.getId(), nodeResult);
                 context.setNodeResult(currentNode.getId(), NodeResult.builder()
                         .nodeType(currentNode.getType())
@@ -111,6 +114,7 @@ public class WorkflowEngine {
         } catch (Exception e) {
             context.setStatus(WorkflowContext.WorkflowStatus.FAILED);
             context.setErrorMessage("工作流执行异常: " + e.getMessage());
+            log.error("工作流执行异常 {} 执行失败: {}",currentNode.getData().getLabel(), e.getMessage());
             return new WorkflowExecutionResult(false, context, "工作流执行异常: " + e.getMessage());
         }
     }
@@ -173,6 +177,7 @@ public class WorkflowEngine {
                 }
             }
         } catch (Exception e) {
+            log.error("节点执行异常: {}",  e.getMessage());
             result = NodeExecutionResult.failure("节点执行异常: " + e.getMessage());
             // 如果有回调，在错误时调用
             if (callback != null) {
