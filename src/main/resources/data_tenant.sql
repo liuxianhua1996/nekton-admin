@@ -16,13 +16,13 @@ VALUES
 -- 顶级菜单
 ('DASHBOARD', '首页', '/dashboard', NULL, 1,1696032000000, 1696032000000, 'system', 'system'),
 ('USER_MANAGE', '用户管理', '/user', NULL, 2,1696032000000, 1696032000000, 'system', 'system'),
-('WORKFLOW', '工作流', '/workflow', NULL, 3,1696032000000, 1696032000000, 'system', 'system'),
-('LOW_CODE', '低代码', '/lowcode', NULL, 4, 1696032000000, 1696032000000, 'system', 'system'),
-('PERMISSION', '权限管理', '/permission', NULL, 5, 1696032000000, 1696032000000, 'system', 'system'),
+('SCHEDULE', '调度管理', '/schedule', NULL, 3, 1696032000000, 1696032000000, 'system', 'system'),
+('WORKFLOW', '工作流', '/workflow', NULL, 4,1696032000000, 1696032000000, 'system', 'system'),
+('LOW_CODE', '低代码', '/lowcode', NULL, 5, 1696032000000, 1696032000000, 'system', 'system'),
+('PERMISSION', '权限管理', '/permission', NULL, 6, 1696032000000, 1696032000000, 'system', 'system'),
 -- 用户管理子菜单
 ('USER_LIST', '用户列表', '/user/list', 'USER_MANAGE', 1,1696032000000, 1696032000000, 'system',
  'system'),
-('SCHEDULE', '调度管理', '/schedule', NULL, 2, 1696032000000, 1696032000000, 'system', 'system'),
 
 -- 工作流子菜单
 ('WORKFLOW_LIST', '工作流列表', '/workflow/list', 'WORKFLOW', 1,1696032000000, 1696032000000,

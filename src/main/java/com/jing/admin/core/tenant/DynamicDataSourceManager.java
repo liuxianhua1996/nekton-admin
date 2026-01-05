@@ -105,7 +105,7 @@ public class DynamicDataSourceManager {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(defaultDataSource);
 
         String sql = "SELECT tenant_id, db_name, jdbc_url, username, password " +
-                "FROM tenant_metadata WHERE tenant_id = ? AND status = 'ACTIVE'";
+                "FROM tb_tenant_metadata WHERE tenant_id = ? AND status = 'ACTIVE'";
 
         return jdbcTemplate.query(sql, new Object[]{tenantId}, rs -> {
             if (rs.next()) {
