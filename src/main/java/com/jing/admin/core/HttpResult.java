@@ -1,5 +1,6 @@
 package com.jing.admin.core;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import org.slf4j.MDC;
 
@@ -13,12 +14,16 @@ import java.io.Serializable;
 public class HttpResult<T> implements Serializable {
     public HttpResult() {
     }
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public T data;
     public boolean success;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String traceId;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String error;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String errorCode;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String message;
     HttpResult(T data){
         this.data= data;
