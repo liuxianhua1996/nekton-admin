@@ -5,6 +5,7 @@ import com.jing.admin.core.workflow.exception.NodeExecutor;
 import com.jing.admin.core.workflow.node.impl.EndNode;
 import com.jing.admin.core.workflow.node.impl.IfNode;
 import com.jing.admin.core.workflow.node.impl.JsNode;
+import com.jing.admin.core.workflow.node.impl.LoopNode;
 import com.jing.admin.core.workflow.node.impl.SdkNode;
 import com.jing.admin.core.workflow.node.impl.StartNode;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,7 @@ public class WorkflowConfig {
         executors.add(new SdkNode(parameterConverter));
         executors.add(new JsNode(parameterConverter));
         executors.add(new IfNode(parameterConverter));
+        executors.add(new LoopNode(parameterConverter));
         return executors;
     }
 }

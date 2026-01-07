@@ -147,6 +147,8 @@ public class NodeData {
          */
         private Map<String, Object> sdkParams;
 
+        private Map<String, Object> loopParams;
+
 
         private String code;
     }

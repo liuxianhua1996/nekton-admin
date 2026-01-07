@@ -207,18 +207,23 @@
                                     "dataType": "string"
                                 }
                             ]
+                        },
+                        "list": {
+                            "id": "field_1767754327726_t4y92j80z",
+                            "name": "list",
+                            "dataType": "array"
                         }
                     },
                     "conditions": [
 
                     ],
-                    "code": "// 在这里编写JavaScript代码\n// 输入参数可以通过 context.inputs 获取\n// 输出结果请赋值给 context.outputs\nfunction main(context) {\n  // 示例：简单的数据处理\n  const input = context.inputs.input1 || \"Hello World\";\n  // 处理逻辑\n  const result = input.toUpperCase();\n  // 设置输出\n  context.outputs = {\n    appType: \"APP_XFIBVR4Y9BUOL1J0VRT6\",\n    formDataJson: JSON.stringify({\n      \"textField_mjy1c0tv\": \"连接器测试写入：\" + Date.now()\n    }),\n    obj: {\n      a: \"APP_XFIBVR4Y9BUOL1J0VRT6\"\n    }\n  };\n  return context;\n}"
+                    "code": "// 在这里编写JavaScript代码\n// 输入参数可以通过 context.inputs 获取\n// 输出结果请赋值给 context.outputs\nfunction main(context) {\n  // 示例：简单的数据处理\n  const input = context.inputs.input1 || \"Hello World\";\n  // 处理逻辑\n  const result = input.toUpperCase();\n  // 设置输出\n  context.outputs = {\n    appType: \"APP_XFIBVR4Y9BUOL1J0VRT6\",\n    formDataJson: JSON.stringify({\n      \"textField_mjy1c0tv\": \"连接器测试写入：\" + Date.now()\n    }),\n    obj: {\n      a: \"APP_XFIBVR4Y9BUOL1J0VRT6\"\n    },\n    list:[{\n      a: \"APP_XFIBVR4Y9BUOL1J0VRT6\"\n    }]\n  };\n  return context;\n}"
                 },
                 "selected": false,
                 "error": false
             },
             "position": {
-                "x": 595,
+                "x": 596,
                 "y": 119
             },
             "targetPosition": "left",
@@ -226,7 +231,7 @@
             "width": 200,
             "height": 52,
             "positionAbsolute": {
-                "x": 595,
+                "x": 596,
                 "y": 119
             },
             "selected": false
@@ -314,25 +319,32 @@
                     "loopParams": {
                         "loopType": "array",
                         "maxIterations": 100,
-                        "loopValue": "",
+                        "loopValue": "{{f9fe16cf8dc14c1f8f50aa857eb47986.list}}",
                         "loopVariable": "value",
-                        "loopKey": "index"
+                        "loopKey": "index",
+                        "loopValueField": "",
+                        "customOutputFields": [
+                            {
+                                "name": "a",
+                                "dataType": "string"
+                            }
+                        ]
                     }
                 },
                 "selected": false,
                 "error": false
             },
             "position": {
-                "x": 1251,
-                "y": 410
+                "x": 802,
+                "y": 432
             },
             "targetPosition": "left",
             "sourcePosition": "right",
             "width": 464,
             "height": 303,
             "positionAbsolute": {
-                "x": 1251,
-                "y": 410
+                "x": 802,
+                "y": 432
             },
             "selected": false
         },
@@ -346,7 +358,12 @@
                 "type": "javascript",
                 "content": {
                     "inParams": {
-
+                        "param": {
+                            "name": "param",
+                            "value": "{{9b4c3f707fdd4ca3a5623a65bad0e59d.value.a}}",
+                            "valueType": "column",
+                            "sort": 0
+                        }
                     },
                     "outParams": {
                         "result": {
@@ -357,7 +374,8 @@
                     },
                     "conditions": [
 
-                    ]
+                    ],
+                    "code": "// 在这里编写JavaScript代码\n// 输入参数可以通过 context.inputs 获取\n// 输出结果请赋值给 context.outputs\nfunction main(context) {\n\t// 示例：简单的数据处理\n\tconst input = context.inputs.input1 || \"Hello World\";\n\t// 处理逻辑\n\tconst result = input.toUpperCase();\n\t// 设置输出\n\tcontext.outputs = {\n\t\tresult: context.inputs.param\n\t};\n\treturn context;\n}"
                 },
                 "selected": true,
                 "error": false
@@ -373,8 +391,8 @@
             "height": 56,
             "zIndex": 1002,
             "positionAbsolute": {
-                "x": 1339,
-                "y": 559
+                "x": 890,
+                "y": 581
             },
             "selected": true
         },
@@ -411,8 +429,8 @@
             "height": 40,
             "zIndex": 1002,
             "positionAbsolute": {
-                "x": 1283,
-                "y": 485
+                "x": 834,
+                "y": 507
             }
         }
     ],
