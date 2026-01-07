@@ -8,6 +8,7 @@ import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.core.workflow.node.BaseNode;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.Map;
  * 开始节点处理器
  * 处理工作流的开始节点
  */
+@Component
 public class StartNode extends BaseNode {
 
 

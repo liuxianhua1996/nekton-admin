@@ -139,4 +139,19 @@ public class WorkflowDefinition {
         // 对于非IF节点，使用普通逻辑
         return getNextNode(currentNodeId);
     }
+    
+    /**
+     * 根据父节点ID获取子节点列表
+     * 
+     * @param parentId 父节点ID
+     * @return 子节点列表
+     */
+    public List<NodeDefinition> getChildNodes(String parentId) {
+        if (nodes == null) {
+            return java.util.Collections.emptyList();
+        }
+        return nodes.stream()
+                .filter(node -> parentId != null && parentId.equals(node.getParentId()))
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

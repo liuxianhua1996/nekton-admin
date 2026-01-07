@@ -9,6 +9,7 @@ import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.core.workflow.node.BaseNode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.graalvm.polyglot.*;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.Map;
  * 执行JavaScript代码的节点
  */
 @Slf4j
+@Component
 public class JsNode extends BaseNode {
 
     public JsNode(ParameterConverter parameterConverter) {

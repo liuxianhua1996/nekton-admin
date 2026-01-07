@@ -7,6 +7,7 @@ import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.core.workflow.node.BaseNode;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.Map;
  * 结束节点处理器
  * 处理工作流的结束节点
  */
+@Component
 public class EndNode extends BaseNode {
     public EndNode(ParameterConverter parameterConverter) {
         super(parameterConverter);

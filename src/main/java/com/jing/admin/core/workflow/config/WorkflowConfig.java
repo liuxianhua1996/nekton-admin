@@ -1,18 +1,8 @@
 package com.jing.admin.core.workflow.config;
 
 import com.jing.admin.core.workflow.core.conversion.ParameterConverter;
-import com.jing.admin.core.workflow.exception.NodeExecutor;
-import com.jing.admin.core.workflow.node.impl.EndNode;
-import com.jing.admin.core.workflow.node.impl.IfNode;
-import com.jing.admin.core.workflow.node.impl.JsNode;
-import com.jing.admin.core.workflow.node.impl.LoopNode;
-import com.jing.admin.core.workflow.node.impl.SdkNode;
-import com.jing.admin.core.workflow.node.impl.StartNode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 工作流配置类
@@ -21,19 +11,11 @@ import java.util.List;
 @Configuration
 public class WorkflowConfig {
     
-    /**
-     * 配置节点执行器列表
-     */
     @Bean
-    public List<NodeExecutor> nodeExecutors() {
-        ParameterConverter parameterConverter = new ParameterConverter();
-        List<NodeExecutor> executors = new ArrayList<>();
-        executors.add(new StartNode(parameterConverter));
-        executors.add(new EndNode(parameterConverter));
-        executors.add(new SdkNode(parameterConverter));
-        executors.add(new JsNode(parameterConverter));
-        executors.add(new IfNode(parameterConverter));
-        executors.add(new LoopNode(parameterConverter));
-        return executors;
+    public ParameterConverter parameterConverter() {
+        return new ParameterConverter();
     }
+
+    // NodeExecutor实现类现在通过@Component注解自动注册到Spring容器
+    // 不再需要手动创建列表
 }

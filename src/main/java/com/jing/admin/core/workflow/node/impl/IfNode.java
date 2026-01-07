@@ -7,6 +7,7 @@ import com.jing.admin.core.workflow.model.NodeDefinition;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.core.workflow.node.BaseNode;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
@@ -14,6 +15,7 @@ import java.util.*;
  * IF条件判断节点处理器
  * 根据条件判断执行不同的分支
  */
+@Component
 public class IfNode extends BaseNode {
 
     public IfNode(ParameterConverter parameterConverter) {

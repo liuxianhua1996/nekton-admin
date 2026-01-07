@@ -7,6 +7,7 @@ import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.node.BaseNode;
 import com.jing.admin.core.workflow.sdk.ISdkClient;
 import com.jing.admin.core.workflow.sdk.SdkManager;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.Optional;
  * SDK节点处理器
  * 处理系统集成类型的节点
  */
+@Component
 public class SdkNode extends BaseNode {
 
     public SdkNode(ParameterConverter parameterConverter) {

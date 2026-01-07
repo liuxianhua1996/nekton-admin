@@ -13,6 +13,8 @@ import com.jing.admin.core.workflow.exception.NodeExecutor;
 import com.jing.admin.model.domain.WorkflowNodeLog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,10 +26,16 @@ import java.util.UUID;
  */
 @Component
 @Slf4j
-public class WorkflowEngine {
+public class WorkflowEngine implements ApplicationContextAware {
 
-    @Autowired
-    private List<NodeExecutor> nodeExecutors;
+
+    
+    private ApplicationContext applicationContext;
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     /**
      * 执行工作流
@@ -150,18 +158,9 @@ public class WorkflowEngine {
             if (nodeType == null) {
                 result = NodeExecutionResult.failure("节点类型为空");
             } else {
-                // 查找支持该节点类型的执行器
-                NodeExecutor executor = nodeExecutors.stream()
-                        .filter(e -> e.supports(nodeType))
-                        .findFirst()
-                        .orElse(null);
-
-                if (executor == null) {
-                    result = NodeExecutionResult.failure("未找到支持节点类型 " + nodeType + " 的执行器");
-                } else {
-                    // 执行节点
-                    result = executor.execute(nodeDefinition, context,workflowDefinition);
-                }
+                // 使用统一的助手类来执行节点
+                result = com.jing.admin.core.workflow.core.executor.NodeExecutorHelper.executeNode(
+                    nodeType, nodeDefinition, context, workflowDefinition, applicationContext);
             }
         } catch (Exception e) {
             log.error("节点执行异常: {}",  e.getMessage());
