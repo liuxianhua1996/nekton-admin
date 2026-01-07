@@ -20,9 +20,9 @@ import java.util.regex.Pattern;
 public class ParameterConverter {
 
     /**
-     * 正则表达式，用于匹配{{节点id.变量}}格式的参数引用
+     * 正则表达式，用于匹配{{节点id.变量.子变量...}}格式的参数引用
      */
-    private static final Pattern PARAMETER_PATTERN = Pattern.compile("\\{\\{(\\w+)\\.(\\w+)\\}\\}");
+    private static final Pattern PARAMETER_PATTERN = Pattern.compile("\\{\\{([\\w\\.]+)\\}\\}");
 
     /**
      * 转换参数值
@@ -47,35 +47,28 @@ public class ParameterConverter {
         Matcher matcher = PARAMETER_PATTERN.matcher(stringValue);
         Map<String, GlobalParams> globalParamsMap = context.getGlobalParams();
         if (matcher.matches()) {
-            String nodeId = matcher.group(1);
-            String variableName = matcher.group(2);
+            String fullVariablePath = matcher.group(1);
+            String[] pathParts = fullVariablePath.split("\\.");
+            if (pathParts.length < 1) {
+                throw new BusinessException("参数引用格式错误");
+            }
+
+            String nodeId = pathParts[0];
+            String[] variablePath = new String[pathParts.length - 1];
+            System.arraycopy(pathParts, 1, variablePath, 0, pathParts.length - 1);
+
             if (globalParamsMap.containsKey(nodeId)) {
                 GlobalParams globalParams = globalParamsMap.get(nodeId);
-                return convertByDataType(globalParams.getParamValue(),globalParams.getValueType());
+                // 全局参数只有一层，即 id.value，不需要多层访问
+                return convertByDataType(globalParams.getParamValue(), globalParams.getValueType());
             }
+
             // 从上下文中获取节点执行结果
             NodeExecutionResult nodeResult = context.getVariable(nodeId);
             if (nodeResult != null) {
                 // 获取节点的执行结果
                 Object executeResult = nodeResult.getData();
-                if (executeResult instanceof Map) {
-                    Map<?, ?> resultMap = (Map<?, ?>) executeResult;
-                    return resultMap.get(variableName);
-                } else if (executeResult instanceof Object){
-                    // 使用反射获取DTO对象的属性值
-                    try {
-                        java.lang.reflect.Field field = executeResult.getClass().getDeclaredField(variableName);
-                        field.setAccessible(true); // 允许访问私有字段
-                        return field.get(executeResult);
-                    } catch (NoSuchFieldException | IllegalAccessException e) {
-                        // 如果反射获取失败，尝试使用其他方式获取属性
-                         throw new BusinessException("未找到相关节点值");
-                    }
-                }
-                // 如果executeResult不是Map，但变量名为""或为null，则返回整个executeResult
-                if ("".equals(variableName) || variableName == null) {
-                    return executeResult;
-                }
+                return getValueByPath(executeResult, variablePath);
             }
         }
         // 如果没有匹配的模式或找不到节点结果，返回原值
@@ -123,15 +116,76 @@ public class ParameterConverter {
                     return value;
                 }
                 // 否则将其作为字符串处理，可能需要进一步解析
-                return JSONObject.parseObject((String) value,List.class);
+                return JSONObject.parseObject((String) value, List.class);
             case "object":
                 // 对象类型通常不需要转换，直接返回
-                return JSONObject.parseObject((String) value,Map.class);
+                return JSONObject.parseObject((String) value, Map.class);
             case "file":
                 // 文件类型，可能需要特殊处理，暂时返回原值
                 return value;
             default:
                 return value; // 默认返回原值
+        }
+    }
+
+    /**
+     * 根据路径获取嵌套值
+     *
+     * @param obj  起始对象
+     * @param path 路径数组，如 ["user", "name"] 表示访问 obj.user.name
+     * @return 最终值
+     */
+    private Object getValueByPath(Object obj, String[] path) {
+        Object current = obj;
+        for (String pathSegment : path) {
+            if (current == null) {
+                throw new BusinessException("路径访问中遇到null值: " + String.join(".", path));
+            }
+
+            if (current instanceof Map) {
+                // 如果是Map类型，通过key获取值
+                Map<?, ?> map = (Map<?, ?>) current;
+                current = map.get(pathSegment);
+            } else {
+                // 如果是对象类型，通过反射获取属性值
+                try {
+                    java.lang.reflect.Method getterMethod = findGetterMethod(current.getClass(), pathSegment);
+                    if (getterMethod != null) {
+                        current = getterMethod.invoke(current);
+                    } else {
+                        java.lang.reflect.Field field = current.getClass().getDeclaredField(pathSegment);
+                        field.setAccessible(true);
+                        current = field.get(current);
+                    }
+                } catch (Exception e) {
+                    throw new BusinessException("无法访问路径段: " + pathSegment + ", 错误: " + e.getMessage());
+                }
+            }
+        }
+        return current;
+    }
+
+    /**
+     * 查找属性的getter方法
+     *
+     * @param clazz     类型
+     * @param fieldName 属性名
+     * @return getter方法，如果不存在返回null
+     */
+    private java.lang.reflect.Method findGetterMethod(Class<?> clazz, String fieldName) {
+        String capitalizedFieldName = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+        try {
+            // 尝试标准getter方法
+            java.lang.reflect.Method method = clazz.getMethod("get" + capitalizedFieldName);
+            return method;
+        } catch (NoSuchMethodException e) {
+            try {
+                // 尝试is方法（对于boolean类型）
+                java.lang.reflect.Method method = clazz.getMethod("is" + capitalizedFieldName);
+                return method;
+            } catch (NoSuchMethodException ex) {
+                return null;
+            }
         }
     }
 }

@@ -32,14 +32,15 @@
             "positionAbsolute": {
                 "x": 300,
                 "y": 50
-            }
+            },
+            "selected": false
         },
         {
             "id": "45004afdcf1e4bed933b246c6cebb878",
             "type": "custom",
             "position": {
-                "x": 1623,
-                "y": 182
+                "x": 1881,
+                "y": 299
             },
             "width": 200,
             "height": 52,
@@ -51,14 +52,14 @@
                 "content": {
                     "outParams": {
                         "result": {
-                            "id": "7dbeb7a2c0704e029835daf7b698e18e",
+                            "id": "d2b6658cad3a4f598259a8fbab193ee0",
                             "name": "result",
                             "valueType": "column",
                             "dataType": "string",
-                            "value": "{e8bcbe6ae2b64295b2fa2baaf4fc654f.变量}",
+                            "value": "{{837d28577696478385539ae7e614767b.result}}",
                             "description": "",
                             "required": "false",
-                            "sort": 0
+                            "sort": 1
                         }
                     }
                 },
@@ -66,8 +67,8 @@
                 "error": false
             },
             "positionAbsolute": {
-                "x": 1623,
-                "y": 182
+                "x": 1881,
+                "y": 299
             },
             "selected": false
         },
@@ -143,7 +144,7 @@
                                 "dataType": "string",
                                 "desc": "应用编码",
                                 "required": true,
-                                "value": "{{f9fe16cf8dc14c1f8f50aa857eb47986.appType}}",
+                                "value": "{{f9fe16cf8dc14c1f8f50aa857eb47986.obj.a}}",
                                 "valueType": "column",
                                 "sort": 0
                             }
@@ -155,16 +156,16 @@
                 "error": false
             },
             "position": {
-                "x": 1322,
-                "y": 267
+                "x": 1326,
+                "y": 132
             },
             "targetPosition": "left",
             "sourcePosition": "right",
             "width": 200,
             "height": 52,
             "positionAbsolute": {
-                "x": 1322,
-                "y": 267
+                "x": 1326,
+                "y": 132
             },
             "selected": false
         },
@@ -177,22 +178,41 @@
                 "type": "javascript",
                 "content": {
                     "inParams": {
-
+                        "param": {
+                            "name": "param",
+                            "value": "{{f29d5140611548aa87b467dd3ebf9e81.value}}",
+                            "valueType": "column",
+                            "sort": 0
+                        }
                     },
                     "outParams": {
+                        "appType": {
+                            "id": "field_1767693737795_5qx5h6ton",
+                            "name": "appType",
+                            "dataType": "string"
+                        },
                         "formDataJson": {
+                            "id": "field_1767693743372_q3b8nvenr",
                             "name": "formDataJson",
                             "dataType": "string"
                         },
-                        "appType": {
-                            "name": "appType",
-                            "dataType": "string"
+                        "obj": {
+                            "id": "field_1767694728520_434ucjqah",
+                            "name": "obj",
+                            "dataType": "object",
+                            "children": [
+                                {
+                                    "id": "field_1767694735953_u3irpkfny",
+                                    "name": "a",
+                                    "dataType": "string"
+                                }
+                            ]
                         }
                     },
                     "conditions": [
 
                     ],
-                    "code": "// 在这里编写JavaScript代码\n// 输入参数可以通过 context.inputs 获取\n// 输出结果请赋值给 context.outputs\nfunction main(context) {\n\t// 示例：简单的数据处理\n\tconst input = context.inputs.input1 || \"Hello World\";\n\t// 处理逻辑\n\tconst result = input.toUpperCase();\n\t// 设置输出\n\tcontext.outputs = {\n      appType:\"APP_XFIBVR4Y9BUOL1J0VRT6\",\n      formDataJson: JSON.stringify({\n          \"textField_mjy1c0tv\":\"连接器测试写入：\"+Date.now()\n        })\n    };\n    return context;\n}"
+                    "code": "// 在这里编写JavaScript代码\n// 输入参数可以通过 context.inputs 获取\n// 输出结果请赋值给 context.outputs\nfunction main(context) {\n  // 示例：简单的数据处理\n  const input = context.inputs.input1 || \"Hello World\";\n  // 处理逻辑\n  const result = input.toUpperCase();\n  // 设置输出\n  context.outputs = {\n    appType: \"APP_XFIBVR4Y9BUOL1J0VRT6\",\n    formDataJson: JSON.stringify({\n      \"textField_mjy1c0tv\": \"连接器测试写入：\" + Date.now()\n    }),\n    obj: {\n      a: \"APP_XFIBVR4Y9BUOL1J0VRT6\"\n    }\n  };\n  return context;\n}"
                 },
                 "selected": false,
                 "error": false
@@ -233,15 +253,8 @@
                                 {
                                     "id": "ba658394903440e5adccc56c86cb9c24",
                                     "field": "{{f9fe16cf8dc14c1f8f50aa857eb47986.appType}}",
-                                    "operator": "==",
-                                    "value": "APP",
-                                    "valueType": "value"
-                                },
-                                {
-                                    "id": "1767509142358",
-                                    "field": "{{f9fe16cf8dc14c1f8f50aa857eb47986.formDataJson}}",
-                                    "operator": "==",
-                                    "value": "222",
+                                    "operator": "eq",
+                                    "value": "APP_XFIBVR4Y9BUOL1J0VRT6",
                                     "valueType": "value"
                                 }
                             ],
@@ -253,8 +266,8 @@
                             "subConditions": [
                                 {
                                     "id": "fbfdf7339c9448cea53062b19f8a5100",
-                                    "field": "{{global.newParam2}}",
-                                    "operator": "contains",
+                                    "field": "{{c6a87388d0ce4a6290ce4bf623ee0775.value}}",
+                                    "operator": "gt",
                                     "value": "123",
                                     "valueType": "value"
                                 }
@@ -267,18 +280,140 @@
                 "error": false
             },
             "position": {
-                "x": 924,
-                "y": 244
+                "x": 930,
+                "y": 125
             },
             "targetPosition": "left",
             "sourcePosition": "right",
             "width": 200,
             "height": 138,
             "positionAbsolute": {
-                "x": 924,
-                "y": 244
+                "x": 930,
+                "y": 125
+            },
+            "selected": false
+        },
+        {
+            "id": "9b4c3f707fdd4ca3a5623a65bad0e59d",
+            "type": "custom",
+            "data": {
+                "label": "循环",
+                "code": "loop",
+                "type": "loop",
+                "isLoop": true,
+                "content": {
+                    "inParams": {
+
+                    },
+                    "outParams": {
+
+                    },
+                    "conditions": [
+
+                    ],
+                    "loopParams": {
+                        "loopType": "array",
+                        "maxIterations": 100,
+                        "loopValue": "",
+                        "loopVariable": "value",
+                        "loopKey": "index"
+                    }
+                },
+                "selected": false,
+                "error": false
+            },
+            "position": {
+                "x": 1251,
+                "y": 410
+            },
+            "targetPosition": "left",
+            "sourcePosition": "right",
+            "width": 464,
+            "height": 303,
+            "positionAbsolute": {
+                "x": 1251,
+                "y": 410
+            },
+            "selected": false
+        },
+        {
+            "id": "7b078e5fcf2249f7a21d497286ccd893",
+            "type": "custom",
+            "parentId": "9b4c3f707fdd4ca3a5623a65bad0e59d",
+            "data": {
+                "label": "JS脚本",
+                "code": "javascript",
+                "type": "javascript",
+                "content": {
+                    "inParams": {
+
+                    },
+                    "outParams": {
+                        "result": {
+                            "id": "field_1767753502518_mkqcs51d8",
+                            "name": "result",
+                            "dataType": "string"
+                        }
+                    },
+                    "conditions": [
+
+                    ]
+                },
+                "selected": true,
+                "error": false
+            },
+            "extent": "parent",
+            "position": {
+                "x": 88,
+                "y": 149
+            },
+            "targetPosition": "left",
+            "sourcePosition": "right",
+            "width": 200,
+            "height": 56,
+            "zIndex": 1002,
+            "positionAbsolute": {
+                "x": 1339,
+                "y": 559
             },
             "selected": true
+        },
+        {
+            "id": "06b849d5729c491e8450f9d4fc13b4d8",
+            "type": "custom",
+            "parentId": "9b4c3f707fdd4ca3a5623a65bad0e59d",
+            "data": {
+                "label": "开始",
+                "code": "loopStart",
+                "type": "loopStart",
+                "content": {
+                    "inParams": {
+
+                    },
+                    "outParams": {
+
+                    },
+                    "conditions": [
+
+                    ]
+                },
+                "selected": false,
+                "error": false
+            },
+            "extent": "parent",
+            "position": {
+                "x": 32,
+                "y": 75
+            },
+            "targetPosition": "left",
+            "sourcePosition": "right",
+            "width": 60,
+            "height": 40,
+            "zIndex": 1002,
+            "positionAbsolute": {
+                "x": 1283,
+                "y": 485
+            }
         }
     ],
     "edges": [
@@ -326,42 +461,71 @@
             }
         },
         {
-            "id": "source-cd3c94315bb44b8a885c111869b3ae1b-837d28577696478385539ae7e614767b",
+            "id": "source-cd3c94315bb44b8a885c111869b3ae1b-9b4c3f707fdd4ca3a5623a65bad0e59d",
+            "type": "custom",
             "source": "d32ab9453ab04f16a72d89aff98e986d",
-            "target": "837d28577696478385539ae7e614767b",
             "sourceHandle": "source-cd3c94315bb44b8a885c111869b3ae1b",
-            "type": "custom"
+            "target": "9b4c3f707fdd4ca3a5623a65bad0e59d",
+            "targetHandle": "target-9b4c3f707fdd4ca3a5623a65bad0e59d",
+            "style": {
+
+            }
+        },
+        {
+            "id": "source-9b4c3f707fdd4ca3a5623a65bad0e59d-45004afdcf1e4bed933b246c6cebb878",
+            "source": "9b4c3f707fdd4ca3a5623a65bad0e59d",
+            "target": "45004afdcf1e4bed933b246c6cebb878",
+            "sourceHandle": "source-9b4c3f707fdd4ca3a5623a65bad0e59d",
+            "type": "custom",
+            "style": {
+
+            }
+        },
+        {
+            "id": "source-9b4c3f707fdd4ca3a5623a65bad0e59d-7b078e5fcf2249f7a21d497286ccd893",
+            "type": "custom",
+            "source": "06b849d5729c491e8450f9d4fc13b4d8",
+            "sourceHandle": "source-06b849d5729c491e8450f9d4fc13b4d8",
+            "target": "7b078e5fcf2249f7a21d497286ccd893",
+            "targetHandle": "target-7b078e5fcf2249f7a21d497286ccd893",
+            "zIndex": 1001,
+            "style": {
+
+            }
         }
     ],
     "globalSettings": {
         "globalParams": {
             "variables": {
-                "newParam2": {
-                    "key": "newParam2",
-                    "value": "",
-                    "type": "string",
-                    "id": "f29d5140611548aa87b467dd3ebf9e81"
-                },
                 "newParam1": {
                     "key": "newParam1",
                     "value": "1111",
                     "type": "string",
                     "id": "f247174cd7f442c9b0651cd04f6b37bb"
+                },
+                "对象1": {
+                    "key": "对象1",
+                    "value": "{\"a\":\"123\"}",
+                    "type": "object",
+                    "id": "f29d5140611548aa87b467dd3ebf9e81"
+                },
+                "对象2": {
+                    "key": "对象2",
+                    "value": "{“ceshi”:\"11111\"}",
+                    "type": "object",
+                    "id": "1a0b3388d8a84a4fa3e329bee31a1f9a"
+                },
+                "数字1": {
+                    "key": "数字1",
+                    "value": "100",
+                    "type": "number",
+                    "id": "c6a87388d0ce4a6290ce4bf623ee0775"
                 }
             }
         },
         "databaseConfig": {
             "connections": [
-                {
-                    "type": "mysql",
-                    "host": "111",
-                    "port": "3306",
-                    "database": "123",
-                    "username": "123",
-                    "password": "123",
-                    "url": "jdbc:mysql://111:3306/123",
-                    "id": "234f281402cc4611aeba1fc0fb3931ba"
-                }
+
             ]
         },
         "logSettings": {
