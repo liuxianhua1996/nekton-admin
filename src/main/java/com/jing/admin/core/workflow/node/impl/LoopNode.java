@@ -5,6 +5,7 @@ import com.jing.admin.core.workflow.core.context.WorkflowContext;
 import com.jing.admin.core.workflow.model.NodeData;
 import com.jing.admin.core.workflow.model.NodeDefinition;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
+import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.core.workflow.node.BaseNode;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +23,7 @@ public class LoopNode extends BaseNode {
     }
 
     @Override
-    public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context) {
+    public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context, WorkflowDefinition workflowDefinition) {
         long startTime = System.currentTimeMillis();
         try {
             // 获取节点数据
@@ -42,6 +43,7 @@ public class LoopNode extends BaseNode {
             String loopValue = (String) loopParams.get("loopValue");
             String loopVariable = (String) loopParams.get("loopVariable");
             String loopKey = (String) loopParams.get("loopKey");
+            int maxIterations = (Integer) loopParams.get("maxIterations");
             List<Map<String, Object>> customOutputFields = (List<Map<String, Object>>) loopParams.get("customOutputFields");
             
             // 获取循环数据
@@ -65,6 +67,7 @@ public class LoopNode extends BaseNode {
             outputData.put("loopValue", loopValue);
             outputData.put("loopVariable", loopVariable);
             outputData.put("loopKey", loopKey);
+            outputData.put("maxIterations", maxIterations);
             outputData.put("customOutputFields", customOutputFields);
             outputData.put("loopData", loopData);
             

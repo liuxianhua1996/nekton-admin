@@ -2,6 +2,7 @@ package com.jing.admin.core.workflow.exception;
 
 import com.jing.admin.core.workflow.core.context.WorkflowContext;
 import com.jing.admin.core.workflow.model.NodeDefinition;
+import com.jing.admin.core.workflow.model.WorkflowDefinition;
 
 /**
  * 节点执行器接口
@@ -16,7 +17,7 @@ public interface NodeExecutor {
      * @param context 工作流执行上下文
      * @return 节点执行结果
      */
-    NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context);
+    NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context, WorkflowDefinition workflowDefinition);
     
     /**
      * 判断是否支持执行指定类型的节点

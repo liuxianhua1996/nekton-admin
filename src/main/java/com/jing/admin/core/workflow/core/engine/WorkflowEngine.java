@@ -3,6 +3,7 @@ package com.jing.admin.core.workflow.core.engine;
 import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jing.admin.core.workflow.WorkflowExecutionCallback;
 import com.jing.admin.core.workflow.core.context.WorkflowContext;
 import com.jing.admin.core.workflow.model.NodeDefinition;
 import com.jing.admin.core.workflow.model.NodeResult;
@@ -27,8 +28,6 @@ public class WorkflowEngine {
 
     @Autowired
     private List<NodeExecutor> nodeExecutors;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * 执行工作流
@@ -75,7 +74,7 @@ public class WorkflowEngine {
             while (currentNode != null) {
                 // 执行当前节点
                 log.info("[工作流执行][{}]: {}", context.getDefinitionId(), currentNode.getData().getLabel());
-                NodeExecutionResult nodeResult = executeNode(currentNode, context, callback);
+                NodeExecutionResult nodeResult = executeNode(currentNode, context, workflowDefinition,callback);
                 // 如果节点执行失败，终止工作流
                 if (!nodeResult.isSuccess()) {
                     log.info("[工作流执行][{}] 执行失败: {}",context.getDefinitionId(),currentNode.getData().getLabel(), nodeResult.getErrorMessage());
@@ -118,18 +117,6 @@ public class WorkflowEngine {
             return new WorkflowExecutionResult(false, context, "工作流执行异常: " + e.getMessage());
         }
     }
-
-    /**
-     * 执行单个节点
-     *
-     * @param nodeDefinition 节点定义
-     * @param context        工作流执行上下文
-     * @return 节点执行结果
-     */
-    private NodeExecutionResult executeNode(NodeDefinition nodeDefinition, WorkflowContext context) {
-        return executeNode(nodeDefinition, context, null);
-    }
-
     /**
      * 执行单个节点（支持回调）
      *
@@ -138,7 +125,7 @@ public class WorkflowEngine {
      * @param callback       执行回调接口
      * @return 节点执行结果
      */
-    private NodeExecutionResult executeNode(NodeDefinition nodeDefinition, WorkflowContext context, com.jing.admin.core.workflow.WorkflowExecutionCallback callback) {
+    private NodeExecutionResult executeNode(NodeDefinition nodeDefinition, WorkflowContext context, WorkflowDefinition workflowDefinition, WorkflowExecutionCallback callback) {
         long startTime = System.currentTimeMillis();
         String nodeType = nodeDefinition.getData() != null ? nodeDefinition.getData().getType() : null;
         String nodeName = nodeDefinition.getData() != null ? nodeDefinition.getData().getLabel() : "Unknown";
@@ -173,7 +160,7 @@ public class WorkflowEngine {
                     result = NodeExecutionResult.failure("未找到支持节点类型 " + nodeType + " 的执行器");
                 } else {
                     // 执行节点
-                    result = executor.execute(nodeDefinition, context);
+                    result = executor.execute(nodeDefinition, context,workflowDefinition);
                 }
             }
         } catch (Exception e) {

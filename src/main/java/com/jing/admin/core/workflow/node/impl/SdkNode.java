@@ -2,10 +2,7 @@ package com.jing.admin.core.workflow.node.impl;
 
 import com.jing.admin.core.workflow.core.conversion.ParameterConverter;
 import com.jing.admin.core.workflow.core.context.WorkflowContext;
-import com.jing.admin.core.workflow.model.GlobalParams;
-import com.jing.admin.core.workflow.model.NodeData;
-import com.jing.admin.core.workflow.model.NodeDefinition;
-import com.jing.admin.core.workflow.model.NodeResult;
+import com.jing.admin.core.workflow.model.*;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.node.BaseNode;
 import com.jing.admin.core.workflow.sdk.ISdkClient;
@@ -26,7 +23,7 @@ public class SdkNode extends BaseNode {
     }
 
     @Override
-    public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context) {
+    public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context, WorkflowDefinition workflowDefinition) {
         long startTime = System.currentTimeMillis();
         Map<String, Object> processedParams = new HashMap<>(1);
         try {

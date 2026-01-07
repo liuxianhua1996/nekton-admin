@@ -6,6 +6,7 @@ import com.jing.admin.core.workflow.model.NodeData;
 import com.jing.admin.core.workflow.model.NodeDefinition;
 import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
+import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.core.workflow.node.BaseNode;
 
 import java.util.HashMap;
@@ -22,7 +23,7 @@ public class StartNode extends BaseNode {
         super(parameterConverter);
     }
 
-    public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context) {
+    public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context, WorkflowDefinition workflowDefinition) {
         long startTime = System.currentTimeMillis();
 
         try {

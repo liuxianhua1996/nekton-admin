@@ -6,6 +6,7 @@ import com.jing.admin.core.workflow.model.NodeData;
 import com.jing.admin.core.workflow.model.NodeDefinition;
 import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
+import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.core.workflow.node.BaseNode;
 import lombok.extern.slf4j.Slf4j;
 import org.graalvm.polyglot.*;
@@ -47,7 +48,7 @@ public class JsNode extends BaseNode {
     }
 
     @Override
-    public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context) {
+    public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context, WorkflowDefinition workflowDefinition) {
         long startTime = System.currentTimeMillis();
         Map<String, Object> inputData = new HashMap<>();
         try {

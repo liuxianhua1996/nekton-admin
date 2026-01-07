@@ -5,6 +5,7 @@ import com.jing.admin.core.workflow.core.context.WorkflowContext;
 import com.jing.admin.core.workflow.model.NodeData;
 import com.jing.admin.core.workflow.model.NodeDefinition;
 import com.jing.admin.core.workflow.exception.NodeExecutionResult;
+import com.jing.admin.core.workflow.model.WorkflowDefinition;
 import com.jing.admin.core.workflow.node.BaseNode;
 
 import java.util.*;
@@ -20,7 +21,7 @@ public class IfNode extends BaseNode {
     }
 
     @Override
-    public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context) {
+    public NodeExecutionResult execute(NodeDefinition nodeDefinition, WorkflowContext context, WorkflowDefinition workflowDefinition) {
         long startTime = System.currentTimeMillis();
         try {
             // 获取节点数据
