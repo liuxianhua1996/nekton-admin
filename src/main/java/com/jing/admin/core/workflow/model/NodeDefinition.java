@@ -20,6 +20,11 @@ public class NodeDefinition {
     private String type;
     
     /**
+     * 父节点ID（用于循环节点的子节点）
+     */
+    private String parentId;
+    
+    /**
      * 节点数据
      */
     private NodeData data;

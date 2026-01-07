@@ -62,6 +62,7 @@ public class WorkflowJsonConverter {
         
         node.setId((String) nodeJson.get("id"));
         node.setType((String) nodeJson.get("type"));
+        node.setParentId((String) nodeJson.get("parentId"));
         // 转换节点数据
         Map<String, Object> dataJson = (Map<String, Object>) nodeJson.get("data");
         if (dataJson != null) {
