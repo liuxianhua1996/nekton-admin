@@ -137,7 +137,10 @@ public class LoopNode extends BaseNode implements ApplicationContextAware {
                 NodeExecutionResult iterationResult = NodeExecutionResult.success(currentIterationData);
                 loopContext.setVariable(nodeDefinition.getId(), iterationResult);
                 // 执行循环的子节点
+                long currStartTime = System.currentTimeMillis();
                 NodeExecutionResult loopResult = executeChildNodes(childNodes, loopContext, workflowDefinition);
+                loopResult.setStartTime(currStartTime);
+                loopResult.setEndTime(System.currentTimeMillis());
                 results.add(loopResult);
                 iterationCount++;
             }
@@ -247,7 +250,8 @@ public class LoopNode extends BaseNode implements ApplicationContextAware {
                 long startTime = System.currentTimeMillis();
                 NodeExecutionResult nodeResult = executeCurrentNode(currentNode, context, workflowDefinition);
                 long endTime = System.currentTimeMillis();
-                
+                nodeResult.setStartTime(startTime);
+                nodeResult.setEndTime(endTime);
                 // 记录节点执行结果
                 context.setVariable(currentNode.getId(), nodeResult);
                 processedNodes.add(currentNode.getId());
@@ -255,8 +259,6 @@ public class LoopNode extends BaseNode implements ApplicationContextAware {
                 resultMap.put("nodeId",currentNode.getId());
                 resultMap.put("nodeType",currentNode.getData().getCode());
                 resultMap.put("nodeName",currentNode.getData().getLabel());
-                resultMap.put("startTime",startTime);
-                resultMap.put("endTime",endTime);
                 resultMap.put("nodeResult",nodeResult);
                 childResults.add(resultMap);
                 if (!nodeResult.isSuccess()) {

@@ -199,6 +199,7 @@ public class WorkflowService {
                     .endTime(nodeTestResult.getEndTime())
                     .status("COMPLETED")
                     .sort(nodeTestResult.getSort())
+                    .inputData(nodeTestResult.getInputData())
                     .executeResult(nodeTestResult.getExecuteResult())
                     .errorMessage(nodeTestResult.getErrorMessage())
                     .build());

@@ -15,6 +15,9 @@ public class NodeExecutionResult {
      * 执行是否成功
      */
     private boolean success;
+
+    private long startTime;
+    private long endTime;
     
     /**
      * 执行结果数据

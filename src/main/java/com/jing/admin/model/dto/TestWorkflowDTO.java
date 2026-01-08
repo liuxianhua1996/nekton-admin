@@ -33,6 +33,7 @@ public class TestWorkflowDTO {
         private Object executeResult;
 
         private String errorMessage;
+        private Map<String, Object> inputData;
 
     }
 }
