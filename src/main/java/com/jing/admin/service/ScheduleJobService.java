@@ -57,4 +57,9 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
      * 立即执行调度工作流
      */
     Boolean executeJob(String id);
+    
+    /**
+     * Webhook触发调度任务
+     */
+    Boolean triggerWebhookJob(String id);
 }

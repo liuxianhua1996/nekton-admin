@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jing.admin.core.PageResult;
 import com.jing.admin.core.constant.ConstantEnum;
 import com.jing.admin.core.schedule.AbstractJobTask;
+import com.jing.admin.core.schedule.ThreadPoolConfig;
 import com.jing.admin.core.schedule.job.JobTaskManager;
 import com.jing.admin.core.tenant.TenantContextHolder;
 import com.jing.admin.core.workflow.WorkflowExecutor;
@@ -26,6 +27,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -264,6 +266,46 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         );
 
         return result.isSuccess();
+    }
+
+    @Override
+    public Boolean triggerWebhookJob(String id) {
+        // 获取调度任务信息
+        ScheduleJob scheduleJob = scheduleJobRepository.getById(id);
+        if (scheduleJob == null) {
+            throw new RuntimeException("调度任务不存在");
+        }
+
+        // 验证调度任务的触发类型是否为webhook
+        if (!"webhook".equalsIgnoreCase(scheduleJob.getTriggerType())) {
+            throw new RuntimeException("该调度任务不是webhook触发类型");
+        }
+
+        String workflowId = scheduleJob.getWorkflowId();
+
+        // 使用线程池异步执行工作流（带日志记录），触发类型为webhook
+        // 避免直接创建线程，使用预定义的webhook线程池
+        ThreadPoolConfig.WEBHOOK_THREAD_POOL.submit(() -> {
+            try {
+                WorkflowExecutionResult result = workflowExecutionService.executeWorkflowWithLog(
+                        WorkflowExecution.builder()
+                                .jobId(id)
+                                .workflowId(workflowId)
+                                .startParams(new HashMap<>())
+                                .workflowInstanceId(id)
+                                .triggerType("WEBHOOK")
+                                .extraLogInfo(null)
+                                .build()
+                );
+                
+                log.info("Webhook触发的工作流执行完成，任务ID: {}, 结果: {}", id, result.isSuccess());
+            } catch (Exception e) {
+                log.error("Webhook触发的工作流执行失败，任务ID: {}", id, e);
+            }
+        });
+
+        // 立即返回成功，表示webhook已接收并开始处理
+        return true;
     }
 
     /**

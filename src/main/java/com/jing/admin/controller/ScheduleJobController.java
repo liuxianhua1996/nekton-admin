@@ -114,4 +114,14 @@ public class ScheduleJobController {
         return HttpResult.success(result);
 
     }
+    
+    /**
+     * Webhook触发调度任务
+     */
+    @PostMapping("/webhook/{id}")
+    @Operation(summary = "Webhook触发调度任务", description = "通过Webhook方式触发调度任务")
+    public HttpResult<Boolean> triggerWebhookJob(@PathVariable String id) {
+        Boolean result = scheduleJobService.triggerWebhookJob(id);
+        return HttpResult.success(result);
+    }
 }
