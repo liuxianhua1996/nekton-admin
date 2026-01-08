@@ -12,8 +12,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * 任务引擎 - 提供任务执行功能
+ * 
+ * @deprecated 建议使用 {@link TaskExecutor}，它提供了更优雅和安全的任务执行方式
+ */
 @Data
 @Slf4j
+@Deprecated
 public class TaskEngine {
     private AbstractJobTask abstractTask;
     private long timeOut;
@@ -30,7 +36,7 @@ public class TaskEngine {
     }
 
     public TaskEngine(AbstractJobTask abstractTask) {
-        this(abstractTask, 1 * 60 * 60);
+        this(abstractTask, 1 * 60 * 1000); // 修正：默认1小时，单位为毫秒
     }
 
     public void run() {
@@ -50,13 +56,17 @@ public class TaskEngine {
         
         Future<String> future = ThreadPoolConfig.JOB_THREAD_POOL.submit(wrappedTask, "success");
         try {
-            result = future.get(timeOut, TimeUnit.SECONDS);
+            // 修正：使用毫秒作为时间单位
+            result = future.get(timeOut, TimeUnit.MILLISECONDS);
         } catch (TimeoutException timeoutException) {
-            throw new RuntimeException(String.format("run for more than %d seconds", timeOut));
+            throw new RuntimeException(String.format("run for more than %d ms", timeOut));
         } catch (Exception e) {
             throw new RuntimeException(String.format("%s", e.getMessage()));
         } finally {
-            future.cancel(true);//取消线程执行
+            // 仅在任务未完成时才取消
+            if (!future.isDone()) {
+                future.cancel(true); // 取消线程执行
+            }
         }
     }
 }

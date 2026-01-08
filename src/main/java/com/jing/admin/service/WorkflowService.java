@@ -195,9 +195,12 @@ public class WorkflowService {
             nodeTestResults.add(TestWorkflowDTO.NodeTestResult.builder()
                     .nodeId(nodeTestResult.getNodeId())
                     .nodeName(nodeTestResult.getNodeName())
+                    .startTime(nodeTestResult.getStartTime())
+                    .endTime(nodeTestResult.getEndTime())
                     .status("COMPLETED")
                     .sort(nodeTestResult.getSort())
                     .executeResult(nodeTestResult.getExecuteResult())
+                    .errorMessage(nodeTestResult.getErrorMessage())
                     .build());
         });
         testWorkflowDTO.setNodeTestResults(nodeTestResults);

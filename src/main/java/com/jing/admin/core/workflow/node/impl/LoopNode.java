@@ -105,7 +105,7 @@ public class LoopNode extends BaseNode implements ApplicationContextAware {
             }
 
             // 执行循环
-            List<Map<String, Object>> results = new ArrayList<>();
+            List<NodeExecutionResult> results = new ArrayList<>();
             int iterationCount = 0;
             
             for (Object item : iterableData) {
@@ -138,6 +138,7 @@ public class LoopNode extends BaseNode implements ApplicationContextAware {
                 loopContext.setVariable(nodeDefinition.getId(), iterationResult);
                 // 执行循环的子节点
                 NodeExecutionResult loopResult = executeChildNodes(childNodes, loopContext, workflowDefinition);
+                results.add(loopResult);
                 iterationCount++;
             }
             long executionTime = System.currentTimeMillis() - startTime;
@@ -188,54 +189,6 @@ public class LoopNode extends BaseNode implements ApplicationContextAware {
     }
 
     /**
-     * 执行从指定节点开始的节点链，直到遇到结束节点或另一个循环节点
-     */
-    private NodeExecutionResult executeNextNodes(NodeDefinition startNode, WorkflowContext context, WorkflowDefinition workflowDefinition) {
-        try {
-            NodeDefinition currentNode = startNode;
-            
-            while (currentNode != null) {
-                // 检查当前节点是否是结束节点或另一个循环节点，如果是则停止当前执行链
-                String currentNodeType = currentNode.getType();
-                if ("end".equals(currentNodeType) || "loop".equals(currentNodeType)) {
-                    break;
-                }
-                
-                // 检查是否是loopStart节点，如果是则跳过（只是标识节点，不需要执行）
-                String nodeType = currentNode.getData() != null ? currentNode.getData().getType() : null;
-                String nodeCode = currentNode.getData() != null ? currentNode.getData().getCode() : null;
-                
-                if ("loopStart".equals(nodeType) || "loopStart".equals(nodeCode)) {
-                    // 跳过loopStart节点，不执行任何操作，直接获取下一个节点
-                    currentNode = workflowDefinition.getNextNode(currentNode.getId());
-                    continue; // 继续下一次循环
-                }
-                
-                // 执行当前节点（非loopStart节点）
-                NodeExecutionResult nodeResult = executeCurrentNode(currentNode, context, workflowDefinition);
-                
-                if (!nodeResult.isSuccess()) {
-                    return nodeResult; // 如果节点执行失败，返回失败结果
-                }
-
-                // 记录节点执行结果
-                context.setVariable(currentNode.getId(), nodeResult);
-                
-                // 获取下一个节点
-                currentNode = workflowDefinition.getNextNode(currentNode.getId());
-            }
-            
-            // 返回执行完成的结果
-            Map<String, Object> resultData = new HashMap<>();
-            resultData.put("status", "completed");
-            return NodeExecutionResult.success(resultData);
-        } catch (Exception e) {
-            log.error("执行后续节点链异常: {}", e.getMessage(), e);
-            return NodeExecutionResult.failure("执行后续节点链失败: " + e.getMessage());
-        }
-    }
-
-    /**
      * 执行循环的所有子节点
      */
     private NodeExecutionResult executeChildNodes(List<NodeDefinition> childNodes, WorkflowContext context, WorkflowDefinition workflowDefinition) {
@@ -244,8 +197,6 @@ public class LoopNode extends BaseNode implements ApplicationContextAware {
             // 如果没有子节点，直接返回
             if (childNodes == null || childNodes.isEmpty()) {
                 Map<String, Object> resultData = new HashMap<>();
-                resultData.put("status", "completed");
-                resultData.put("childNodeCount", 0);
                 return NodeExecutionResult.success(resultData);
             }
             
@@ -293,11 +244,9 @@ public class LoopNode extends BaseNode implements ApplicationContextAware {
                 }
                 
                 // 执行当前节点
+                long startTime = System.currentTimeMillis();
                 NodeExecutionResult nodeResult = executeCurrentNode(currentNode, context, workflowDefinition);
-                
-                if (!nodeResult.isSuccess()) {
-                    return nodeResult; // 如果节点执行失败，返回失败结果
-                }
+                long endTime = System.currentTimeMillis();
                 
                 // 记录节点执行结果
                 context.setVariable(currentNode.getId(), nodeResult);
@@ -306,8 +255,13 @@ public class LoopNode extends BaseNode implements ApplicationContextAware {
                 resultMap.put("nodeId",currentNode.getId());
                 resultMap.put("nodeType",currentNode.getData().getCode());
                 resultMap.put("nodeName",currentNode.getData().getLabel());
+                resultMap.put("startTime",startTime);
+                resultMap.put("endTime",endTime);
                 resultMap.put("nodeResult",nodeResult);
                 childResults.add(resultMap);
+                if (!nodeResult.isSuccess()) {
+                    break; // 如果节点执行失败，返回失败结果
+                }
                 // 获取下一个节点（根据边的连接关系）
                 currentNode = workflowDefinition.getNextNode(currentNode.getId());
 

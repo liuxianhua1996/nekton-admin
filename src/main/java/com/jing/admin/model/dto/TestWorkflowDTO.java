@@ -25,6 +25,9 @@ public class TestWorkflowDTO {
     public static class  NodeTestResult {
         private String nodeId;
         private String nodeName;
+        private long startTime;
+        private long endTime;
+
         private int sort;
         private String status;
         private Object executeResult;
