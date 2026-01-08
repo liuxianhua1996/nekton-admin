@@ -255,6 +255,38 @@
 | message | String | 响应消息 |
 | data | Boolean | 操作结果，true表示执行成功，false表示执行失败 |
 
+### 9. 通过Webhook触发调度任务
+
+- **接口地址**: `POST /api/schedule/job/webhook/{id}`
+- **功能描述**: 通过Webhook触发指定调度任务，适用于webhook触发类型的调度任务
+- **路径参数**:
+
+| 参数名 | 类型 | 必填 | 描述 |
+|--------|------|------|------|
+| id | String | 是 | 调度任务ID |
+
+- **请求示例**:
+```bash
+curl -X POST "http://localhost:8080/api/schedule/job/webhook/job_001"
+```
+
+- **响应参数**:
+
+| 参数名 | 类型 | 描述 |
+|--------|------|------|
+| code | String | 响应状态码 |
+| message | String | 响应消息 |
+| data | Boolean | 操作结果，true表示触发成功，false表示触发失败 |
+
+- **响应示例**:
+```json
+{
+  "code": "200",
+  "message": "成功",
+  "data": true
+}
+```
+
 ## 状态值说明
 
 ### 调度任务状态

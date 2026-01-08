@@ -8,6 +8,7 @@ import com.jing.admin.model.api.ScheduleJobQueryRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 调度工作流Service接口
@@ -61,5 +62,5 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
     /**
      * Webhook触发调度任务
      */
-    Boolean triggerWebhookJob(String id);
+    Boolean triggerWebhookJob(String id, Map inputData);
 }

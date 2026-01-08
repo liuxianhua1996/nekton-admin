@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -74,7 +75,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         this.save(scheduleJob);
 
         // 如果新创建的任务状态是启用的，需要注册定时任务
-        if ("ENABLED".equals(request.getStatus())) {
+        if ("ENABLED".equals(request.getStatus()) && "triggerType".equals(request.getTriggerType())) {
             registerCronJob(scheduleJob);
         }
 
@@ -269,7 +270,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
     }
 
     @Override
-    public Boolean triggerWebhookJob(String id) {
+    public Boolean triggerWebhookJob(String id, Map inputData) {
         // 获取调度任务信息
         ScheduleJob scheduleJob = scheduleJobRepository.getById(id);
         if (scheduleJob == null) {
@@ -291,7 +292,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
                         WorkflowExecution.builder()
                                 .jobId(id)
                                 .workflowId(workflowId)
-                                .startParams(new HashMap<>())
+                                .startParams(inputData == null ? new HashMap<>() : inputData)
                                 .workflowInstanceId(id)
                                 .triggerType("WEBHOOK")
                                 .extraLogInfo(null)

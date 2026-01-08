@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 调度工作流Controller
@@ -120,8 +121,8 @@ public class ScheduleJobController {
      */
     @PostMapping("/webhook/{id}")
     @Operation(summary = "Webhook触发调度任务", description = "通过Webhook方式触发调度任务")
-    public HttpResult<Boolean> triggerWebhookJob(@PathVariable String id) {
-        Boolean result = scheduleJobService.triggerWebhookJob(id);
+    public HttpResult<Boolean> triggerWebhookJob(@PathVariable String id,@RequestBody Map inputData) {
+        Boolean result = scheduleJobService.triggerWebhookJob(id,inputData);
         return HttpResult.success(result);
     }
 }

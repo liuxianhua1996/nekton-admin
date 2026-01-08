@@ -37,10 +37,14 @@ public class StartNode extends BaseNode {
             NodeData nodeData = nodeDefinition.getData();
             Map<String, Object> outputData = new HashMap<>();
             Map outputParams = nodeData.getContent().getOutParams();
+            outputParams.forEach((k,v)->{
+                Map<String,Object> value = (Map)v;
+                Object outValue = value.get("value") instanceof Map ? ((Map<?, ?>) value.get("value")).get("value") : value.get("value");
+                outputData.put((String) value.get("name"),value.get("value"));
+            });
             long executionTime = System.currentTimeMillis() - startTime;
             NodeExecutionResult result = NodeExecutionResult.success(outputData);
             result.setExecutionTime(executionTime);
-            result.setData(outputParams);
 
             return result;
         } catch (Exception e) {
