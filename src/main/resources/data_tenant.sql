@@ -45,7 +45,8 @@ VALUES
 
 -- 数据中心模块
 ('DATA_CENTER', '数据中心', '/data-warehouse', NULL, 8, 1696032000000, 1696032000000, 'system', 'system'),
-('DATA_WAREHOUSE', '数仓管理', '/data-warehouse', 'DATA_CENTER', 1, 1696032000000, 1696032000000, 'system', 'system');
+('DATA_WAREHOUSE', '数仓管理', '/data-warehouse', 'DATA_CENTER', 1, 1696032000000, 1696032000000, 'system', 'system'),
+('KNOWLEDGE_BASE', '知识库', '/data-warehouse/knowledge', 'DATA_CENTER', 2, 1696032000000, 1696032000000, 'system', 'system');
 
 -- 工作流全局参数示例数据
 -- 注意：在实际部署时，需要根据当前租户ID来插入数据
