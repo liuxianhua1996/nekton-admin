@@ -139,13 +139,17 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
     public Boolean deleteScheduleJob(String id) {
         // 在删除前，先暂停并删除对应的定时任务
         jobTaskManager.deleteJob(id);
-        return this.removeById(id);
+        
+        // 使用QueryWrapper处理UUID，符合项目规范
+        QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", UUID.fromString(id));
+        return this.remove(queryWrapper);
     }
 
     @Override
     public ScheduleJobDTO getScheduleJobById(String id) {
         QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", id);
+        queryWrapper.eq("id", UUID.fromString(id));
         ScheduleJob scheduleJob = this.getOne(queryWrapper);
         if (scheduleJob == null) {
             return null;
@@ -232,7 +236,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         // 如果更新成功，处理对应的定时任务
         if (updateResult) {
             // 检查任务是否已存在于JobTaskManager中
-            if (jobTaskManager.getJobTask(id) != null) {
+            if (jobTaskManager.getJobTask(id) != null &&  "triggerType".equals(existingJob.getTriggerType())) {
                 // 如果任务存在，直接恢复
                 jobTaskManager.resumeJob(id);
             } else {
@@ -270,7 +274,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
     }
 
     @Override
-    public Boolean triggerWebhookJob(String id, Map inputData) {
+    public Boolean triggerWebhookJob(String id, Map<String, Object> inputData) {
         // 获取调度任务信息
         ScheduleJob scheduleJob = scheduleJobRepository.getById(id);
         if (scheduleJob == null) {
@@ -283,11 +287,16 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         }
 
         String workflowId = scheduleJob.getWorkflowId();
+        
+        // 在主线程中获取当前租户ID，以便在异步线程中使用
+        String currentTenantId = MDC.get("tenantId");
 
         // 使用线程池异步执行工作流（带日志记录），触发类型为webhook
         // 避免直接创建线程，使用预定义的webhook线程池
         ThreadPoolConfig.WEBHOOK_THREAD_POOL.submit(() -> {
             try {
+                // 设置租户上下文，确保在异步线程中正确识别租户
+                TenantContextHolder.setTenantId(currentTenantId);
                 WorkflowExecutionResult result = workflowExecutionService.executeWorkflowWithLog(
                         WorkflowExecution.builder()
                                 .jobId(id)
@@ -302,6 +311,9 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
                 log.info("Webhook触发的工作流执行完成，任务ID: {}, 结果: {}", id, result.isSuccess());
             } catch (Exception e) {
                 log.error("Webhook触发的工作流执行失败，任务ID: {}", id, e);
+            } finally {
+                // 清理租户上下文，避免影响其他线程
+                TenantContextHolder.clear();
             }
         });
 
