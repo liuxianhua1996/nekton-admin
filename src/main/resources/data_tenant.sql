@@ -14,7 +14,7 @@ DELETE FROM tb_menu;
 INSERT INTO tb_menu (code, name, path, parent_code, sort_order, create_time, update_time, create_user_id, update_user_id)
 VALUES
 -- 顶级菜单
-('DASHBOARD', '首页', '/dashboard', NULL, 1,1696032000000, 1696032000000, 'system', 'system'),
+('DASHBOARD', '工作台', '/dashboard', NULL, 1,1696032000000, 1696032000000, 'system', 'system'),
 ('USER_MANAGE', '用户管理', '/user', NULL, 2,1696032000000, 1696032000000, 'system', 'system'),
 ('SCHEDULE', '调度管理', '/schedule', NULL, 3, 1696032000000, 1696032000000, 'system', 'system'),
 ('WORKFLOW', '工作流', '/workflow', NULL, 4,1696032000000, 1696032000000, 'system', 'system'),
@@ -38,7 +38,16 @@ VALUES
 ('ADMIN_MANAGE', '管理员管理', '/permission/admins','PERMISSION', 3, 1696032000000, 1696032000000,
  'system', 'system'),
 ('SCHEDULE_LIST', '调度列表', '/schedule/list','SCHEDULE', 1, 1696032000000, 1696032000000,
- 'system', 'system');
+ 'system', 'system'),
+
+-- AI智能菜单
+('AI_SMART', 'AI智能', '/ai', NULL, 7, 1696032000000, 1696032000000, 'system', 'system'),
+('AI_QUERY', 'AI问数', '/ai/query', 'AI_SMART', 1, 1696032000000, 1696032000000, 'system', 'system'),
+('AI_CHAT', 'AI问答', '/ai/chat', 'AI_SMART', 2, 1696032000000, 1696032000000, 'system', 'system'),
+
+-- 数据中心菜单
+('DATA_CENTER', '数据中心', '/data-warehouse', NULL, 8, 1696032000000, 1696032000000, 'system', 'system'),
+('DATA_WAREHOUSE', '数仓管理', '/data-warehouse', 'DATA_CENTER', 1, 1696032000000, 1696032000000, 'system', 'system');
 
 -- 工作流全局参数示例数据
 -- 注意：在实际部署时，需要根据当前租户ID来插入数据
