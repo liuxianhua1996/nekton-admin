@@ -2,9 +2,8 @@ package com.jing.admin.controller;
 
 import com.jing.admin.core.HttpResult;
 import com.jing.admin.model.domain.Role;
-import com.jing.admin.service.RoleService;
+import com.jing.admin.service.impl.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

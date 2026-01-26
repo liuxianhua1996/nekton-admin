@@ -1,7 +1,7 @@
 package com.jing.admin.controller;
 
 import com.jing.admin.core.HttpResult;
-import com.jing.admin.service.MenuService;
+import com.jing.admin.service.impl.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

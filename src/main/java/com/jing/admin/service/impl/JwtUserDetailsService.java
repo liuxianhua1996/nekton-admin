@@ -1,4 +1,4 @@
-package com.jing.admin.service;
+package com.jing.admin.service.impl;
 
 import com.jing.admin.model.domain.User;
 import com.jing.admin.model.mapping.UserMapping;

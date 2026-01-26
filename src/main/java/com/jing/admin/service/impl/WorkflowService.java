@@ -1,4 +1,4 @@
-package com.jing.admin.service;
+package com.jing.admin.service.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -7,7 +7,6 @@ import com.jing.admin.core.PageResult;
 import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.core.workflow.WorkflowExecutor;
-import com.jing.admin.core.workflow.exception.NodeExecutionResult;
 import com.jing.admin.core.workflow.model.GlobalParams;
 import com.jing.admin.core.workflow.model.NodeResult;
 import com.jing.admin.model.api.WorkflowQueryRequest;
@@ -18,6 +17,8 @@ import com.jing.admin.model.domain.WorkflowGlobalParam;
 import com.jing.admin.model.dto.TestWorkflowDTO;
 import com.jing.admin.model.dto.WorkflowDTO;
 import com.jing.admin.repository.WorkflowRepository;
+import com.jing.admin.service.WorkflowExecutionService;
+import com.jing.admin.service.WorkflowGlobalParamService;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

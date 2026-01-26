@@ -3,7 +3,7 @@ package com.jing.admin.controller;
 import com.jing.admin.core.HttpResult;
 import com.jing.admin.model.domain.Menu;
 import com.jing.admin.model.dto.MenuDTO;
-import com.jing.admin.service.MenuService;
+import com.jing.admin.service.impl.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

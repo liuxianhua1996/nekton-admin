@@ -1,24 +1,17 @@
 package com.jing.admin.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.jing.admin.core.HttpResult;
 import com.jing.admin.core.PageResult;
-import com.jing.admin.core.workflow.core.engine.WorkflowExecutionResult;
 import com.jing.admin.model.api.WorkflowQueryRequest;
 import com.jing.admin.model.api.WorkflowRequest;
 import com.jing.admin.model.api.WorkflowTestRequest;
 import com.jing.admin.model.domain.Workflow;
 import com.jing.admin.model.dto.TestWorkflowDTO;
 import com.jing.admin.model.dto.WorkflowDTO;
-import com.jing.admin.model.mapping.WorkflowMapping;
-import com.jing.admin.service.WorkflowService;
+import com.jing.admin.service.impl.WorkflowService;
 import io.swagger.v3.oas.annotations.Operation;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 工作流控制器

@@ -1,4 +1,4 @@
-package com.jing.admin.service;
+package com.jing.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jing.admin.core.cache.RoleMenuCache;

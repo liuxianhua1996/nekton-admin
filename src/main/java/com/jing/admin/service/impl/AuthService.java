@@ -1,11 +1,10 @@
-package com.jing.admin.service;
+package com.jing.admin.service.impl;
 
 import com.jing.admin.config.JwtTokenUtil;
 import com.jing.admin.config.LoginUserUtil;
 import com.jing.admin.core.constant.Role;
 import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.model.domain.LoginUser;
-import com.jing.admin.model.domain.TenantUser;
 import com.jing.admin.model.domain.User;
 import com.jing.admin.model.dto.MenuDTO;
 import com.jing.admin.model.dto.TenantUseDTO;
@@ -13,7 +12,6 @@ import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.model.mapping.UserMapping;
 import com.jing.admin.repository.TenantUserRepository;
 import com.jing.admin.repository.UserRepository;
-import com.jing.admin.repository.WorkflowRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;

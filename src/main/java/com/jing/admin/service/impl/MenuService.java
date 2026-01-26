@@ -1,4 +1,4 @@
-package com.jing.admin.service;
+package com.jing.admin.service.impl;
 
 import com.jing.admin.core.cache.RoleMenuCache;
 import com.jing.admin.core.constant.Role;
