@@ -53,6 +53,8 @@ public class AuthService {
     private UserRoleMapper userRoleMapper;
     @Autowired
     LoginUserUtil loginUserUtil;
+    @Autowired
+    private RoleService roleService;
 
     public Map<String, Object> authenticate(String username, String password) {
         try {
@@ -226,15 +228,20 @@ public class AuthService {
         String currentTenantId = TenantContextHolder.getTenantId();
         try {
             TenantContextHolder.setTenantId(tenantId);
-            List<String> roleNames = userRoleMapper.selectRolesByUserId(userId);
-            if (roleNames == null || roleNames.isEmpty()) {
+            List<String> roleIds = userRoleMapper.selectRoleIdsByUserId(userId);
+            if (roleIds == null || roleIds.isEmpty()) {
                 return List.of();
             }
             List<Role> roles = new ArrayList<>();
-            for (String roleName : roleNames) {
-                try {
-                    roles.add(Role.fromName(roleName));
-                } catch (Exception ignored) {
+            // 根据角色ID获取角色名称
+            for (String roleId : roleIds) {
+                // 从角色表查询角色名称
+                com.jing.admin.model.domain.Role role = roleService.getById(roleId);
+                if (role != null) {
+                    try {
+                        roles.add(Role.fromName(role.getName()));
+                    } catch (Exception ignored) {
+                    }
                 }
             }
             return roles;

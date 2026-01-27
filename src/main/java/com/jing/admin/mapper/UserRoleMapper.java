@@ -12,28 +12,28 @@ import java.util.List;
 public interface UserRoleMapper {
     
     /**
-     * 根据用户ID查询角色列表
+     * 根据用户ID查询角色ID列表
      * @param userId 用户ID
-     * @return 角色列表
+     * @return 角色ID列表
      */
-    @Select("SELECT role FROM tb_user_roles WHERE user_id = #{userId}")
-    List<String> selectRolesByUserId(@Param("userId") String userId);
+    @Select("SELECT role_id FROM tb_user_roles WHERE user_id = #{userId}")
+    List<String> selectRoleIdsByUserId(@Param("userId") String userId);
     
     /**
      * 为用户添加角色
      * @param userId 用户ID
-     * @param role 角色
+     * @param roleId 角色ID
      */
-    @Insert("INSERT INTO tb_user_roles (user_id, role,create_time,update_time) VALUES (#{userId}, #{role}, #{createTime},#{createTime}) ")
-    void insertUserRole(@Param("userId") String userId, @Param("role") String role,@Param("createTime") long createTime);
+    @Insert("INSERT INTO tb_user_roles (user_id, role_id, create_time, update_time) VALUES (#{userId}, #{roleId}, #{createTime}, #{createTime}) ")
+    void insertUserRole(@Param("userId") String userId, @Param("roleId") String roleId, @Param("createTime") long createTime);
     
     /**
      * 删除用户的角色
      * @param userId 用户ID
-     * @param role 角色
+     * @param roleId 角色ID
      */
-    @Delete("DELETE FROM tb_user_roles WHERE user_id = #{userId} AND role = #{role}")
-    void deleteUserRole(@Param("userId") String userId, @Param("role") String role);
+    @Delete("DELETE FROM tb_user_roles WHERE user_id = #{userId} AND role_id = #{roleId}")
+    void deleteUserRole(@Param("userId") String userId, @Param("roleId") String roleId);
     
     /**
      * 删除用户的所有角色
@@ -46,9 +46,9 @@ public interface UserRoleMapper {
      * 根据角色ID删除用户角色关联
      * @param roleId 角色ID
      */
-    @Delete("DELETE FROM tb_user_roles WHERE role = #{roleId}")
+    @Delete("DELETE FROM tb_user_roles WHERE role_id = #{roleId}")
     void deleteByRoleId(@Param("roleId") String roleId);
 
-    @Update("UPDATE tb_user_roles SET role = #{newRole} WHERE role = #{oldRole}")
-    void updateRoleName(@Param("oldRole") String oldRole, @Param("newRole") String newRole);
+    @Update("UPDATE tb_user_roles SET role_id = #{newRoleId} WHERE role_id = #{oldRoleId}")
+    void updateRoleId(@Param("oldRoleId") String oldRoleId, @Param("newRoleId") String newRoleId);
 }

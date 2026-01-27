@@ -95,8 +95,15 @@ public class MenuService {
      */
     @Transactional
     public void assignMenusToRole(String role, List<String> menuIds) {
+        // 先根据角色名称获取角色ID
+        com.jing.admin.model.domain.Role roleEntity = roleService.getByName(role);
+        if (roleEntity == null) {
+            throw new RuntimeException("角色不存在: " + role);
+        }
+        String roleId = roleEntity.getId();
+        
         // 先删除角色原有的菜单关联
-        roleMenuMapper.deleteByRole(role);
+        roleMenuMapper.deleteByRoleId(roleId);
         if (menuIds == null || menuIds.isEmpty()) {
             roleMenuCache.setRoleMenus(role, null);
             roleMenuCache.setRoleMenuTree(role, null);
@@ -109,7 +116,7 @@ public class MenuService {
         for (String menuId : menuIds) {
             RoleMenu roleMenu = new RoleMenu();
             roleMenu.setId(UUID.randomUUID().toString().replace("-", ""));
-            roleMenu.setRole(role);
+            roleMenu.setRoleId(roleId);
             roleMenu.setMenuId(menuId);
             roleMenu.setCreateTime(currentTime);
             roleMenu.setUpdateTime(currentTime);
@@ -129,7 +136,13 @@ public class MenuService {
      * @return 菜单ID列表
      */
     public List<String> getMenuIdsByRole(String role) {
-        return roleMenuMapper.selectMenuIdsByRole(role);
+        // 先根据角色名称获取角色ID
+        com.jing.admin.model.domain.Role roleEntity = roleService.getByName(role);
+        if (roleEntity == null) {
+            return List.of();
+        }
+        String roleId = roleEntity.getId();
+        return roleMenuMapper.selectMenuIdsByRoleId(roleId);
     }
     
     /**
@@ -145,18 +158,19 @@ public class MenuService {
         List<Menu> allMenus = menuMapper.selectAll();
         
         for (com.jing.admin.model.domain.Role role : roles) {
-            // admin角色拥有所有菜单权限
-            if ("ADMIN".equals(role.getName())) {
-                roleMenuCache.setRoleMenus(role.getName(), allMenus);
-                List<MenuDTO> menuTree = MenuUtil.buildMenuTree(allMenus);
-                roleMenuCache.setRoleMenuTree(role.getName(), menuTree);
+            // 使用统一的逻辑处理所有角色，包括admin和其他角色
+            List<Menu> roleMenus;
+            if (Role.ADMIN.equals(Role.fromName(role.getName()))) {
+                // admin角色拥有所有菜单权限
+                roleMenus = allMenus;
             } else {
                 // 其他角色按实际分配的菜单初始化
-                List<Menu> roleMenus = menuMapper.selectByRole(role.getName());
-                roleMenuCache.setRoleMenus(role.getName(), roleMenus);
-                List<MenuDTO> menuTree = MenuUtil.buildMenuTree(roleMenus);
-                roleMenuCache.setRoleMenuTree(role.getName(), menuTree);
+                roleMenus = menuMapper.selectByRole(role.getName());
             }
+            
+            roleMenuCache.setRoleMenus(role.getName(), roleMenus);
+            List<MenuDTO> menuTree = MenuUtil.buildMenuTree(roleMenus);
+            roleMenuCache.setRoleMenuTree(role.getName(), menuTree);
         }
     }
 }

@@ -108,9 +108,9 @@ public class RoleService {
         queryWrapper.eq("id", UUID.fromString(id));
         roleMapper.delete(queryWrapper);
         // 删除角色菜单关联
-        roleMenuMapper.deleteByRole(role.getName());
+        roleMenuMapper.deleteByRoleId(id);
         // 删除用户角色关联
-        userRoleMapper.deleteByRoleId(role.getName());
+        userRoleMapper.deleteByRoleId(id);
         
         // 更新缓存：清除该角色的缓存
         roleMenuCache.setRoleMenus(role.getName(), null);
@@ -138,6 +138,28 @@ public class RoleService {
     public Role getRoleByName(String name) {
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", name);
+        return roleMapper.selectOne(queryWrapper);
+    }
+    
+    /**
+     * 根据名称获取角色
+     * @param name 角色名称
+     * @return 角色信息
+     */
+    public Role getByName(String name) {
+        QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("name", name);
+        return roleMapper.selectOne(queryWrapper);
+    }
+    
+    /**
+     * 根据ID获取角色
+     * @param id 角色ID
+     * @return 角色信息
+     */
+    public Role getById(String id) {
+        QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", UUID.fromString(id));
         return roleMapper.selectOne(queryWrapper);
     }
     
@@ -171,7 +193,7 @@ public class RoleService {
             throw new RuntimeException("角色不存在");
         }
         String roleName = role.getName();
-        roleMenuMapper.deleteByRole(roleName);
+        roleMenuMapper.deleteByRoleId(roleId);
         if (menuIds == null || menuIds.isEmpty()) {
             roleMenuCache.setRoleMenus(roleName, null);
             roleMenuCache.setRoleMenuTree(roleName, null);
@@ -182,7 +204,7 @@ public class RoleService {
         for (String menuId : menuIds) {
             RoleMenu roleMenu = new RoleMenu();
             roleMenu.setId(UUID.randomUUID().toString().replace("-", ""));
-            roleMenu.setRole(roleName);
+            roleMenu.setRoleId(roleId);
             roleMenu.setMenuId(menuId);
             roleMenu.setCreateTime(currentTime);
             roleMenu.setUpdateTime(currentTime);
@@ -199,7 +221,7 @@ public class RoleService {
         if (role == null) {
             throw new RuntimeException("角色不存在");
         }
-        return roleMenuMapper.selectMenuIdsByRole(role.getName());
+        return roleMenuMapper.selectMenuIdsByRoleId(roleId);
     }
 
     @Transactional
@@ -208,9 +230,10 @@ public class RoleService {
         if (role == null) {
             throw new RuntimeException("角色不存在");
         }
-        roleMenuMapper.deleteByRole(role.getName());
-        roleMenuCache.setRoleMenus(role.getName(), null);
-        roleMenuCache.setRoleMenuTree(role.getName(), null);
+        String roleName = role.getName();
+        roleMenuMapper.deleteByRoleId(roleId);
+        roleMenuCache.setRoleMenus(roleName, null);
+        roleMenuCache.setRoleMenuTree(roleName, null);
     }
 
     public Role getRoleEntityById(String id) {

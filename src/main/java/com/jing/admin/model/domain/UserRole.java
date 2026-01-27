@@ -19,9 +19,9 @@ public class UserRole extends Base {
     private String userId;
 
     /**
-     * 角色
+     * 角色ID
      */
-    private String role;
+    private String roleId;
 
     /**
      * 租户ID

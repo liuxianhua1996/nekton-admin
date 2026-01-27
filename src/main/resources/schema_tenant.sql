@@ -32,20 +32,21 @@ COMMENT ON COLUMN tb_users.update_user_id IS '更新用户ID';
 CREATE TABLE IF NOT EXISTS tb_user_roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id VARCHAR(120),
-    role VARCHAR(20),
+    role_id UUID,
     tenant_id VARCHAR(255),
     create_time BIGINT,
     update_time BIGINT,
     create_user_id VARCHAR(255),
     update_user_id VARCHAR(255),
-    UNIQUE  (user_id, role)
-    );
+    UNIQUE  (user_id, role_id),
+    CONSTRAINT fk_user_roles_role_id FOREIGN KEY (role_id) REFERENCES tb_roles(id) ON DELETE CASCADE
+);
 
 -- 用户角色关联表字段注释
 COMMENT ON TABLE tb_user_roles IS '用户角色关联表';
 COMMENT ON COLUMN tb_user_roles.id IS '关联ID';
 COMMENT ON COLUMN tb_user_roles.user_id IS '用户ID';
-COMMENT ON COLUMN tb_user_roles.role IS '角色';
+COMMENT ON COLUMN tb_user_roles.role_id IS '角色ID';
 COMMENT ON COLUMN tb_user_roles.tenant_id IS '租户ID';
 COMMENT ON COLUMN tb_user_roles.create_time IS '创建时间';
 COMMENT ON COLUMN tb_user_roles.update_time IS '更新时间';
@@ -105,19 +106,20 @@ COMMENT ON COLUMN tb_roles.update_user_id IS '更新用户ID';
 
 -- 角色菜单关联表
 CREATE TABLE IF NOT EXISTS tb_role_menu (
-    role VARCHAR(20) NOT NULL,
+    role_id UUID NOT NULL,
     menu_id UUID NOT NULL,
     tenant_id VARCHAR(255),
     create_time BIGINT,
     update_time BIGINT,
     create_user_id VARCHAR(255),
     update_user_id VARCHAR(255),
-    PRIMARY KEY (role, menu_id)
+    PRIMARY KEY (role_id, menu_id),
+    CONSTRAINT fk_role_menu_role_id FOREIGN KEY (role_id) REFERENCES tb_roles(id) ON DELETE CASCADE
     );
 
 -- 角色菜单关联表字段注释
 COMMENT ON TABLE tb_role_menu IS '角色菜单关联表';
-COMMENT ON COLUMN tb_role_menu.role IS '角色';
+COMMENT ON COLUMN tb_role_menu.role_id IS '角色ID';
 COMMENT ON COLUMN tb_role_menu.menu_id IS '菜单ID';
 COMMENT ON COLUMN tb_role_menu.tenant_id IS '租户ID';
 COMMENT ON COLUMN tb_role_menu.create_time IS '创建时间';

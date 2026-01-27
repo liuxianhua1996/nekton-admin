@@ -14,9 +14,9 @@ import lombok.EqualsAndHashCode;
 @TableName("tb_role_menu")
 public class RoleMenu extends Base {
     /**
-     * 角色
+     * 角色ID
      */
-    private String role;
+    private String roleId;
 
     /**
      * 菜单ID

@@ -11,6 +11,7 @@ import com.jing.admin.model.api.UserQueryRequest;
 import com.jing.admin.model.domain.User;
 import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.model.mapping.UserMapping;
+import com.jing.admin.service.RoleService;
 import com.jing.admin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Autowired
     private UserRoleMapper userRoleMapper;
+    @Autowired
+    private RoleService roleService;
 
     @Override
     public PageResult<UserDTO> getUserPage(UserQueryRequest queryRequest) {
@@ -55,16 +58,21 @@ public class UserServiceImpl implements UserService {
 
     private UserDTO toUserDTOWithRoles(User user) {
         UserDTO dto = UserMapping.INSTANCE.toDTO(user);
-        List<String> roleNames = userRoleMapper.selectRolesByUserId(user.getId());
-        if (roleNames == null || roleNames.isEmpty()) {
+        List<String> roleIds = userRoleMapper.selectRoleIdsByUserId(user.getId());
+        if (roleIds == null || roleIds.isEmpty()) {
             dto.setRoles(List.of());
             return dto;
         }
         List<Role> roles = new ArrayList<>();
-        for (String roleName : roleNames) {
-            try {
-                roles.add(Role.fromName(roleName));
-            } catch (Exception ignored) {
+        // 根据角色ID获取角色名称
+        for (String roleId : roleIds) {
+            // 从角色表查询角色名称
+            com.jing.admin.model.domain.Role role = roleService.getById(roleId);
+            if (role != null) {
+                try {
+                    roles.add(Role.fromName(role.getName()));
+                } catch (Exception ignored) {
+                }
             }
         }
         dto.setRoles(roles);
