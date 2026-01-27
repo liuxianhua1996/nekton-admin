@@ -36,7 +36,7 @@ VALUES
 
 -- 低代码模块
 ('LOW_CODE', '低代码', '/lowcode', NULL, 6, 1696032000000, 1696032000000, 'system', 'system'),
-('LOW_CODE_LIST', '页面管理', '/lowcode', 'LOW_CODE', 1, 1696032000000, 1696032000000, 'system', 'system'),
+('LOW_CODE_LIST', '应用管理', '/lowcode', 'LOW_CODE', 1, 1696032000000, 1696032000000, 'system', 'system'),
 
 -- AI智能模块
 ('AI_SMART', 'AI智能', '/ai', NULL, 7, 1696032000000, 1696032000000, 'system', 'system'),

@@ -1,8 +1,12 @@
 package com.jing.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jing.admin.model.domain.User;
+import com.jing.admin.model.api.UserQueryRequest;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -60,4 +64,9 @@ public interface UserMapper extends BaseMapper<User> {
      * @return 用户对象
      */
     User selectUserWithRolesByUsername(String username);
+
+    IPage<User> selectUserPage(
+            Page<User> page,
+            @Param("query") UserQueryRequest queryRequest
+    );
 }

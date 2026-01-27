@@ -8,6 +8,7 @@ import com.jing.admin.mapper.RoleMenuMapper;
 import com.jing.admin.model.domain.Menu;
 import com.jing.admin.model.domain.RoleMenu;
 import com.jing.admin.model.dto.MenuDTO;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,9 +97,15 @@ public class MenuService {
     public void assignMenusToRole(String role, List<String> menuIds) {
         // 先删除角色原有的菜单关联
         roleMenuMapper.deleteByRole(role);
+        if (menuIds == null || menuIds.isEmpty()) {
+            roleMenuCache.setRoleMenus(role, null);
+            roleMenuCache.setRoleMenuTree(role, null);
+            return;
+        }
         
         // 添加新的菜单关联
         long currentTime = System.currentTimeMillis();
+        String userId = MDC.get("userId");
         for (String menuId : menuIds) {
             RoleMenu roleMenu = new RoleMenu();
             roleMenu.setId(UUID.randomUUID().toString().replace("-", ""));
@@ -106,8 +113,8 @@ public class MenuService {
             roleMenu.setMenuId(menuId);
             roleMenu.setCreateTime(currentTime);
             roleMenu.setUpdateTime(currentTime);
-            roleMenu.setCreateUserId("system");
-            roleMenu.setUpdateUserId("system");
+            roleMenu.setCreateUserId(userId);
+            roleMenu.setUpdateUserId(userId);
             roleMenuMapper.insert(roleMenu);
         }
         

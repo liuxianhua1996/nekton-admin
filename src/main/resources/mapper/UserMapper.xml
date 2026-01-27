@@ -11,18 +11,35 @@
         <result column="enabled" property="enabled"/>
     </resultMap>
 
-    <!-- 查询用户及其角色 -->
-    <select id="selectUserWithRoles" parameterType="long" resultMap="UserResultMap">
-        SELECT u.*,
+    <select id="selectUserWithRoles" parameterType="string" resultMap="UserResultMap">
+        SELECT u.*
         FROM tb_users u
-        WHERE u.id = #{id}
+        WHERE u.id = #{id}::uuid
     </select>
 
-    <!-- 根据用户名查询用户及其角色 -->
     <select id="selectUserWithRolesByUsername" parameterType="string" resultMap="UserResultMap">
         SELECT u.*
         FROM tb_users u
         WHERE u.username = #{username}
+    </select>
+
+    <select id="selectUserPage" resultMap="UserResultMap">
+        SELECT
+        u.*
+        FROM
+        tb_users u
+        <where>
+            <if test="query.username != null and query.username != ''">
+                AND u.username LIKE CONCAT('%', #{query.username}, '%')
+            </if>
+            <if test="query.email != null and query.email != ''">
+                AND u.email LIKE CONCAT('%', #{query.email}, '%')
+            </if>
+            <if test="query.enabled != null">
+                AND u.enabled = #{query.enabled}
+            </if>
+        </where>
+        ORDER BY u.create_time DESC
     </select>
 
 </mapper>

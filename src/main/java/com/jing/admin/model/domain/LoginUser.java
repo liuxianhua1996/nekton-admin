@@ -2,6 +2,7 @@ package com.jing.admin.model.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.jing.admin.core.constant.Role;
+import com.jing.admin.model.dto.TenantUseDTO;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,7 +26,7 @@ public class LoginUser extends User implements UserDetails {
 
     private int enabled;
     private String selectedTenant;
-    private List tenant;
+    private List<TenantUseDTO> tenant;
     private Collection<Role> roles;
 
     @Override

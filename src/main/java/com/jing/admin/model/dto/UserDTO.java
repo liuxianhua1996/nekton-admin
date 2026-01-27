@@ -1,16 +1,13 @@
 package com.jing.admin.model.dto;
 
 import com.jing.admin.core.constant.Role;
+import com.jing.admin.model.dto.TenantUseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author lxh
@@ -30,9 +27,6 @@ public class UserDTO {
     private int enabled;
 
     private Collection<Role> roles;
-
-
-    private List tenant;
-
+    private List<TenantUseDTO> tenant;
     private String selectedTenant;
 }

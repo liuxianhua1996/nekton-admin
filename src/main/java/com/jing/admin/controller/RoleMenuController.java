@@ -3,6 +3,7 @@ package com.jing.admin.controller;
 import com.jing.admin.core.HttpResult;
 import com.jing.admin.service.impl.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +25,7 @@ public class RoleMenuController {
      * @return 操作结果
      */
     @PostMapping("/refresh-cache")
+    @PreAuthorize("@permissionService.hasMenu('PERMISSION_ASSIGN')")
     public HttpResult<String> refreshRoleMenuCache() {
         try {
             menuService.refreshRoleMenuCache();

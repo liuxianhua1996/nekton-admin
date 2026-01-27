@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -37,4 +38,10 @@ public interface RoleMenuMapper extends BaseMapper<RoleMenu> {
      */
     @Delete("DELETE FROM tb_role_menu WHERE role = #{role}")
     void deleteByRole(@Param("role") String role);
+
+    @Update("UPDATE tb_role_menu SET role = #{newRole} WHERE role = #{oldRole}")
+    void updateRoleName(@Param("oldRole") String oldRole, @Param("newRole") String newRole);
+
+    @Select("<script>SELECT COUNT(*) &gt; 0 FROM tb_role_menu WHERE menu_id = #{menuId} AND role IN <foreach collection='roles' item='role' open='(' separator=',' close=')'>#{role}</foreach></script>")
+    boolean existsByRolesAndMenuId(@Param("menuId") String menuId, @Param("roles") List<String> roles);
 }

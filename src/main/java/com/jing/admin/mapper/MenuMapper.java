@@ -32,4 +32,7 @@ public interface MenuMapper extends BaseMapper<Menu> {
      */
     @Select("SELECT * FROM tb_menu ORDER BY sort_order")
     List<Menu> selectAll();
+
+    @Select("SELECT * FROM tb_menu WHERE code = #{code}")
+    Menu selectByCode(@Param("code") String code);
 }

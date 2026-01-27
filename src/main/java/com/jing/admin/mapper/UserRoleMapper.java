@@ -48,4 +48,7 @@ public interface UserRoleMapper {
      */
     @Delete("DELETE FROM tb_user_roles WHERE role = #{roleId}")
     void deleteByRoleId(@Param("roleId") String roleId);
+
+    @Update("UPDATE tb_user_roles SET role = #{newRole} WHERE role = #{oldRole}")
+    void updateRoleName(@Param("oldRole") String oldRole, @Param("newRole") String newRole);
 }

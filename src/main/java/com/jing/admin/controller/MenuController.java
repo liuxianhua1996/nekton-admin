@@ -1,6 +1,7 @@
 package com.jing.admin.controller;
 
 import com.jing.admin.core.HttpResult;
+import com.jing.admin.model.api.RoleMenuAssignRequest;
 import com.jing.admin.model.domain.Menu;
 import com.jing.admin.model.dto.MenuDTO;
 import com.jing.admin.service.impl.MenuService;
@@ -49,9 +50,9 @@ public class MenuController {
      * 为角色分配菜单
      */
     @PostMapping("/assign/{role}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public HttpResult<Void> assignMenusToRole(@PathVariable String role, @RequestBody List<String> menuIds) {
-        menuService.assignMenusToRole(role, menuIds);
+    @PreAuthorize("@permissionService.hasMenu('PERMISSION_ASSIGN')")
+    public HttpResult<Void> assignMenusToRole(@PathVariable String role, @RequestBody RoleMenuAssignRequest request) {
+        menuService.assignMenusToRole(role, request == null ? null : request.getMenuIds());
         return HttpResult.success();
     }
 
@@ -59,7 +60,7 @@ public class MenuController {
      * 获取角色的菜单ID列表
      */
     @GetMapping("/role/{role}/ids")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@permissionService.hasMenu('PERMISSION_ASSIGN')")
     public HttpResult<List<String>> getMenuIdsByRole(@PathVariable String role) {
         List<String> menuIds = menuService.getMenuIdsByRole(role);
         return HttpResult.success(menuIds);

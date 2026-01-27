@@ -4,6 +4,7 @@ import com.jing.admin.config.JwtTokenUtil;
 import com.jing.admin.config.LoginUserUtil;
 import com.jing.admin.core.constant.Role;
 import com.jing.admin.core.exception.BusinessException;
+import com.jing.admin.core.tenant.TenantContextHolder;
 import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.domain.User;
 import com.jing.admin.model.dto.MenuDTO;
@@ -12,6 +13,7 @@ import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.model.mapping.UserMapping;
 import com.jing.admin.repository.TenantUserRepository;
 import com.jing.admin.repository.UserRepository;
+import com.jing.admin.mapper.UserRoleMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,8 @@ public class AuthService {
     private MenuService menuService;
     @Autowired
     private com.jing.admin.mapper.TenantUserMapper tenantUserMapper;
+    @Autowired
+    private UserRoleMapper userRoleMapper;
     @Autowired
     LoginUserUtil loginUserUtil;
 
@@ -168,8 +172,7 @@ public class AuthService {
      * @return 菜单树结构
      */
     public List<MenuDTO> getMenusByUser(LoginUser user) {
-        // 获取用户的角色，如果有管理员角色则直接返回所有菜单
-        Collection<Role> roles = Arrays.asList(Role.ADMIN);
+        Collection<Role> roles = user.getRoles() == null ? List.of() : user.getRoles();
         if (roles.contains(Role.ADMIN)) {
             return menuService.getMenuTreeByRole("ADMIN");
         }
@@ -208,6 +211,7 @@ public class AuthService {
         // 创建LoginUser对象
         LoginUser user = loginUserUtil.getLoginUser(MDC.get("jwtToken"));
         user.setSelectedTenant(tenantId);
+        user.setRoles(getUserRoles(userId, tenantId));
         // 生成包含租户信息的新JWT
         String accessToken = jwtTokenUtil.generateTokenWithTenant(user, tenantId);
         String refreshToken = jwtTokenUtil.generateRefreshTokenWithTenant(user, tenantId);
@@ -216,5 +220,30 @@ public class AuthService {
         response.put("refreshToken", refreshToken);
         
         return response;
+    }
+
+    private List<Role> getUserRoles(String userId, String tenantId) {
+        String currentTenantId = TenantContextHolder.getTenantId();
+        try {
+            TenantContextHolder.setTenantId(tenantId);
+            List<String> roleNames = userRoleMapper.selectRolesByUserId(userId);
+            if (roleNames == null || roleNames.isEmpty()) {
+                return List.of();
+            }
+            List<Role> roles = new ArrayList<>();
+            for (String roleName : roleNames) {
+                try {
+                    roles.add(Role.fromName(roleName));
+                } catch (Exception ignored) {
+                }
+            }
+            return roles;
+        } finally {
+            if (currentTenantId == null) {
+                TenantContextHolder.clear();
+            } else {
+                TenantContextHolder.setTenantId(currentTenantId);
+            }
+        }
     }
 }
