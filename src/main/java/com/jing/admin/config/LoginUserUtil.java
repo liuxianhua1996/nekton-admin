@@ -31,7 +31,10 @@ public class LoginUserUtil {
         }
         LoginUser user = new LoginUser();
         user.setUsername(jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("username", String.class)));
-        user.setId(jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("userId", String.class)));
+        String uuid = jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("uuid", String.class));
+        String userId = jwtTokenUtil.getClaimFromToken(token, cl -> cl.get("userId", String.class));
+        user.setUuid(uuid);
+        user.setId(userId == null || userId.isBlank() ? uuid : userId);
         Collection<String> roleNames = jwtTokenUtil.getClaimFromToken(token, cl -> (Collection<String>) cl.get("roles"));
         List<Role> roles = roleNames.stream()
                 .map(Role::fromName) // 使用你定义的 Role.fromName(String) 方法

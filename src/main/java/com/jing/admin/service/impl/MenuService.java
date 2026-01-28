@@ -1,10 +1,14 @@
 package com.jing.admin.service.impl;
 
 import com.jing.admin.core.cache.RoleMenuCache;
+import com.jing.admin.core.constant.AdminType;
 import com.jing.admin.core.constant.Role;
 import com.jing.admin.core.utils.MenuUtil;
+import com.jing.admin.mapper.AdminMapper;
+import com.jing.admin.mapper.AdminMenuMapper;
 import com.jing.admin.mapper.MenuMapper;
 import com.jing.admin.mapper.RoleMenuMapper;
+import com.jing.admin.model.domain.Admin;
 import com.jing.admin.model.domain.Menu;
 import com.jing.admin.model.domain.RoleMenu;
 import com.jing.admin.model.dto.MenuDTO;
@@ -33,6 +37,12 @@ public class MenuService {
     
     @Autowired
     private RoleMenuCache roleMenuCache;
+
+    @Autowired
+    private AdminMapper adminMapper;
+
+    @Autowired
+    private AdminMenuMapper adminMenuMapper;
 
     
     /**
@@ -86,6 +96,24 @@ public class MenuService {
         roleMenuCache.setRoleMenuTree(role, menuTree);
         
         return menuTree;
+    }
+
+    public List<MenuDTO> getMenuTreeByAdmin(String userId) {
+        if (userId == null || userId.isBlank()) {
+            return List.of();
+        }
+        Admin admin = adminMapper.selectByUserId(userId);
+        if (admin == null) {
+            return List.of();
+        }
+        AdminType adminType = AdminType.fromCode(admin.getAdminType());
+        List<Menu> menus;
+        if (AdminType.SUPER_ADMIN.equals(adminType)) {
+            menus = menuMapper.selectAll();
+        } else {
+            menus = adminMenuMapper.selectMenusByAdminId(admin.getId());
+        }
+        return MenuUtil.buildMenuTree(menus);
     }
     
     /**

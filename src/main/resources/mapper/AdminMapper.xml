@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jing.admin.mapper.AdminMapper">
+
+    <resultMap id="AdminDTOMap" type="com.jing.admin.model.dto.AdminDTO">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="admin_type" property="adminType"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="create_user_name" property="createUserName"/>
+        <result column="update_user_id" property="updateUserId"/>
+        <result column="update_user_name" property="updateUserName"/>
+    </resultMap>
+
+    <select id="selectAdminPageWithUser" resultMap="AdminDTOMap">
+        SELECT
+            a.id,
+            a.user_id,
+            a.admin_type,
+            a.create_time,
+            a.update_time,
+            a.create_user_id,
+            a.update_user_id,
+            u.username AS user_name,
+            cu.username AS create_user_name,
+            uu.username AS update_user_name
+        FROM
+            tb_admins a
+        LEFT JOIN
+            tb_users u ON a.user_id = u.uuid
+        LEFT JOIN
+            tb_users cu ON a.create_user_id = cu.uuid
+        LEFT JOIN
+            tb_users uu ON a.update_user_id = uu.uuid
+        <where>
+            <if test="query.userId != null and query.userId != ''">
+                AND a.user_id = #{query.userId}::uuid
+            </if>
+            <if test="query.adminType != null and query.adminType != ''">
+                AND a.admin_type = #{query.adminType}
+            </if>
+            <if test="query.username != null and query.username != ''">
+                AND u.username LIKE CONCAT('%', #{query.username}, '%')
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+
+    <select id="selectAdminByIdWithUser" resultMap="AdminDTOMap">
+        SELECT
+            a.id,
+            a.user_id,
+            a.admin_type,
+            a.create_time,
+            a.update_time,
+            a.create_user_id,
+            a.update_user_id,
+            u.username AS user_name,
+            cu.username AS create_user_name,
+            uu.username AS update_user_name
+        FROM
+            tb_admins a
+        LEFT JOIN
+            tb_users u ON a.user_id = u.uuid
+        LEFT JOIN
+            tb_users cu ON a.create_user_id = cu.uuid
+        LEFT JOIN
+            tb_users uu ON a.update_user_id = uu.uuid
+        WHERE a.id = #{id}::uuid
+    </select>
+</mapper>

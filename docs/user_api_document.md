@@ -2,7 +2,9 @@
 
 ## 概述
 
-用户模块提供租户视角的用户查询与详情获取能力。
+用户模块提供租户视角的用户查询与详情获取能力。登录、获取当前登录信息(/auth/me)、当前用户菜单(/auth/menus)接口结构保持不变，但“菜单访问权限”已由管理员体系控制：
+- roles 字段用于审批/数据权限；不再用于系统菜单访问权限
+- 系统菜单访问权限由管理员身份（super_admin/admin）及管理员菜单授权决定
 
 ## 通用说明
 
@@ -50,7 +52,7 @@
 | username | String | 用户名 |
 | email | String | 邮箱 |
 | enabled | Integer | 启用状态 |
-| roles | Array | 角色列表 |
+| roles | Array | 角色列表（用于审批/数据权限，不用于菜单权限） |
 | tenant | Array | 租户列表 |
 | tenant.tenantId | String | 租户ID |
 | tenant.tenantName | String | 租户名称 |

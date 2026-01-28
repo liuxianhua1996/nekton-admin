@@ -26,32 +26,6 @@ COMMENT ON COLUMN tb_users.create_time IS '创建时间';
 COMMENT ON COLUMN tb_users.update_time IS '更新时间';
 COMMENT ON COLUMN tb_users.create_user_id IS '创建用户ID';
 COMMENT ON COLUMN tb_users.update_user_id IS '更新用户ID';
-
-
--- 创建用户角色关联表
-CREATE TABLE IF NOT EXISTS tb_user_roles (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id VARCHAR(120),
-    role_id UUID,
-    tenant_id VARCHAR(255),
-    create_time BIGINT,
-    update_time BIGINT,
-    create_user_id VARCHAR(255),
-    update_user_id VARCHAR(255),
-    UNIQUE  (user_id, role_id),
-    CONSTRAINT fk_user_roles_role_id FOREIGN KEY (role_id) REFERENCES tb_roles(id) ON DELETE CASCADE
-);
-
--- 用户角色关联表字段注释
-COMMENT ON TABLE tb_user_roles IS '用户角色关联表';
-COMMENT ON COLUMN tb_user_roles.id IS '关联ID';
-COMMENT ON COLUMN tb_user_roles.user_id IS '用户ID';
-COMMENT ON COLUMN tb_user_roles.role_id IS '角色ID';
-COMMENT ON COLUMN tb_user_roles.tenant_id IS '租户ID';
-COMMENT ON COLUMN tb_user_roles.create_time IS '创建时间';
-COMMENT ON COLUMN tb_user_roles.update_time IS '更新时间';
-COMMENT ON COLUMN tb_user_roles.create_user_id IS '创建用户ID';
-COMMENT ON COLUMN tb_user_roles.update_user_id IS '更新用户ID';
 -- 菜单表
 CREATE TABLE IF NOT EXISTS tb_menu (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -104,6 +78,31 @@ COMMENT ON COLUMN tb_roles.update_time IS '更新时间';
 COMMENT ON COLUMN tb_roles.create_user_id IS '创建用户ID';
 COMMENT ON COLUMN tb_roles.update_user_id IS '更新用户ID';
 
+-- 创建用户角色关联表
+CREATE TABLE IF NOT EXISTS tb_user_roles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id VARCHAR(120),
+    role_id UUID,
+    tenant_id VARCHAR(255),
+    create_time BIGINT,
+    update_time BIGINT,
+    create_user_id VARCHAR(255),
+    update_user_id VARCHAR(255),
+    UNIQUE  (user_id, role_id),
+    CONSTRAINT fk_user_roles_role_id FOREIGN KEY (role_id) REFERENCES tb_roles(id) ON DELETE CASCADE
+);
+
+-- 用户角色关联表字段注释
+COMMENT ON TABLE tb_user_roles IS '用户角色关联表';
+COMMENT ON COLUMN tb_user_roles.id IS '关联ID';
+COMMENT ON COLUMN tb_user_roles.user_id IS '用户ID';
+COMMENT ON COLUMN tb_user_roles.role_id IS '角色ID';
+COMMENT ON COLUMN tb_user_roles.tenant_id IS '租户ID';
+COMMENT ON COLUMN tb_user_roles.create_time IS '创建时间';
+COMMENT ON COLUMN tb_user_roles.update_time IS '更新时间';
+COMMENT ON COLUMN tb_user_roles.create_user_id IS '创建用户ID';
+COMMENT ON COLUMN tb_user_roles.update_user_id IS '更新用户ID';
+
 -- 角色菜单关联表
 CREATE TABLE IF NOT EXISTS tb_role_menu (
     role_id UUID NOT NULL,
@@ -126,6 +125,50 @@ COMMENT ON COLUMN tb_role_menu.create_time IS '创建时间';
 COMMENT ON COLUMN tb_role_menu.update_time IS '更新时间';
 COMMENT ON COLUMN tb_role_menu.create_user_id IS '创建用户ID';
 COMMENT ON COLUMN tb_role_menu.update_user_id IS '更新用户ID';
+
+CREATE TABLE IF NOT EXISTS tb_admins (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id VARCHAR(120) UNIQUE NOT NULL,
+    admin_type VARCHAR(50) NOT NULL,
+    tenant_id VARCHAR(255),
+    create_time BIGINT,
+    update_time BIGINT,
+    create_user_id VARCHAR(255),
+    update_user_id VARCHAR(255)
+);
+
+COMMENT ON TABLE tb_admins IS '管理员表';
+COMMENT ON COLUMN tb_admins.id IS '管理员ID';
+COMMENT ON COLUMN tb_admins.user_id IS '用户ID';
+COMMENT ON COLUMN tb_admins.admin_type IS '管理员类型';
+COMMENT ON COLUMN tb_admins.tenant_id IS '租户ID';
+COMMENT ON COLUMN tb_admins.create_time IS '创建时间';
+COMMENT ON COLUMN tb_admins.update_time IS '更新时间';
+COMMENT ON COLUMN tb_admins.create_user_id IS '创建用户ID';
+COMMENT ON COLUMN tb_admins.update_user_id IS '更新用户ID';
+
+CREATE TABLE IF NOT EXISTS tb_admin_menu (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    admin_id UUID NOT NULL,
+    menu_id UUID NOT NULL,
+    tenant_id VARCHAR(255),
+    create_time BIGINT,
+    update_time BIGINT,
+    create_user_id VARCHAR(255),
+    update_user_id VARCHAR(255),
+    UNIQUE (admin_id, menu_id),
+    CONSTRAINT fk_admin_menu_admin_id FOREIGN KEY (admin_id) REFERENCES tb_admins(id) ON DELETE CASCADE
+);
+
+COMMENT ON TABLE tb_admin_menu IS '管理员菜单关联表';
+COMMENT ON COLUMN tb_admin_menu.id IS '关联ID';
+COMMENT ON COLUMN tb_admin_menu.admin_id IS '管理员ID';
+COMMENT ON COLUMN tb_admin_menu.menu_id IS '菜单ID';
+COMMENT ON COLUMN tb_admin_menu.tenant_id IS '租户ID';
+COMMENT ON COLUMN tb_admin_menu.create_time IS '创建时间';
+COMMENT ON COLUMN tb_admin_menu.update_time IS '更新时间';
+COMMENT ON COLUMN tb_admin_menu.create_user_id IS '创建用户ID';
+COMMENT ON COLUMN tb_admin_menu.update_user_id IS '更新用户ID';
 
 
 -- 工作流表，存储工作流定义信息

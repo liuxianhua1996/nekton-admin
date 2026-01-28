@@ -82,7 +82,7 @@ public class JwtTokenUtil {
     // 生成访问token
     public String generateToken(LoginUser userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userDetails.getId());
+        claims.put("uuid", userDetails.getId());
         claims.put("username", userDetails.getUsername());
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -95,6 +95,7 @@ public class JwtTokenUtil {
     // 生成包含租户信息的访问token
     public String generateTokenWithTenant(LoginUser userDetails, String tenantId) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("uuid", userDetails.getUuid());
         claims.put("userId", userDetails.getId());
         claims.put("username", userDetails.getUsername());
         claims.put("roles", userDetails.getAuthorities().stream()
@@ -109,7 +110,7 @@ public class JwtTokenUtil {
     // 生成刷新token
     public String generateRefreshToken(LoginUser userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userDetails.getId());
+        claims.put("uuid", userDetails.getId());
         claims.put("username", userDetails.getUsername());
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -121,6 +122,7 @@ public class JwtTokenUtil {
     // 生成包含租户信息的刷新token
     public String generateRefreshTokenWithTenant(LoginUser userDetails, String tenantId) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("uuid", userDetails.getUuid());
         claims.put("userId", userDetails.getId());
         claims.put("username", userDetails.getUsername());
         claims.put("roles", userDetails.getAuthorities().stream()

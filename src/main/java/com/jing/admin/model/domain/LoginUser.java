@@ -27,6 +27,7 @@ public class LoginUser extends User implements UserDetails {
     private int enabled;
     private String selectedTenant;
     private List<TenantUseDTO> tenant;
+    private String uuid;
     private Collection<Role> roles;
 
     @Override

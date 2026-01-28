@@ -3,20 +3,31 @@ VALUES ("", 'admin', '$2a$10$IcYw33M9T9QfyrV0kkYVv.bK18r.MbrGwxXAkLl1nzNv4TgkxNb
         1) ON CONFLICT (username) DO NOTHING;
 -- 插入默认角色
 INSERT INTO tb_roles (name, description)
-VALUES ('ADMIN', '系统管理员角色，拥有所有权限'),
-       ('USER', '普通用户角色，拥有基本权限') ON CONFLICT (name) DO NOTHING;
+VALUES ('管理层', '管理层'),
+       ('普通员工', '普通员工') ON CONFLICT (name) DO NOTHING;
 
 -- 插入默认角色关联
-INSERT INTO tb_user_roles (user_id, role_id, create_time, update_time, create_user_id, update_user_id)
-SELECT 
+-- INSERT INTO tb_user_roles (user_id, role_id, create_time, update_time, create_user_id, update_user_id)
+-- SELECT 
+--     u.id,
+--     r.id,
+--     1696032000000,
+--     1696032000000,
+--     'system',
+--     'system'
+-- FROM tb_users u, tb_roles r
+-- WHERE u.username = 'admin' AND r.name = '超级管理员';
+
+INSERT INTO tb_admins (user_id, admin_type, create_time, update_time, create_user_id, update_user_id)
+SELECT
     u.id,
-    r.id,
+    'super_admin',
     1696032000000,
     1696032000000,
     'system',
     'system'
-FROM tb_users u, tb_roles r
-WHERE u.username = 'admin' AND r.name = 'ADMIN';
+FROM tb_users u
+WHERE u.username = 'admin' ON CONFLICT (user_id) DO NOTHING;
 
 -- 删除已存在的菜单数据（用于重新初始化）
 DELETE FROM tb_menu;

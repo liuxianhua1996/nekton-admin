@@ -11,7 +11,6 @@ import com.jing.admin.model.api.UserQueryRequest;
 import com.jing.admin.model.domain.User;
 import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.model.mapping.UserMapping;
-import com.jing.admin.service.RoleService;
 import com.jing.admin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,5 +1,6 @@
 package com.jing.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jing.admin.config.JwtTokenUtil;
 import com.jing.admin.config.LoginUserUtil;
 import com.jing.admin.core.constant.Role;
@@ -26,7 +27,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -66,6 +66,7 @@ public class AuthService {
 
             List<TenantUseDTO> tenantUsers = this.tenantUserRepository.queryUserTenants(user.getId());
             LoginUser loginUser = UserMapping.INSTANCE.toLoginUser(user);
+            loginUser.setUuid(user.getId());
             loginUser.setTenant(tenantUsers);
             String accessToken = jwtTokenUtil.generateToken(loginUser);
             String refreshToken = jwtTokenUtil.generateRefreshToken(loginUser);
@@ -104,6 +105,7 @@ public class AuthService {
         
         // 生成新的访问TOKEN和刷新TOKEN
         LoginUser loginUser = UserMapping.INSTANCE.toLoginUser(user);
+        loginUser.setUuid(user.getId());
         String newAccessToken = jwtTokenUtil.generateToken(loginUser);
         String newRefreshToken = jwtTokenUtil.generateRefreshToken(loginUser);
         
@@ -174,19 +176,10 @@ public class AuthService {
      * @return 菜单树结构
      */
     public List<MenuDTO> getMenusByUser(LoginUser user) {
-        Collection<Role> roles = user.getRoles() == null ? List.of() : user.getRoles();
-        if (roles.contains(Role.ADMIN)) {
-            return menuService.getMenuTreeByRole("ADMIN");
-        }
-        
-        // 如果用户有多个角色，合并所有角色的菜单
-        List<MenuDTO> allMenus = roles.stream()
-                .map(role -> menuService.getMenuTreeByRole(role.name()))
-                .flatMap(List::stream)
-                .distinct()
-                .collect(Collectors.toList());
-        
-        return allMenus;
+        String adminUserId = user.getId() == null || user.getId().isBlank()
+                ? user.getUuid()
+                : user.getId();
+        return menuService.getMenuTreeByAdmin(adminUserId);
     }
     
     /**
@@ -213,7 +206,11 @@ public class AuthService {
         // 创建LoginUser对象
         LoginUser user = loginUserUtil.getLoginUser(MDC.get("jwtToken"));
         user.setSelectedTenant(tenantId);
-        user.setRoles(getUserRoles(userId, tenantId));
+        String uuid = user.getUuid() == null || user.getUuid().isBlank() ? userId : user.getUuid();
+        String tenantUserId = getTenantUserId(uuid, tenantId);
+        user.setUuid(uuid);
+        user.setId(tenantUserId);
+        user.setRoles(getUserRoles(tenantUserId, tenantId));
         // 生成包含租户信息的新JWT
         String accessToken = jwtTokenUtil.generateTokenWithTenant(user, tenantId);
         String refreshToken = jwtTokenUtil.generateRefreshTokenWithTenant(user, tenantId);
@@ -222,6 +219,26 @@ public class AuthService {
         response.put("refreshToken", refreshToken);
         
         return response;
+    }
+
+    private String getTenantUserId(String userId, String tenantId) {
+        String currentTenantId = TenantContextHolder.getTenantId();
+        try {
+            TenantContextHolder.setTenantId(tenantId);
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("uuid", userId);
+            User tenantUser = userRepository.getOne(queryWrapper);
+            if (tenantUser == null) {
+                throw new BusinessException("租户用户不存在");
+            }
+            return tenantUser.getId();
+        } finally {
+            if (currentTenantId == null) {
+                TenantContextHolder.clear();
+            } else {
+                TenantContextHolder.setTenantId(currentTenantId);
+            }
+        }
     }
 
     private List<Role> getUserRoles(String userId, String tenantId) {

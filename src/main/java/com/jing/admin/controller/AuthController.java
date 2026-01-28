@@ -104,7 +104,7 @@ public class AuthController {
             // 从请求中获取租户ID
             String tenantId = confirmRequest.get("tenantId");
             LoginUser user = loginUserUtil.getLoginUser(MDC.get("jwtToken"));
-            String userId = user.getId();
+            String userId = user.getUuid() == null || user.getUuid().isBlank() ? user.getId() : user.getUuid();
             return HttpResult.success(authService.confirmTenant(userId, tenantId));
         } catch (Exception e) {
             e.printStackTrace();

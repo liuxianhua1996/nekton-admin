@@ -1,8 +1,10 @@
 package com.jing.admin.service.impl;
 
-import com.jing.admin.core.constant.Role;
+import com.jing.admin.core.constant.AdminType;
+import com.jing.admin.mapper.AdminMapper;
+import com.jing.admin.mapper.AdminMenuMapper;
 import com.jing.admin.mapper.MenuMapper;
-import com.jing.admin.mapper.RoleMenuMapper;
+import com.jing.admin.model.domain.Admin;
 import com.jing.admin.model.domain.LoginUser;
 import com.jing.admin.model.domain.Menu;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,15 +12,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service("permissionService")
 public class PermissionService {
     @Autowired
     private MenuMapper menuMapper;
 
     @Autowired
-    private RoleMenuMapper roleMenuMapper;
+    private AdminMapper adminMapper;
+
+    @Autowired
+    private AdminMenuMapper adminMenuMapper;
 
     public boolean hasMenu(String menuCode) {
         if (menuCode == null || menuCode.isBlank()) {
@@ -32,17 +35,24 @@ public class PermissionService {
         if (!(principal instanceof LoginUser loginUser)) {
             return false;
         }
-        if (loginUser.getRoles() == null || loginUser.getRoles().isEmpty()) {
+        String adminUserId = loginUser.getId() == null || loginUser.getId().isBlank()
+                ? loginUser.getUuid()
+                : loginUser.getId();
+        if (adminUserId == null || adminUserId.isBlank()) {
             return false;
         }
-        if (loginUser.getRoles().contains(Role.ADMIN)) {
+        Admin admin = adminMapper.selectByUserId(adminUserId);
+        if (admin == null) {
+            return false;
+        }
+        AdminType adminType = AdminType.fromCode(admin.getAdminType());
+        if (AdminType.SUPER_ADMIN.equals(adminType)) {
             return true;
         }
         Menu menu = menuMapper.selectByCode(menuCode);
         if (menu == null) {
             return false;
         }
-        List<String> roleNames = loginUser.getRoles().stream().map(Role::name).toList();
-        return roleMenuMapper.existsByRolesAndMenuId(menu.getId(), roleNames);
+        return adminMenuMapper.existsByAdminIdAndMenuId(admin.getId(), menu.getId());
     }
 }

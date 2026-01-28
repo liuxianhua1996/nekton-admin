@@ -83,8 +83,6 @@ public class RoleService {
         queryWrapper.eq("id", UUID.fromString(id));
         roleMapper.update(existingRole, queryWrapper);
         if (!oldRoleName.equals(newRoleName)) {
-            roleMenuMapper.updateRoleName(oldRoleName, newRoleName);
-            userRoleMapper.updateRoleName(oldRoleName, newRoleName);
             roleMenuCache.setRoleMenus(oldRoleName, null);
             roleMenuCache.setRoleMenuTree(oldRoleName, null);
         }
