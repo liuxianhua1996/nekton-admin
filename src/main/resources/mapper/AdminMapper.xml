@@ -30,14 +30,14 @@
         FROM
             tb_admins a
         LEFT JOIN
-            tb_users u ON a.user_id = u.uuid
+            tb_users u ON a.user_id::uuid = u.id
         LEFT JOIN
-            tb_users cu ON a.create_user_id = cu.uuid
+            tb_users cu ON a.create_user_id::uuid = cu.id
         LEFT JOIN
-            tb_users uu ON a.update_user_id = uu.uuid
+            tb_users uu ON a.update_user_id::uuid = uu.id
         <where>
             <if test="query.userId != null and query.userId != ''">
-                AND a.user_id = #{query.userId}::uuid
+                AND a.user_id = #{query.userId}
             </if>
             <if test="query.adminType != null and query.adminType != ''">
                 AND a.admin_type = #{query.adminType}
@@ -64,11 +64,11 @@
         FROM
             tb_admins a
         LEFT JOIN
-            tb_users u ON a.user_id = u.uuid
+            tb_users u ON a.user_id::uuid = u.id
         LEFT JOIN
-            tb_users cu ON a.create_user_id = cu.uuid
+            tb_users cu ON a.create_user_id::uuid = cu.id
         LEFT JOIN
-            tb_users uu ON a.update_user_id = uu.uuid
+            tb_users uu ON a.update_user_id::uuid = uu.id
         WHERE a.id = #{id}::uuid
     </select>
 </mapper>

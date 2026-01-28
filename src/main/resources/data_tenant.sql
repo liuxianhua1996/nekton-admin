@@ -24,8 +24,8 @@ SELECT
     'super_admin',
     1696032000000,
     1696032000000,
-    'system',
-    'system'
+    u.id,
+    u.id
 FROM tb_users u
 WHERE u.username = 'admin' ON CONFLICT (user_id) DO NOTHING;
 
