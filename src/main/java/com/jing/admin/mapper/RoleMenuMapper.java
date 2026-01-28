@@ -36,7 +36,7 @@ public interface RoleMenuMapper extends BaseMapper<RoleMenu> {
      * 根据角色ID删除角色菜单关联
      * @param roleId 角色ID
      */
-    @Delete("DELETE FROM tb_role_menu WHERE role_id = #{roleId}")
+    @Delete("DELETE FROM tb_role_menu WHERE role_id = #{roleId}::uuid")
     void deleteByRoleId(@Param("roleId") String roleId);
 
     @Update("UPDATE tb_role_menu SET role_id = #{newRoleId} WHERE role_id = #{oldRoleId}")

@@ -12,8 +12,6 @@ import java.io.Serializable;
  **/
 @Data
 public class HttpResult<T> implements Serializable {
-    public HttpResult() {
-    }
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public T data;
     public boolean success;
@@ -25,6 +23,12 @@ public class HttpResult<T> implements Serializable {
     public String errorCode;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String message;
+    public HttpResult() {
+        this.success = true;
+        this.error = "";
+        this.message = "";
+        this.traceId =MDC.get(ThreadMdcUtils.getTraceId());
+    }
     HttpResult(T data){
         this.data= data;
         this.success = true;

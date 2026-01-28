@@ -81,7 +81,7 @@ COMMENT ON COLUMN tb_roles.update_user_id IS '更新用户ID';
 -- 创建用户角色关联表
 CREATE TABLE IF NOT EXISTS tb_user_roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id VARCHAR(120),
+    user_id UUID,
     role_id UUID,
     tenant_id VARCHAR(255),
     create_time BIGINT,

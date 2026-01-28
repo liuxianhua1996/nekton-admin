@@ -2,6 +2,7 @@ package com.jing.admin.controller;
 
 import com.jing.admin.core.HttpResult;
 import com.jing.admin.model.api.RoleMemberQueryRequest;
+import com.jing.admin.model.api.RoleMemberAssignRequest;
 import com.jing.admin.model.api.RoleRequest;
 import com.jing.admin.model.dto.RoleDTO;
 import com.jing.admin.model.dto.UserDTO;
@@ -97,5 +98,12 @@ public class RoleController {
             return HttpResult.error("角色不存在");
         }
         return HttpResult.success(roleService.getRoleMembers(request.getRoleId()));
+    }
+
+    @PostMapping("/members")
+    @PreAuthorize("@permissionService.hasMenu('ROLE_MANAGE')")
+    public HttpResult<Void> assignRoleMember(@RequestBody RoleMemberAssignRequest request) {
+        roleService.assignRoleMember(request);
+        return HttpResult.success();
     }
 }

@@ -5,6 +5,7 @@ import com.jing.admin.model.domain.Role;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,4 +39,9 @@ public interface RoleMapper extends BaseMapper<Role> {
      */
     @Select("SELECT * FROM tb_roles")
     List<Role> findAll();
+
+    @Insert("INSERT INTO tb_roles (name, description, create_time, update_time, create_user_id, update_user_id) " +
+            "VALUES (#{name}, #{description}, #{createTime}, #{updateTime}, " +
+            "CAST(#{createUserId} AS UUID), CAST(#{updateUserId} AS UUID))")
+    int insertRole(Role role);
 }

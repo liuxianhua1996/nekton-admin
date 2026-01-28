@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jing.admin.core.PageResult;
 import com.jing.admin.core.constant.AdminType;
+import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.mapper.AdminMapper;
 import com.jing.admin.mapper.AdminMenuMapper;
 import com.jing.admin.mapper.UserMapper;
@@ -39,19 +40,19 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public AdminDTO createAdmin(AdminRequest request) {
         if (request == null || request.getUserId() == null || request.getUserId().isBlank()) {
-            throw new RuntimeException("用户ID不能为空");
+            throw new BusinessException("用户ID不能为空");
         }
         if (request.getAdminType() == null || request.getAdminType().isBlank()) {
-            throw new RuntimeException("管理员类型不能为空");
+            throw new BusinessException("管理员类型不能为空");
         }
         validateAdminType(request.getAdminType());
         Admin existing = adminMapper.selectByUserId(request.getUserId());
         if (existing != null) {
-            throw new RuntimeException("该用户已是管理员");
+            throw new BusinessException("该用户已是管理员");
         }
         User user = getUserById(request.getUserId());
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new BusinessException("用户不存在");
         }
         Admin entity = AdminMapping.INSTANCE.toEntity(request);
         if (entity.getId() == null || entity.getId().isBlank()) {

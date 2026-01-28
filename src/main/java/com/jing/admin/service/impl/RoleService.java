@@ -2,10 +2,12 @@ package com.jing.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jing.admin.core.cache.RoleMenuCache;
+import com.jing.admin.core.exception.BusinessException;
 import com.jing.admin.mapper.RoleMapper;
 import com.jing.admin.mapper.RoleMenuMapper;
 import com.jing.admin.mapper.UserMapper;
 import com.jing.admin.mapper.UserRoleMapper;
+import com.jing.admin.model.api.RoleMemberAssignRequest;
 import com.jing.admin.model.api.RoleRequest;
 import com.jing.admin.model.domain.Role;
 import com.jing.admin.model.domain.User;
@@ -59,7 +61,7 @@ public class RoleService {
         entity.setUpdateTime(currentTime);
         entity.setCreateUserId(userId);
         entity.setUpdateUserId(userId);
-        roleMapper.insert(entity);
+        roleMapper.insertRole(entity);
         return RoleMapping.INSTANCE.toDTO(entity);
     }
     
@@ -107,7 +109,6 @@ public class RoleService {
         if (role == null) {
             return;
         }
-        
         // 删除角色
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", UUID.fromString(id));
@@ -116,7 +117,6 @@ public class RoleService {
         roleMenuMapper.deleteByRoleId(id);
         // 删除用户角色关联
         userRoleMapper.deleteByRoleId(id);
-        
         // 更新缓存：清除该角色的缓存
         roleMenuCache.setRoleMenus(role.getName(), null);
         roleMenuCache.setRoleMenuTree(role.getName(), null);
@@ -192,20 +192,61 @@ public class RoleService {
     }
 
     public List<UserDTO> getRoleMembers(String roleId) {
-        List<String> userIds = userRoleMapper.selectUserIdsByRoleId(roleId);
-        if (userIds == null || userIds.isEmpty()) {
+        List<User> users = userMapper.selectUsersByRoleId(roleId);
+        if (users == null || users.isEmpty()) {
             return List.of();
         }
-        List<User> users = userMapper.selectBatchIds(userIds);
         return users.stream()
                 .map(this::toUserDTOWithRoles)
                 .toList();
+    }
+
+    public void assignRoleMember(RoleMemberAssignRequest request) {
+        if (request == null) {
+            throw new BusinessException("请求参数不能为空");
+        }
+        if (request.getUserId() == null || request.getUserId().isBlank()) {
+            throw new BusinessException("用户ID不能为空");
+        }
+        if (request.getRoleId() == null || request.getRoleId().isBlank()) {
+            throw new BusinessException("角色ID不能为空");
+        }
+        User user;
+        try {
+            user = getUserEntityById(request.getUserId());
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("用户ID格式错误");
+        }
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        Role role;
+        try {
+            role = getRoleEntityById(request.getRoleId());
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("角色ID格式错误");
+        }
+        if (role == null) {
+            throw new BusinessException("角色不存在");
+        }
+        List<String> roleIds = userRoleMapper.selectRoleIdsByUserId(user.getId());
+        if (roleIds != null && roleIds.contains(role.getId())) {
+            return;
+        }
+        long currentTime = System.currentTimeMillis();
+        userRoleMapper.insertUserRole(user.getId(), role.getId(), currentTime);
     }
 
     public Role getRoleEntityById(String id) {
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", UUID.fromString(id));
         return roleMapper.selectOne(queryWrapper);
+    }
+
+    private User getUserEntityById(String id) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", UUID.fromString(id));
+        return userMapper.selectOne(queryWrapper);
     }
 
     private UserDTO toUserDTOWithRoles(User user) {
