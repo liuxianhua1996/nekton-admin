@@ -18,6 +18,9 @@ public interface UserRoleMapper {
      */
     @Select("SELECT role_id FROM tb_user_roles WHERE user_id = #{userId}")
     List<String> selectRoleIdsByUserId(@Param("userId") String userId);
+
+    @Select("SELECT user_id FROM tb_user_roles WHERE role_id = #{roleId}")
+    List<String> selectUserIdsByRoleId(@Param("roleId") String roleId);
     
     /**
      * 为用户添加角色

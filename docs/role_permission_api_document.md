@@ -129,67 +129,30 @@
 | message | String | 响应消息 |
 | data | Boolean | 是否存在 |
 
-## 角色权限接口
-### 1. 分配菜单权限
-- **接口地址**: `PUT /api/roles/{id}/menus`
-- **功能描述**: 为角色分配菜单权限
-- **路径参数**:
-
-| 参数名 | 类型 | 必填 | 描述 |
-|--------|------|------|------|
-| id | String | 是 | 角色ID |
-
+## 角色成员接口
+### 1. 查询角色成员
+- **接口地址**: `GET /api/roles/members`
+- **功能描述**: 根据角色ID查询角色成员列表
 - **请求参数**:
 
 | 参数名 | 类型 | 必填 | 描述 |
 |--------|------|------|------|
-| menuIds | Array | 是 | 菜单ID列表 |
-
-- **请求示例**:
-```json
-{
-  "menuIds": ["菜单ID1", "菜单ID2"]
-}
-```
+| roleId | String | 是 | 角色ID |
 
 - **响应参数**:
 | 参数名 | 类型 | 描述 |
 |--------|------|------|
 | code | String | 响应状态码 |
 | message | String | 响应消息 |
-| data | Object | 空对象 |
-
-### 2. 查询角色菜单
-- **接口地址**: `GET /api/roles/{id}/menus`
-- **功能描述**: 查询角色关联的菜单ID列表
-- **路径参数**:
-
-| 参数名 | 类型 | 必填 | 描述 |
-|--------|------|------|------|
-| id | String | 是 | 角色ID |
-
-- **响应参数**:
-| 参数名 | 类型 | 描述 |
-|--------|------|------|
-| code | String | 响应状态码 |
-| message | String | 响应消息 |
-| data | Array | 菜单ID列表 |
-
-### 3. 清空角色菜单
-- **接口地址**: `DELETE /api/roles/{id}/menus`
-- **功能描述**: 清空角色菜单权限
-- **路径参数**:
-
-| 参数名 | 类型 | 必填 | 描述 |
-|--------|------|------|------|
-| id | String | 是 | 角色ID |
-
-- **响应参数**:
-| 参数名 | 类型 | 描述 |
-|--------|------|------|
-| code | String | 响应状态码 |
-| message | String | 响应消息 |
-| data | Object | 空对象 |
+| data | Array | 角色成员列表 |
+| data.id | String | 用户ID |
+| data.uuid | String | 用户UUID |
+| data.username | String | 用户名 |
+| data.email | String | 邮箱 |
+| data.enabled | Integer | 启用状态 |
+| data.roles | Array | 角色列表 |
+| data.tenant | Array | 租户信息列表 |
+| data.selectedTenant | String | 当前选中租户 |
 
 ## 菜单权限接口
 ### 1. 分配角色菜单

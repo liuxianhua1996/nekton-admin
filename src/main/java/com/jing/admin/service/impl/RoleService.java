@@ -4,17 +4,21 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jing.admin.core.cache.RoleMenuCache;
 import com.jing.admin.mapper.RoleMapper;
 import com.jing.admin.mapper.RoleMenuMapper;
+import com.jing.admin.mapper.UserMapper;
 import com.jing.admin.mapper.UserRoleMapper;
 import com.jing.admin.model.api.RoleRequest;
 import com.jing.admin.model.domain.Role;
-import com.jing.admin.model.domain.RoleMenu;
+import com.jing.admin.model.domain.User;
 import com.jing.admin.model.dto.RoleDTO;
+import com.jing.admin.model.dto.UserDTO;
+import com.jing.admin.model.mapping.UserMapping;
 import com.jing.admin.model.mapping.RoleMapping;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,6 +39,9 @@ public class RoleService {
     
     @Autowired
     private RoleMenuCache roleMenuCache;
+
+    @Autowired
+    private UserMapper userMapper;
     
     /**
      * 创建角色
@@ -184,59 +191,41 @@ public class RoleService {
         return roleMapper.existsByName(name);
     }
 
-    @Transactional
-    public void assignRoleMenus(String roleId, List<String> menuIds) {
-        Role role = getRoleEntityById(roleId);
-        if (role == null) {
-            throw new RuntimeException("角色不存在");
+    public List<UserDTO> getRoleMembers(String roleId) {
+        List<String> userIds = userRoleMapper.selectUserIdsByRoleId(roleId);
+        if (userIds == null || userIds.isEmpty()) {
+            return List.of();
         }
-        String roleName = role.getName();
-        roleMenuMapper.deleteByRoleId(roleId);
-        if (menuIds == null || menuIds.isEmpty()) {
-            roleMenuCache.setRoleMenus(roleName, null);
-            roleMenuCache.setRoleMenuTree(roleName, null);
-            return;
-        }
-        long currentTime = System.currentTimeMillis();
-        String userId = MDC.get("userId");
-        for (String menuId : menuIds) {
-            RoleMenu roleMenu = new RoleMenu();
-            roleMenu.setId(UUID.randomUUID().toString().replace("-", ""));
-            roleMenu.setRoleId(roleId);
-            roleMenu.setMenuId(menuId);
-            roleMenu.setCreateTime(currentTime);
-            roleMenu.setUpdateTime(currentTime);
-            roleMenu.setCreateUserId(userId);
-            roleMenu.setUpdateUserId(userId);
-            roleMenuMapper.insert(roleMenu);
-        }
-        roleMenuCache.setRoleMenus(roleName, null);
-        roleMenuCache.setRoleMenuTree(roleName, null);
-    }
-
-    public List<String> getRoleMenuIds(String roleId) {
-        Role role = getRoleEntityById(roleId);
-        if (role == null) {
-            throw new RuntimeException("角色不存在");
-        }
-        return roleMenuMapper.selectMenuIdsByRoleId(roleId);
-    }
-
-    @Transactional
-    public void clearRoleMenus(String roleId) {
-        Role role = getRoleEntityById(roleId);
-        if (role == null) {
-            throw new RuntimeException("角色不存在");
-        }
-        String roleName = role.getName();
-        roleMenuMapper.deleteByRoleId(roleId);
-        roleMenuCache.setRoleMenus(roleName, null);
-        roleMenuCache.setRoleMenuTree(roleName, null);
+        List<User> users = userMapper.selectBatchIds(userIds);
+        return users.stream()
+                .map(this::toUserDTOWithRoles)
+                .toList();
     }
 
     public Role getRoleEntityById(String id) {
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", UUID.fromString(id));
         return roleMapper.selectOne(queryWrapper);
+    }
+
+    private UserDTO toUserDTOWithRoles(User user) {
+        UserDTO dto = UserMapping.INSTANCE.toDTO(user);
+        List<String> roleIds = userRoleMapper.selectRoleIdsByUserId(user.getId());
+        if (roleIds == null || roleIds.isEmpty()) {
+            dto.setRoles(List.of());
+            return dto;
+        }
+        List<com.jing.admin.core.constant.Role> roles = new ArrayList<>();
+        for (String roleId : roleIds) {
+            Role role = getById(roleId);
+            if (role != null) {
+                try {
+                    roles.add(com.jing.admin.core.constant.Role.fromName(role.getName()));
+                } catch (Exception ignored) {
+                }
+            }
+        }
+        dto.setRoles(roles);
+        return dto;
     }
 }

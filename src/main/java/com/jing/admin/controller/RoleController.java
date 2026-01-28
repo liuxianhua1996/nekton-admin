@@ -1,9 +1,10 @@
 package com.jing.admin.controller;
 
 import com.jing.admin.core.HttpResult;
-import com.jing.admin.model.api.RoleMenuAssignRequest;
+import com.jing.admin.model.api.RoleMemberQueryRequest;
 import com.jing.admin.model.api.RoleRequest;
 import com.jing.admin.model.dto.RoleDTO;
+import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.service.impl.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -85,23 +86,16 @@ public class RoleController {
         return HttpResult.success(exists);
     }
 
-    @PutMapping("/{id}/menus")
-    @PreAuthorize("@permissionService.hasMenu('PERMISSION_ASSIGN')")
-    public HttpResult<Void> assignRoleMenus(@PathVariable String id, @RequestBody RoleMenuAssignRequest request) {
-        roleService.assignRoleMenus(id, request == null ? null : request.getMenuIds());
-        return HttpResult.success();
-    }
-
-    @GetMapping("/{id}/menus")
-    @PreAuthorize("@permissionService.hasMenu('PERMISSION_ASSIGN')")
-    public HttpResult<List<String>> getRoleMenuIds(@PathVariable String id) {
-        return HttpResult.success(roleService.getRoleMenuIds(id));
-    }
-
-    @DeleteMapping("/{id}/menus")
-    @PreAuthorize("@permissionService.hasMenu('PERMISSION_ASSIGN')")
-    public HttpResult<Void> clearRoleMenus(@PathVariable String id) {
-        roleService.clearRoleMenus(id);
-        return HttpResult.success();
+    @GetMapping("/members")
+    @PreAuthorize("@permissionService.hasMenu('ROLE_MANAGE')")
+    public HttpResult<List<UserDTO>> getRoleMembers(RoleMemberQueryRequest request) {
+        if (request == null || request.getRoleId() == null || request.getRoleId().isBlank()) {
+            return HttpResult.error("角色ID不能为空");
+        }
+        RoleDTO role = roleService.getRoleById(request.getRoleId());
+        if (role == null) {
+            return HttpResult.error("角色不存在");
+        }
+        return HttpResult.success(roleService.getRoleMembers(request.getRoleId()));
     }
 }

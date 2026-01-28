@@ -44,8 +44,7 @@ VALUES
 
 -- 权限管理模块
 ('PERMISSION', '权限管理', '/permission', NULL, 3, 1696032000000, 1696032000000, 'system', 'system'),
-('ROLE_MANAGE', '角色管理', '/permission/roles','PERMISSION', 1, 1696032000000, 1696032000000, 'system', 'system'),
-('PERMISSION_ASSIGN', '权限分配', '/permission/assign', 'PERMISSION', 2, 1696032000000, 1696032000000, 'system', 'system'),
+('PERMISSION_ROLES', '角色管理', '/permission/roles', 'PERMISSION', 2, 1696032000000, 1696032000000, 'system', 'system'),
 ('ADMIN_MANAGE', '管理员管理', '/permission/admins','PERMISSION', 3, 1696032000000, 1696032000000, 'system', 'system'),
 
 -- 调度管理模块
