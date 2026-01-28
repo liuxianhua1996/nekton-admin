@@ -3,6 +3,7 @@ package com.jing.admin.controller;
 import com.jing.admin.core.HttpResult;
 import com.jing.admin.core.PageResult;
 import com.jing.admin.model.api.UserQueryRequest;
+import com.jing.admin.model.api.UserRequest;
 import com.jing.admin.model.dto.UserDTO;
 import com.jing.admin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,11 @@ public class UserController {
     @GetMapping("/page")
     public HttpResult<PageResult<UserDTO>> getUserPage(UserQueryRequest queryRequest) {
         return HttpResult.success(userService.getUserPage(queryRequest));
+    }
+
+    @PostMapping
+    public HttpResult<UserDTO> createUser(@RequestBody UserRequest request) {
+        return HttpResult.success(userService.createUser(request));
     }
 
     @GetMapping("/{id}")

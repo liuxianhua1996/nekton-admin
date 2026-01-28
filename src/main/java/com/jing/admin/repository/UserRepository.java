@@ -47,7 +47,7 @@ public class UserRepository extends ServiceImpl<UserMapper, User> {
     public User saveUser(User user) {
         if (user.getId() == null) {
             // 新增用户
-            userMapper.insert(user);
+            userMapper.insertUser(user);
         } else {
             // 更新用户
             userMapper.updateById(user);

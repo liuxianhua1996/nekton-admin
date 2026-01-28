@@ -125,3 +125,28 @@
   }
 }
 ```
+
+### 3. 新增用户
+
+- **接口地址**: `POST /users`
+- **功能描述**: 新增用户
+- **请求参数**:
+
+| 参数名 | 类型 | 必填 | 描述 |
+|--------|------|------|------|
+| username | String | 是 | 用户名 |
+| password | String | 是 | 密码 |
+| email | String | 是 | 邮箱 |
+| enabled | Integer | 否 | 启用状态：1-启用，0-禁用 |
+
+- **请求示例**:
+```json
+{
+  "username": "test_user",
+  "password": "123456",
+  "email": "test_user@example.com",
+  "enabled": 1
+}
+```
+
+- **响应参数**: 同用户分页列表接口中的UserDTO字段

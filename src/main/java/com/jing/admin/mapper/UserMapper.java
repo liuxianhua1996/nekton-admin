@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jing.admin.model.domain.User;
 import com.jing.admin.model.api.UserQueryRequest;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -67,6 +68,11 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Select("<script>SELECT id,username,password,email,enabled,create_time,update_time,create_user_id,update_user_id FROM tb_users WHERE id IN <foreach collection='userIds' item='userId' open='(' separator=',' close=')'>#{userId}::uuid</foreach></script>")
     List<User> selectUsersByIds(@Param("userIds") List<String> userIds);
+
+    @Insert("INSERT INTO tb_users (id, username, password, email, enabled, create_time, update_time, create_user_id, update_user_id) " +
+            "VALUES (CAST(#{id} AS UUID), #{username}, #{password}, #{email}, #{enabled}, #{createTime}, #{updateTime}, " +
+            "CAST(#{createUserId} AS UUID), CAST(#{updateUserId} AS UUID))")
+    int insertUser(User user);
 
     @Select("SELECT u.id,u.username,u.password,u.email,u.enabled,u.create_time,u.update_time,u.create_user_id,u.update_user_id " +
             "FROM tb_users u INNER JOIN tb_user_roles ur ON u.id = ur.user_id " +
